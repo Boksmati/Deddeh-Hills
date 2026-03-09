@@ -112,7 +112,7 @@ export default function AssumptionsPage() {
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <a href="/" className="px-3 py-1.5 text-xs text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+        <a href="/simulator" className="px-3 py-1.5 text-xs text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
           ← {t("nav_simulator")}
         </a>
         <a href="/investor" className="px-3 py-1.5 text-xs text-white bg-dh-green hover:bg-dh-green/90 rounded-lg transition-colors">

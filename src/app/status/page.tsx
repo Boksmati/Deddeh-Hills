@@ -162,7 +162,7 @@ export default function StatusPage() {
       <header className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
         <DhLogo className="h-10" />
         <div className="flex items-center gap-2">
-          <a href="/"          className="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors">{t("nav_simulator")}</a>
+          <a href="/simulator"          className="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors">{t("nav_simulator")}</a>
           <a href="/assumptions" className="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors">{t("nav_assumptions")}</a>
           <a href="/investor"  className="px-3 py-1.5 bg-dh-green text-white text-xs font-medium rounded-lg hover:bg-dh-green/90 transition-colors">{t("nav_investor")}</a>
           <a href="/customer"  className="px-3 py-1.5 bg-slate-700 text-white text-xs font-medium rounded-lg hover:bg-slate-800 transition-colors">{t("nav_customer")}</a>
@@ -391,7 +391,7 @@ export default function StatusPage() {
             <div className="text-5xl mb-4 opacity-20">&#9634;</div>
             <p className="text-sm text-gray-500 font-medium">{t("no_lots_yet")}</p>
             <p className="text-xs text-gray-400 mt-1">
-              <a href="/" className="text-dh-green underline underline-offset-2">{t("go_simulator")}</a>
+              <a href="/simulator" className="text-dh-green underline underline-offset-2">{t("go_simulator")}</a>
             </p>
           </div>
         )}

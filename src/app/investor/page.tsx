@@ -250,7 +250,7 @@ export default function InvestorPage() {
             full infrastructure, and mixed residential typologies.
           </p>
           <div className="flex items-center gap-4 mt-4">
-            <a href="/" className="text-xs text-dh-gold hover:text-dh-gold/80 underline">
+            <a href="/simulator" className="text-xs text-dh-gold hover:text-dh-gold/80 underline">
               &larr; {t("nav_simulator")}
             </a>
             <a href="/assumptions" className="text-xs text-gray-400 hover:text-gray-300 underline">
@@ -789,7 +789,7 @@ export default function InvestorPage() {
           <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center text-gray-400 text-sm">
             {t("no_phases_assigned")}
             <br />
-            <a href="/" className="text-dh-green underline mt-2 inline-block">
+            <a href="/simulator" className="text-dh-green underline mt-2 inline-block">
               {t("go_simulator_configure")}
             </a>
           </div>

@@ -62,6 +62,55 @@ const STATUS_DOTS: Record<string, string> = {
   available: "#22c55e", reserved: "#f59e0b", under_contract: "#f97316", sold: "#ef4444",
 };
 
+// ─── Typology customer metadata ───────────────────────────────────────────────
+const TYPOLOGY_CUSTOMER_META: Record<string, {
+  headline_en: string; headline_ar: string;
+  description_en: string; description_ar: string;
+  specs_en: string[]; specs_ar: string[];
+  icon: string;
+}> = {
+  villa_2f: {
+    headline_en: "Standalone Villa", headline_ar: "فيلا مستقلة",
+    description_en: "Private 2-floor villa with landscaped garden and terrace. Perfect for families.",
+    description_ar: "فيلا مستقلة على طابقين مع حديقة مشجّرة وتراس. مثالية للعائلات.",
+    specs_en: ["370m² built area", "4 bedrooms", "Garden + terrace", "Private parking"],
+    specs_ar: ["370م² مساحة مبنية", "4 غرف نوم", "حديقة + تراس", "موقف خاص"],
+    icon: "🏡",
+  },
+  villa_3f: {
+    headline_en: "Luxury Villa", headline_ar: "فيلا فاخرة",
+    description_en: "Expansive 3-floor villa with panoramic mountain views and rooftop terrace.",
+    description_ar: "فيلا فاخرة على 3 طوابق مع إطلالات جبلية بانورامية وتراس سطح.",
+    specs_en: ["450m² built area", "5 bedrooms", "Rooftop terrace", "OUG permitted"],
+    specs_ar: ["450م² مساحة مبنية", "5 غرف نوم", "تراس سطح", "مستودع مسموح"],
+    icon: "🏠",
+  },
+  twin_villa: {
+    headline_en: "Twin Villa", headline_ar: "فيلا توأم",
+    description_en: "Semi-detached villa sharing one party wall. Two spacious units per plot, each with a private garden.",
+    description_ar: "فيلا شبه منفصلة. وحدتان واسعتان لكل قطعة مع حدائق خاصة.",
+    specs_en: ["280m² per unit", "4 bedrooms", "Private garden", "2 units / lot"],
+    specs_ar: ["280م² للوحدة", "4 غرف نوم", "حديقة خاصة", "وحدتان لكل قطعة"],
+    icon: "🏘️",
+  },
+  apartments: {
+    headline_en: "Apartments & Duplexes", headline_ar: "شقق ودوبلكس",
+    description_en: "Modern 4-unit building with ground-floor garden apartments and upper-floor duplexes.",
+    description_ar: "مبنى حديث بـ4 وحدات — شقق أرضية مع حديقة ودوبلكس علوية.",
+    specs_en: ["140–200m² per unit", "2–3 bedrooms", "Garden or terrace", "4 units / building"],
+    specs_ar: ["140–200م² للوحدة", "2–3 غرف نوم", "حديقة أو تراس", "4 وحدات للمبنى"],
+    icon: "🏢",
+  },
+  lot_sale: {
+    headline_en: "Land Plot", headline_ar: "قطعة أرض",
+    description_en: "Fully serviced land ready to build. Design your own custom home on an infrastructure-ready plot.",
+    description_ar: "أرض مخدومة جاهزة للبناء. صمم منزلك الخاص على أرض ببنية تحتية كاملة.",
+    specs_en: ["Variable area", "Full infrastructure", "Custom design", "Flexible timeline"],
+    specs_ar: ["مساحة متغيرة", "بنية تحتية كاملة", "تصميم مخصص", "جدول زمني مرن"],
+    icon: "🌄",
+  },
+};
+
 type BudgetFilter = "all" | "lt300" | "300to600" | "gt600";
 
 const BUDGET_LABELS: Record<BudgetFilter, { en: string; ar: string }> = {
@@ -666,7 +715,7 @@ export default function CustomerPage() {
   const [filterType,   setFilterType]   = useState<DevelopmentType | "all">("all");
   const [filterAvail,  setFilterAvail]  = useState<"all" | LotStatus>("all");
   const [filterBudget, setFilterBudget] = useState<BudgetFilter>("all");
-  const [viewMode,     setViewMode]     = useState<"map" | "grid">("map");
+  const [viewMode,     setViewMode]     = useState<"map" | "grid" | "typologies">("map");
 
   // Selection state
   const [selectedMapLotId, setSelectedMapLotId] = useState<number | null>(null);
@@ -762,6 +811,32 @@ export default function CustomerPage() {
     lotUnits.forEach(us => { n += us.length; });
     return n;
   }, [lotUnits]);
+
+  // Per-typology stats for the Typologies view
+  const typologyStats = useMemo(() => {
+    const stats: Record<string, { lotCount: number; availableCount: number; fromPrice: number; unitCount: number }> = {};
+    lots.forEach(({ lot, assignment, status }) => {
+      const tp = assignment.developmentType;
+      if (!stats[tp]) stats[tp] = { lotCount: 0, availableCount: 0, fromPrice: Infinity, unitCount: 0 };
+      stats[tp].lotCount++;
+      const units = lotUnits.get(lot.id) ?? [];
+      stats[tp].unitCount += units.length;
+      if (status === "available") stats[tp].availableCount++;
+      const cfg = DEVELOPMENT_TYPES[tp];
+      const price = tp === "lot_sale"
+        ? lot.zone_price_retail * lot.area_sqm
+        : cfg.sellingPricePerM * cfg.avgUnitSize;
+      if (price > 0 && price < stats[tp].fromPrice) stats[tp].fromPrice = price;
+    });
+    return stats;
+  }, [lots, lotUnits]);
+
+  // Sorted devTypes for typology view (predefined order)
+  const TYPOLOGY_ORDER = ["villa_2f", "villa_3f", "twin_villa", "apartments", "lot_sale"];
+  const sortedDevTypes = useMemo(
+    () => TYPOLOGY_ORDER.filter(tp => devTypes.includes(tp as DevelopmentType)),
+    [devTypes] // eslint-disable-line react-hooks/exhaustive-deps
+  );
 
   // Map filter set
   const filteredLotIds = useMemo(() => new Set(lots.map(l => l.lot.id)), [lots]);
@@ -929,6 +1004,20 @@ export default function CustomerPage() {
                 </svg>
                 {lang === "ar" ? "قائمة" : "Browse"}
               </button>
+              <button
+                onClick={() => { setViewMode("typologies"); setSelectedUnit(null); }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all"
+                style={{
+                  background: viewMode === "typologies" ? C.white : "transparent",
+                  color: viewMode === "typologies" ? C.ink : C.muted,
+                  boxShadow: viewMode === "typologies" ? "0 1px 4px rgba(28,32,16,0.1)" : "none",
+                  fontFamily: "'DM Sans', system-ui, sans-serif",
+                }}>
+                <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M2 2h5v5H2V2zm7 0h5v5H9V2zM2 9h5v5H2V9zm7 0h5v5H9V9z" opacity="0.9"/><circle cx="4.5" cy="4.5" r="1.5"/><circle cx="11.5" cy="4.5" r="1.5"/><circle cx="4.5" cy="11.5" r="1.5"/><circle cx="11.5" cy="11.5" r="1.5"/>
+                </svg>
+                {lang === "ar" ? "أنواع" : "Types"}
+              </button>
             </div>
           </div>
 
@@ -996,15 +1085,66 @@ export default function CustomerPage() {
                 boxShadow: "0 4px 24px rgba(28,32,16,0.07)",
                 maxHeight: mapLotEntry ? "calc(100vh - 10rem)" : "580px",
               }}>
-              {/* No selection */}
+              {/* No selection — rich empty state */}
               {!mapLotEntry && (
-                <div className="h-full flex flex-col items-center justify-center text-center p-6 min-h-48">
-                  <div className="text-3xl mb-3 opacity-20">⌖</div>
-                  <p className="text-xs leading-relaxed" style={{ color: C.muted, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
-                    {lang === "ar"
-                      ? "انقر على أي قطعة على الخريطة لاستعراض الوحدات وخطة الدفع"
-                      : "Click any lot on the map to browse units and payment plan"}
-                  </p>
+                <div className="h-full flex flex-col p-5 min-h-52">
+                  {/* Top prompt */}
+                  <div className="flex-1 flex flex-col items-center justify-center text-center mb-4">
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3"
+                      style={{ background: C.goldBg, border: `1px solid ${C.sand}` }}>
+                      <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke={C.gold} strokeWidth="1.5">
+                        <path strokeLinecap="round" strokeLinejoin="round"
+                          d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path strokeLinecap="round" strokeLinejoin="round"
+                          d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/>
+                      </svg>
+                    </div>
+                    <p className="text-sm font-semibold mb-1" style={{ color: C.ink, fontFamily: "'Playfair Display', Georgia, serif" }}>
+                      {lang === "ar" ? "اختر قطعة أرض" : "Select a Plot"}
+                    </p>
+                    <p className="text-xs leading-relaxed max-w-[180px]" style={{ color: C.muted, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                      {lang === "ar"
+                        ? "انقر على أي نقطة ملونة على الخريطة لعرض الوحدات والتسعير"
+                        : "Click any coloured dot on the map to explore units, floor plans, and pricing"}
+                    </p>
+                  </div>
+                  {/* Typology legend */}
+                  <div className="space-y-1.5">
+                    <p className="text-[9px] uppercase tracking-wider font-medium mb-2" style={{ color: C.muted, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                      {lang === "ar" ? "أنواع التطوير" : "Development Types"}
+                    </p>
+                    {mounted && sortedDevTypes.slice(0, 4).map(tp => {
+                      const cfg = DEVELOPMENT_TYPES[tp];
+                      const meta = TYPOLOGY_CUSTOMER_META[tp];
+                      const stat = typologyStats[tp];
+                      return (
+                        <button
+                          key={tp}
+                          onClick={() => { setFilterType(tp as DevelopmentType); }}
+                          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-all text-start"
+                          style={{ background: filterType === tp ? cfg.color + "18" : "transparent",
+                            border: `1px solid ${filterType === tp ? cfg.color + "40" : C.sand}` }}>
+                          <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: cfg.color }} />
+                          <span className="flex-1 text-xs font-medium" style={{ color: C.ink, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                            {lang === "ar" ? meta?.headline_ar : meta?.headline_en ?? cfg.label}
+                          </span>
+                          {stat && (
+                            <span className="text-[10px]" style={{ color: C.muted }}>
+                              {stat.availableCount}
+                              <span style={{ color: C.border }}> / {stat.lotCount}</span>
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                    {filterType !== "all" && (
+                      <button onClick={() => setFilterType("all")}
+                        className="w-full text-center text-[10px] py-1 transition-colors"
+                        style={{ color: C.gold, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                        {lang === "ar" ? "عرض الكل" : "Show all types"}
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
 
@@ -1253,6 +1393,162 @@ export default function CustomerPage() {
         </div>
       )}
 
+      {/* ── Typologies view ── */}
+      {viewMode === "typologies" && (
+        <div className="max-w-7xl mx-auto px-5 pt-6 pb-24 md:pb-12">
+          {/* Section header */}
+          <div className="mb-6">
+            <h2 className="dh-serif font-bold text-xl mb-1" style={{ color: C.ink }}>
+              {lang === "ar" ? "أنواع التطوير" : "Development Types"}
+            </h2>
+            <p className="text-sm" style={{ color: C.muted, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+              {lang === "ar"
+                ? "استكشف الأنواع المختلفة المتاحة في دده هيلز"
+                : "Explore the different typologies available at Deddeh Hills"}
+            </p>
+          </div>
+
+          {/* Typology cards grid */}
+          {!mounted ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="rounded-2xl h-56 animate-pulse" style={{ background: C.sand }} />
+              ))}
+            </div>
+          ) : sortedDevTypes.length === 0 ? (
+            <div className="text-center py-20" style={{ color: C.muted }}>
+              <div className="text-5xl mb-4 opacity-25">🏗️</div>
+              <p className="text-sm" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                {lang === "ar" ? "لم يتم تهيئة أي نوع تطوير بعد." : "No development types configured yet."}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {sortedDevTypes.map(tp => {
+                const cfg  = DEVELOPMENT_TYPES[tp];
+                const meta = TYPOLOGY_CUSTOMER_META[tp];
+                const stat = typologyStats[tp] ?? { lotCount: 0, availableCount: 0, fromPrice: 0, unitCount: 0 };
+                const fromPrice = stat.fromPrice < Infinity ? stat.fromPrice : 0;
+
+                return (
+                  <div
+                    key={tp}
+                    className="rounded-2xl overflow-hidden transition-all duration-200"
+                    style={{
+                      background: C.white,
+                      border: `1px solid ${C.sand}`,
+                      boxShadow: "0 2px 12px rgba(28,32,16,0.06)",
+                    }}
+                  >
+                    {/* Card accent bar + header */}
+                    <div className="px-5 pt-5 pb-4" style={{ borderBottom: `1px solid ${C.sand}` }}>
+                      <div className="flex items-start gap-3">
+                        {/* Icon badge */}
+                        <div className="w-11 h-11 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
+                          style={{ background: cfg.color + "22", border: `1.5px solid ${cfg.color}44` }}>
+                          {meta?.icon ?? "🏠"}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: cfg.color }} />
+                            <h3 className="dh-serif font-bold text-base leading-tight" style={{ color: C.ink }}>
+                              {lang === "ar" ? (meta?.headline_ar ?? cfg.label) : (meta?.headline_en ?? cfg.label)}
+                            </h3>
+                          </div>
+                          <p className="text-xs leading-relaxed" style={{ color: C.muted, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                            {lang === "ar" ? meta?.description_ar : meta?.description_en}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Specs row */}
+                    <div className="px-5 py-3" style={{ borderBottom: `1px solid ${C.sand}` }}>
+                      <div className="flex flex-wrap gap-x-4 gap-y-1.5">
+                        {(lang === "ar" ? (meta?.specs_ar ?? []) : (meta?.specs_en ?? [])).map((spec, i) => (
+                          <span key={i} className="flex items-center gap-1.5 text-xs" style={{ color: C.ink, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                            <span className="w-1 h-1 rounded-full" style={{ background: cfg.color }} />
+                            {spec}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Stats + CTA */}
+                    <div className="px-5 py-4 flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        {fromPrice > 0 && (
+                          <div>
+                            <div className="text-[9px] uppercase tracking-wider font-medium mb-0.5" style={{ color: C.muted, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                              {lang === "ar" ? "يبدأ من" : "From"}
+                            </div>
+                            <div className="dh-serif font-bold text-base" style={{ color: C.forest }} dir="ltr">
+                              {fmtUSD(fromPrice)}
+                            </div>
+                          </div>
+                        )}
+                        <div>
+                          <div className="text-[9px] uppercase tracking-wider font-medium mb-0.5" style={{ color: C.muted, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                            {lang === "ar" ? "متاح" : "Available"}
+                          </div>
+                          <div className="text-base font-bold" style={{ color: stat.availableCount > 0 ? "#22c55e" : "#ef4444", fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                            {stat.availableCount}
+                            <span className="text-xs font-normal ms-1" style={{ color: C.muted }}>/ {stat.unitCount} {lang === "ar" ? "وحدة" : "units"}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Explore CTA */}
+                      <button
+                        onClick={() => {
+                          setFilterType(tp as DevelopmentType);
+                          setViewMode("map");
+                          setSelectedUnit(null);
+                          setSelectedMapLotId(null);
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all"
+                        style={{
+                          background: stat.availableCount > 0 ? C.forest : C.sand,
+                          color: stat.availableCount > 0 ? C.white : C.muted,
+                          fontFamily: "'DM Sans', system-ui, sans-serif",
+                        }}
+                      >
+                        {lang === "ar" ? "استكشف على الخريطة" : "Explore on Map"}
+                        <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor">
+                          <path fillRule="evenodd" d="M1 8a.5.5 0 01.5-.5h11.793l-3.147-3.146a.5.5 0 01.708-.708l4 4a.5.5 0 010 .708l-4 4a.5.5 0 01-.708-.708L13.293 8.5H1.5A.5.5 0 011 8z"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Comparison hint */}
+          {mounted && sortedDevTypes.length > 0 && (
+            <div className="mt-6 rounded-2xl px-5 py-4 flex items-center gap-4" style={{ background: C.goldBg, border: `1px solid ${C.sand}` }}>
+              <div className="text-2xl flex-shrink-0">💡</div>
+              <div>
+                <p className="text-xs font-semibold mb-0.5" style={{ color: C.ink, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                  {lang === "ar" ? "لست متأكداً؟" : "Not sure which type?"}
+                </p>
+                <p className="text-xs" style={{ color: C.muted, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                  {lang === "ar"
+                    ? "انقر على \"استكشف على الخريطة\" لرؤية المواقع الدقيقة على المخطط الرئيسي."
+                    : "Click \"Explore on Map\" to see exact locations on the master plan, or switch to Browse for a full list."}
+                </p>
+              </div>
+              <button onClick={() => setViewMode("grid")}
+                className="ms-auto flex-shrink-0 text-xs font-medium px-3 py-1.5 rounded-lg transition-all"
+                style={{ background: C.white, color: C.forest, border: `1px solid ${C.sand}`, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                {lang === "ar" ? "استعراض الوحدات" : "Browse All"}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ── Mobile bottom sheet ── */}
       {mobileSheetOpen && (
         <div className="fixed inset-0 z-40 md:hidden">
@@ -1341,7 +1637,7 @@ export default function CustomerPage() {
             Deddeh Hills · Koura, Lebanon · All prices in USD
           </div>
           <div className="flex items-center gap-4">
-            <a href="/" className="text-xs transition-colors" style={{ color: C.muted }}>
+            <a href="/simulator" className="text-xs transition-colors" style={{ color: C.muted }}>
               {lang === "ar" ? "عرض الإدارة" : "Admin View"}
             </a>
             <a href="/investor" className="text-xs transition-colors" style={{ color: C.muted }}>
