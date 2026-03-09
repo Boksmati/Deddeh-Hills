@@ -73,3 +73,20 @@ html {
   unicode-bidi: isolate;
   text-align: left;
 }
+
+/* ── Landing page font helpers (always available, even before JS hydration) ── */
+.dh-serif { font-family: 'Playfair Display', Georgia, serif; }
+.dh-sans  { font-family: 'DM Sans', system-ui, sans-serif; }
+
+/* ── Landing page responsive breakpoints ── */
+@media (max-width: 640px) {
+  /* Nav: hide text links, keep CTA button */
+  .dh-nav-links     { display: none !important; }
+  /* About + Location: single column on mobile */
+  .dh-about-grid    { grid-template-columns: 1fr !important; gap: 32px !important; }
+  .dh-location-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+  /* Enquiry form name+email row: stack vertically */
+  .dh-form-2col     { grid-template-columns: 1fr !important; }
+  /* Hero content: tighter horizontal padding */
+  .dh-hero-content  { padding-left: 16px !important; padding-right: 16px !important; }
+}
