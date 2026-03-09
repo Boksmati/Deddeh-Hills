@@ -83,7 +83,7 @@ export default function CustomerMap({
   return (
     <div
       ref={containerRef}
-      className="relative w-full overflow-hidden rounded-2xl border border-stone-200 bg-stone-900 select-none transition-all duration-300"
+      className="relative w-full overflow-hidden rounded-2xl border border-stone-200 bg-stone-50 select-none transition-all duration-300"
       style={{ height: compact ? "300px" : "580px", cursor: "grab" }}
       onWheel={handleWheel}
       onMouseDown={handleMouseDown}
@@ -208,7 +208,7 @@ export default function CustomerMap({
       </div>
 
       {/* Hint pill */}
-      <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-black/50 text-white text-[10px] px-3 py-1 rounded-full z-10 pointer-events-none">
+      <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-stone-700/70 text-white text-[10px] px-3 py-1 rounded-full z-10 pointer-events-none backdrop-blur-sm">
         {lang === "ar"
           ? "قم بالتمرير للتكبير · اسحب للتنقل · انقر على قطعة للتفاصيل"
           : "Scroll to zoom · Drag to pan · Click a lot for details"}
