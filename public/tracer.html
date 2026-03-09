@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Lot Polygon Tracer</title>
+<style>
+  body { margin: 0; background: #222; overflow: hidden; }
+  #canvas-container { position: relative; width: 100vw; height: 100vh; overflow: auto; }
+  canvas { cursor: crosshair; }
+  #info { position: fixed; top: 10px; left: 10px; background: rgba(0,0,0,0.8); color: #0f0;
+           font-family: monospace; padding: 10px; border-radius: 5px; z-index: 100; font-size: 12px; }
+  #output { position: fixed; bottom: 10px; left: 10px; right: 10px; background: rgba(0,0,0,0.9);
+            color: #0f0; font-family: monospace; padding: 10px; border-radius: 5px; z-index: 100;
+            font-size: 11px; max-height: 200px; overflow-y: auto; white-space: pre-wrap; }
+  #controls { position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white;
+              font-family: monospace; padding: 10px; border-radius: 5px; z-index: 100; }
+  button { margin: 2px; padding: 5px 10px; cursor: pointer; }
+  input { width: 60px; }
+</style>
+</head>
+<body>
+<div id="info">Click to add points. Press 'n' for new lot. Press 'u' to undo. Press 'c' to close polygon.</div>
+<div id="controls">
+  Lot ID: <input type="number" id="lotId" value="1">
+  <button onclick="newLot()">New Lot (n)</button>
+  <button onclick="undoPoint()">Undo (u)</button>
+  <button onclick="closeLot()">Close (c)</button>
+  <button onclick="exportAll()">Export All</button>
+  <br>
+  Zoom: <button onclick="zoomIn()">+</button> <button onclick="zoomOut()">-</button>
+  <span id="zoomLevel">100%</span>
+</div>
+<div id="output"></div>
+<div id="canvas-container">
+  <canvas id="canvas"></canvas>
+</div>
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const img = new Image();
+let scale = 1;
+let lots = {}; // lotId -> [[x,y], ...]
+let currentLotId = 1;
+let currentPoints = [];
+const SVG_W = 1000, SVG_H = 795; // viewBox dimensions
+
+img.onload = function() {
+  canvas.width = img.width;
+  canvas.height = img.height;
+  redraw();
+};
+img.src = '/master-plan.png';
+
+function toSVG(px, py) {
+  return [Math.round(px / img.width * SVG_W), Math.round(py / img.height * SVG_H)];
+}
+
+function redraw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(img, 0, 0);
+
+  // Draw completed lots
+  for (const [id, points] of Object.entries(lots)) {
+    ctx.beginPath();
+    const pxPoints = points.map(p => [p[0] / SVG_W * img.width, p[1] / SVG_H * img.height]);
+    ctx.moveTo(pxPoints[0][0], pxPoints[0][1]);
+    for (let i = 1; i < pxPoints.length; i++) ctx.lineTo(pxPoints[i][0], pxPoints[i][1]);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(45,90,39,0.3)';
+    ctx.fill();
+    ctx.strokeStyle = '#2D5A27';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    // Label
+    const cx = pxPoints.reduce((s,p) => s + p[0], 0) / pxPoints.length;
+    const cy = pxPoints.reduce((s,p) => s + p[1], 0) / pxPoints.length;
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 14px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(id, cx, cy);
+  }
+
+  // Draw current polygon being traced
+  if (currentPoints.length > 0) {
+    ctx.beginPath();
+    const pxPoints = currentPoints.map(p => [p[0] / SVG_W * img.width, p[1] / SVG_H * img.height]);
+    ctx.moveTo(pxPoints[0][0], pxPoints[0][1]);
+    for (let i = 1; i < pxPoints.length; i++) ctx.lineTo(pxPoints[i][0], pxPoints[i][1]);
+    ctx.strokeStyle = '#ff0';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    // Draw points
+    for (const p of pxPoints) {
+      ctx.beginPath();
+      ctx.arc(p[0], p[1], 4, 0, Math.PI * 2);
+      ctx.fillStyle = '#f00';
+      ctx.fill();
+    }
+  }
+}
+
+canvas.addEventListener('click', function(e) {
+  const rect = canvas.getBoundingClientRect();
+  const x = (e.clientX - rect.left) / (rect.width / canvas.width);
+  const y = (e.clientY - rect.top) / (rect.height / canvas.height);
+  const svgCoords = toSVG(x, y);
+  currentPoints.push(svgCoords);
+  redraw();
+  updateOutput();
+});
+
+function newLot() {
+  if (currentPoints.length >= 3) {
+    lots[currentLotId] = [...currentPoints];
+  }
+  currentPoints = [];
+  currentLotId = parseInt(document.getElementById('lotId').value) || currentLotId + 1;
+  document.getElementById('lotId').value = currentLotId;
+  redraw();
+}
+
+function undoPoint() {
+  currentPoints.pop();
+  redraw();
+  updateOutput();
+}
+
+function closeLot() {
+  if (currentPoints.length >= 3) {
+    lots[currentLotId] = [...currentPoints];
+    currentPoints = [];
+    currentLotId++;
+    document.getElementById('lotId').value = currentLotId;
+    redraw();
+    updateOutput();
+  }
+}
+
+function updateOutput() {
+  const out = document.getElementById('output');
+  let text = `Current lot ${currentLotId}: [${currentPoints.map(p => `[${p[0]},${p[1]}]`).join(', ')}]\n\n`;
+  text += 'Completed lots:\n';
+  for (const [id, points] of Object.entries(lots)) {
+    const center = [
+      Math.round(points.reduce((s,p) => s+p[0],0)/points.length),
+      Math.round(points.reduce((s,p) => s+p[1],0)/points.length)
+    ];
+    text += `  { id: ${id}, points: [${points.map(p => `[${p[0]},${p[1]}]`).join(',')}], center: [${center}] },\n`;
+  }
+  out.textContent = text;
+}
+
+function exportAll() {
+  let text = '';
+  for (const [id, points] of Object.entries(lots)) {
+    const center = [
+      Math.round(points.reduce((s,p) => s+p[0],0)/points.length),
+      Math.round(points.reduce((s,p) => s+p[1],0)/points.length)
+    ];
+    text += `  { id: ${id}, points: [${points.map(p => `[${p[0]},${p[1]}]`).join(',')}], center: [${center}] },\n`;
+  }
+  navigator.clipboard.writeText(text);
+  alert('Copied to clipboard!');
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'n') newLot();
+  if (e.key === 'u') undoPoint();
+  if (e.key === 'c') closeLot();
+});
+
+function zoomIn() { scale *= 1.2; canvas.style.transform = `scale(${scale})`; canvas.style.transformOrigin = '0 0'; document.getElementById('zoomLevel').textContent = Math.round(scale*100)+'%'; }
+function zoomOut() { scale /= 1.2; canvas.style.transform = `scale(${scale})`; canvas.style.transformOrigin = '0 0'; document.getElementById('zoomLevel').textContent = Math.round(scale*100)+'%'; }
+</script>
+</body>
+</html>

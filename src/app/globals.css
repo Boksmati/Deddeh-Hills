@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --dh-green: #2D5A27;
+  --dh-gold: #C5A55A;
+  --dh-slate: #3A4A5C;
+  --dh-cream: #F5F0E8;
+  --dh-dark: #1A1A2E;
+}
+
+body {
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  background: #f8f9fa;
+  color: #1a1a2e;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* SVG lot polygon animations */
+.lot-polygon {
+  transition: fill 0.2s ease, stroke 0.2s ease, opacity 0.2s ease;
+  cursor: pointer;
+}
+.lot-polygon:hover {
+  opacity: 0.85;
+  stroke-width: 2.5;
+}
+.lot-polygon.selected {
+  stroke: #1a1a2e;
+  stroke-width: 3;
+  stroke-dasharray: 6 3;
+  animation: dash 1s linear infinite;
+}
+@keyframes dash {
+  to {
+    stroke-dashoffset: -9;
+  }
+}
+
+/* Number formatting helper */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* RTL font override — use Noto Sans Arabic for proper Arabic rendering */
+[dir="rtl"],
+[dir="rtl"] body {
+  font-family: "Noto Sans Arabic", "Segoe UI", "Tahoma", "Arial", system-ui, sans-serif;
+}
+
+/* RTL: numbers and currency always render LTR */
+[dir="rtl"] [dir="ltr"] {
+  unicode-bidi: isolate;
+  text-align: left;
+}

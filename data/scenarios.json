@@ -1,0 +1,723 @@
+[
+  {
+    "id": "1773055885674",
+    "name": "Senario A",
+    "createdAt": "2026-03-09T11:31:25.674Z",
+    "assignments": [
+      {
+        "lotId": 1,
+        "developmentType": "apartments",
+        "phase": 2
+      },
+      {
+        "lotId": 2,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 3,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 4,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 5,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 6,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 7,
+        "developmentType": "villa_2f",
+        "phase": 1
+      },
+      {
+        "lotId": 8,
+        "developmentType": "villa_2f",
+        "phase": 1
+      },
+      {
+        "lotId": 9,
+        "developmentType": "villa_2f",
+        "phase": 1
+      },
+      {
+        "lotId": 10,
+        "developmentType": "villa_2f",
+        "phase": 1
+      },
+      {
+        "lotId": 11,
+        "developmentType": "villa_2f",
+        "phase": 1
+      },
+      {
+        "lotId": 12,
+        "developmentType": "villa_2f",
+        "phase": 1
+      },
+      {
+        "lotId": 13,
+        "developmentType": "villa_2f",
+        "phase": 1
+      },
+      {
+        "lotId": 14,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 15,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 16,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 17,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 18,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 19,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 20,
+        "developmentType": "villa_2f",
+        "phase": 1
+      },
+      {
+        "lotId": 21,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 22,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 23,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 24,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 25,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 26,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 27,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 28,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 29,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 30,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 31,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 32,
+        "developmentType": "villa_3f",
+        "phase": 1
+      },
+      {
+        "lotId": 33,
+        "developmentType": "villa_3f",
+        "phase": 1
+      },
+      {
+        "lotId": 34,
+        "developmentType": "villa_3f",
+        "phase": 1
+      },
+      {
+        "lotId": 35,
+        "developmentType": "villa_3f",
+        "phase": 1
+      },
+      {
+        "lotId": 36,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 37,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 38,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 39,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 40,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 41,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 42,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 43,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 44,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 45,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 46,
+        "developmentType": "villa_3f",
+        "phase": 1
+      },
+      {
+        "lotId": 47,
+        "developmentType": "villa_3f",
+        "phase": 1
+      },
+      {
+        "lotId": 48,
+        "developmentType": "twin_villa",
+        "phase": 1
+      },
+      {
+        "lotId": 49,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 50,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 51,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 52,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 53,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 54,
+        "developmentType": "unassigned",
+        "phase": 0
+      },
+      {
+        "lotId": 55,
+        "developmentType": "twin_villa",
+        "phase": 2
+      },
+      {
+        "lotId": 56,
+        "developmentType": "twin_villa",
+        "phase": 2
+      },
+      {
+        "lotId": 57,
+        "developmentType": "twin_villa",
+        "phase": 2
+      },
+      {
+        "lotId": 58,
+        "developmentType": "twin_villa",
+        "phase": 2
+      },
+      {
+        "lotId": 59,
+        "developmentType": "twin_villa",
+        "phase": 2
+      },
+      {
+        "lotId": 60,
+        "developmentType": "twin_villa",
+        "phase": 2
+      },
+      {
+        "lotId": 61,
+        "developmentType": "twin_villa",
+        "phase": 2
+      },
+      {
+        "lotId": 62,
+        "developmentType": "twin_villa",
+        "phase": 2
+      },
+      {
+        "lotId": 63,
+        "developmentType": "twin_villa",
+        "phase": 2
+      },
+      {
+        "lotId": 64,
+        "developmentType": "twin_villa",
+        "phase": 2
+      },
+      {
+        "lotId": 65,
+        "developmentType": "twin_villa",
+        "phase": 2
+      },
+      {
+        "lotId": 66,
+        "developmentType": "twin_villa",
+        "phase": 3
+      },
+      {
+        "lotId": 67,
+        "developmentType": "twin_villa",
+        "phase": 3
+      },
+      {
+        "lotId": 68,
+        "developmentType": "twin_villa",
+        "phase": 3
+      },
+      {
+        "lotId": 69,
+        "developmentType": "twin_villa",
+        "phase": 3
+      },
+      {
+        "lotId": 70,
+        "developmentType": "twin_villa",
+        "phase": 3
+      },
+      {
+        "lotId": 71,
+        "developmentType": "twin_villa",
+        "phase": 3
+      },
+      {
+        "lotId": 72,
+        "developmentType": "twin_villa",
+        "phase": 3
+      },
+      {
+        "lotId": 73,
+        "developmentType": "twin_villa",
+        "phase": 3
+      },
+      {
+        "lotId": 74,
+        "developmentType": "twin_villa",
+        "phase": 3
+      },
+      {
+        "lotId": 75,
+        "developmentType": "twin_villa",
+        "phase": 3
+      },
+      {
+        "lotId": 76,
+        "developmentType": "twin_villa",
+        "phase": 3
+      },
+      {
+        "lotId": 77,
+        "developmentType": "twin_villa",
+        "phase": 3
+      },
+      {
+        "lotId": 78,
+        "developmentType": "twin_villa",
+        "phase": 3
+      },
+      {
+        "lotId": 79,
+        "developmentType": "twin_villa",
+        "phase": 3
+      },
+      {
+        "lotId": 80,
+        "developmentType": "twin_villa",
+        "phase": 3
+      },
+      {
+        "lotId": 81,
+        "developmentType": "twin_villa",
+        "phase": 3
+      },
+      {
+        "lotId": 82,
+        "developmentType": "apartments",
+        "phase": 3
+      },
+      {
+        "lotId": 83,
+        "developmentType": "apartments",
+        "phase": 3
+      },
+      {
+        "lotId": 84,
+        "developmentType": "apartments",
+        "phase": 3
+      },
+      {
+        "lotId": 85,
+        "developmentType": "apartments",
+        "phase": 3
+      },
+      {
+        "lotId": 86,
+        "developmentType": "apartments",
+        "phase": 1
+      },
+      {
+        "lotId": 87,
+        "developmentType": "apartments",
+        "phase": 1
+      },
+      {
+        "lotId": 88,
+        "developmentType": "apartments",
+        "phase": 1
+      },
+      {
+        "lotId": 89,
+        "developmentType": "apartments",
+        "phase": 1
+      },
+      {
+        "lotId": 90,
+        "developmentType": "apartments",
+        "phase": 1
+      },
+      {
+        "lotId": 91,
+        "developmentType": "apartments",
+        "phase": 1
+      },
+      {
+        "lotId": 92,
+        "developmentType": "apartments",
+        "phase": 2
+      },
+      {
+        "lotId": 93,
+        "developmentType": "apartments",
+        "phase": 2
+      },
+      {
+        "lotId": 94,
+        "developmentType": "apartments",
+        "phase": 2
+      },
+      {
+        "lotId": 95,
+        "developmentType": "apartments",
+        "phase": 2
+      },
+      {
+        "lotId": 96,
+        "developmentType": "apartments",
+        "phase": 2
+      },
+      {
+        "lotId": 97,
+        "developmentType": "apartments",
+        "phase": 2
+      },
+      {
+        "lotId": 98,
+        "developmentType": "apartments",
+        "phase": 2
+      },
+      {
+        "lotId": 99,
+        "developmentType": "apartments",
+        "phase": 2
+      },
+      {
+        "lotId": 100,
+        "developmentType": "apartments",
+        "phase": 2
+      },
+      {
+        "lotId": 101,
+        "developmentType": "apartments",
+        "phase": 2
+      }
+    ],
+    "investorSharePct": 20,
+    "lotStatuses": [
+      [
+        2,
+        "sold"
+      ],
+      [
+        3,
+        "sold"
+      ],
+      [
+        4,
+        "sold"
+      ],
+      [
+        5,
+        "sold"
+      ],
+      [
+        6,
+        "sold"
+      ],
+      [
+        14,
+        "sold"
+      ],
+      [
+        15,
+        "sold"
+      ],
+      [
+        19,
+        "sold"
+      ],
+      [
+        24,
+        "sold"
+      ],
+      [
+        26,
+        "sold"
+      ],
+      [
+        29,
+        "sold"
+      ],
+      [
+        36,
+        "sold"
+      ],
+      [
+        37,
+        "sold"
+      ],
+      [
+        38,
+        "sold"
+      ],
+      [
+        39,
+        "sold"
+      ],
+      [
+        44,
+        "sold"
+      ],
+      [
+        45,
+        "sold"
+      ],
+      [
+        53,
+        "sold"
+      ],
+      [
+        54,
+        "sold"
+      ],
+      [
+        55,
+        "under_contract"
+      ],
+      [
+        56,
+        "under_contract"
+      ],
+      [
+        57,
+        "under_contract"
+      ],
+      [
+        58,
+        "under_contract"
+      ],
+      [
+        42,
+        "sold"
+      ],
+      [
+        43,
+        "sold"
+      ],
+      [
+        49,
+        "sold"
+      ],
+      [
+        50,
+        "sold"
+      ],
+      [
+        40,
+        "sold"
+      ],
+      [
+        41,
+        "sold"
+      ],
+      [
+        51,
+        "sold"
+      ],
+      [
+        52,
+        "sold"
+      ],
+      [
+        21,
+        "sold"
+      ],
+      [
+        22,
+        "sold"
+      ],
+      [
+        23,
+        "sold"
+      ]
+    ],
+    "typeAssumptions": {
+      "unassigned": {
+        "constructionCostPerM": 0,
+        "sellingPricePerM": 0,
+        "avgUnitSize": 0,
+        "commonAreaPct": 0,
+        "maxFloors": 0,
+        "unitsPerLot": 0,
+        "gardenAreaM": 0
+      },
+      "lot_sale": {
+        "constructionCostPerM": 0,
+        "sellingPricePerM": 0,
+        "avgUnitSize": 0,
+        "commonAreaPct": 0,
+        "maxFloors": 0,
+        "unitsPerLot": 0,
+        "gardenAreaM": 0
+      },
+      "twin_villa": {
+        "constructionCostPerM": 600,
+        "sellingPricePerM": 1400,
+        "avgUnitSize": 300,
+        "commonAreaPct": 0.1,
+        "maxFloors": 2,
+        "unitsPerLot": 2,
+        "gardenAreaM": 150
+      },
+      "villa_2f": {
+        "constructionCostPerM": 600,
+        "sellingPricePerM": 1500,
+        "avgUnitSize": 300,
+        "commonAreaPct": 0.1,
+        "maxFloors": 2,
+        "unitsPerLot": 2,
+        "gardenAreaM": 390
+      },
+      "villa_3f": {
+        "constructionCostPerM": 600,
+        "sellingPricePerM": 1300,
+        "avgUnitSize": 500,
+        "commonAreaPct": 0.1,
+        "maxFloors": 3,
+        "unitsPerLot": 3,
+        "gardenAreaM": 260
+      },
+      "apartments": {
+        "constructionCostPerM": 600,
+        "sellingPricePerM": 1100,
+        "avgUnitSize": 200,
+        "commonAreaPct": 0.3,
+        "maxFloors": 3,
+        "unitsPerLot": 0,
+        "gardenAreaM": 100
+      }
+    },
+    "investorModel": {
+      "investorModel": "share",
+      "landSharePct": 20,
+      "cashToStartPct": 30,
+      "priorityReturnRate": 12,
+      "holdPeriodYears": 3,
+      "ticketSize": 300000,
+      "investorTickets": {
+        "1": 0,
+        "2": 0,
+        "3": 0
+      }
+    },
+    "updatedAt": "2026-03-09T11:31:25.709Z"
+  }
+]
