@@ -156,7 +156,7 @@ function EnquiryForm() {
   const canSubmit = !sending && !!form.name && !!form.email;
   return (
     <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+      <div className="dh-form-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
         {field("name", "Full name")}
         {field("email", "Email address", "email")}
       </div>
@@ -210,6 +210,14 @@ export default function LandingPage() {
         .fade-up-5 { animation-delay: 0.56s; }
         a { text-decoration: none; color: inherit; }
         ::placeholder { color: #9DB090; }
+        /* ── Responsive ── */
+        @media (max-width: 640px) {
+          .dh-nav-links    { display: none !important; }
+          .dh-about-grid   { grid-template-columns: 1fr !important; gap: 32px !important; }
+          .dh-location-grid{ grid-template-columns: 1fr !important; gap: 32px !important; }
+          .dh-form-2col    { grid-template-columns: 1fr !important; }
+          .dh-hero-content { padding-left: 16px !important; padding-right: 16px !important; }
+        }
       `;
       document.head.appendChild(el);
     }
@@ -249,8 +257,8 @@ export default function LandingPage() {
         </span>
       </a>
 
-      {/* Desktop links */}
-      <div style={{ display: "flex", alignItems: "center", gap: 28, fontSize: 13 }}>
+      {/* Desktop links — hidden on mobile via dh-nav-links */}
+      <div className="dh-nav-links" style={{ display: "flex", alignItems: "center", gap: 28, fontSize: 13 }}>
         {[
           { label: "Typologies", href: "#typologies" },
           { label: "Location",   href: "#location"   },
@@ -262,19 +270,21 @@ export default function LandingPage() {
             onMouseOut={e => (e.currentTarget.style.color = scrolled ? C.muted : "rgba(255,255,255,0.75)")}
           >{label}</a>
         ))}
-        <a
-          href="/customer"
-          style={{
-            padding: "8px 20px", background: C.hills, color: C.white,
-            borderRadius: 8, fontWeight: 600, fontSize: 13,
-            transition: "background 0.2s",
-          }}
-          onMouseOver={e => (e.currentTarget.style.background = C.hillsHov)}
-          onMouseOut={e => (e.currentTarget.style.background = C.hills)}
-        >
-          Explore Units
-        </a>
       </div>
+      {/* CTA — always visible on all screen sizes */}
+      <a
+        href="/customer"
+        style={{
+          padding: "8px 20px", background: C.hills, color: C.white,
+          borderRadius: 8, fontWeight: 600, fontSize: 13,
+          transition: "background 0.2s", flexShrink: 0,
+          fontFamily: "'DM Sans', system-ui, sans-serif",
+        }}
+        onMouseOver={e => (e.currentTarget.style.background = C.hillsHov)}
+        onMouseOut={e => (e.currentTarget.style.background = C.hills)}
+      >
+        Explore Units
+      </a>
     </nav>
   );
 
@@ -386,7 +396,7 @@ export default function LandingPage() {
   /* ── About — light ─────────────────────────────────────────── */
   const About = () => (
     <section style={{ padding: "96px 24px", background: C.white }}>
-      <div style={{
+      <div className="dh-about-grid" style={{
         maxWidth: 1100, margin: "0 auto",
         display: "grid", gridTemplateColumns: "1fr 1fr",
         gap: 72, alignItems: "center",
@@ -586,7 +596,7 @@ export default function LandingPage() {
           }}>Koura, North Lebanon</h2>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 64, alignItems: "start" }}>
+        <div className="dh-location-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 64, alignItems: "start" }}>
           <div>
             <p className="dh-sans" style={{
               color: C.muted, fontSize: 15, lineHeight: 1.78, marginBottom: 32, fontWeight: 300,

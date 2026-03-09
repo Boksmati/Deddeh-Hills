@@ -13,16 +13,16 @@ import CustomerMap from "@/components/customer/CustomerMap";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const C = {
-  bg:     "#F5F0E8",
-  bgAlt:  "#EDE8DE",
-  ink:    "#1C2010",
-  forest: "#2D5A27",
-  gold:   "#C5A55A",
-  goldBg: "#F7F2E4",
-  sand:   "#E8DDD0",
-  border: "#D4CBBA",
-  muted:  "#7A7260",
-  white:  "#FAFAF7",
+  bg:     "#F4F9EF",                    // barely-green white (logo palette)
+  bgAlt:  "#EAF4E1",                    // light green tint
+  ink:    "#1C2010",                    // deep dark ink
+  forest: "#3D7A24",                    // deep swoosh green — primary CTA
+  gold:   "#78BF42",                    // "HILLS" brand green (replaces gold accent)
+  goldBg: "rgba(120,191,66,0.10)",      // light green tint background
+  sand:   "#C8E0B5",                    // green-tinted border
+  border: "#C8E0B5",                    // green border
+  muted:  "#6A7B5F",                    // greenish-gray secondary text
+  white:  "#FFFFFF",                    // pure white
 } as const;
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
@@ -926,7 +926,7 @@ export default function CustomerPage() {
                 ].map(label => (
                   <span key={label}
                     className="text-[10px] px-2.5 py-1 rounded-full"
-                    style={{ background: "rgba(197,165,90,0.12)", color: C.gold, border: "1px solid rgba(197,165,90,0.28)", fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                    style={{ background: "rgba(120,191,66,0.12)", color: C.gold, border: "1px solid rgba(120,191,66,0.28)", fontFamily: "'DM Sans', system-ui, sans-serif" }}>
                     {label}
                   </span>
                 ))}
@@ -1202,7 +1202,7 @@ export default function CustomerPage() {
               {totalAssigned === 0 && (
                 <p className="text-xs mt-2" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
                   {lang === "ar" ? "لم يتم تهيئة أي قطعة." : "No lots configured yet."}{" "}
-                  <a href="/" style={{ color: C.forest }} className="underline">
+                  <a href="/simulator" style={{ color: C.forest }} className="underline">
                     {lang === "ar" ? "انتقل إلى المحاكي" : "Go to Simulator"}
                   </a>
                 </p>
