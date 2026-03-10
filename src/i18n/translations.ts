@@ -251,6 +251,72 @@ const en = {
   enquire_message: "Message",
   enquire_send: "Send Enquiry",
   enquire_success: "Thank you! We'll be in touch within 24 hours.",
+
+  // Landing page — nav
+  landing_nav_typologies: "Typologies",
+  landing_nav_location: "Location",
+  landing_nav_contact: "Contact",
+  landing_nav_explore: "Explore Units",
+
+  // Landing page — hero
+  landing_hero_subtitle: "A gated hilltop community of 101 private residences overlooking the Koura valley — where mountain living meets modern infrastructure.",
+  landing_hero_browse: "Browse Available Units →",
+  landing_hero_enquire: "Enquire",
+  landing_stats_lots: "Private lots",
+  landing_stats_available: "Available now",
+  landing_stats_phase_label: "Underway",
+
+  // Landing page — about
+  landing_about_eyebrow: "About the project",
+  landing_about_heading: "101 private residences on a hilltop estate",
+  landing_about_p1: "Deddeh Hills is a master-planned gated community set on elevated land in the Koura district of North Lebanon. The development spans 101 lots across four residential typologies — from contemporary apartments to spacious standalone villas.",
+  landing_about_p2: "Every plot benefits from complete infrastructure — paved roads, electricity, water — and a secure perimeter, allowing residents to build and move in with confidence.",
+  landing_about_lots: "Lots",
+  landing_about_phases: "Phases",
+  landing_about_masterplan: "Master plan · Koura",
+
+  // Landing page — typologies section
+  landing_typo_eyebrow: "Residence types",
+  landing_typo_heading: "Choose your residence",
+  landing_typo_size: "Size",
+  landing_typo_beds: "Bedrooms",
+  landing_typo_from: "Starting from",
+  landing_typo_available: "Available",
+  landing_typo_units: "units",
+  landing_typo_view: "View units →",
+  landing_typo_cta: "Explore all units on the master plan →",
+
+  // Landing page — location
+  landing_loc_eyebrow: "Where we are",
+  landing_loc_heading: "Koura, North Lebanon",
+  landing_loc_text: "Situated on elevated terrain in the Koura district, Deddeh Hills commands sweeping views of the surrounding valley and the distant Mediterranean. The area is known for its olive groves, mild climate, and proximity to both Tripoli and the Beirut–Tripoli highway.",
+
+  // Landing page — features
+  landing_feat_eyebrow: "What's included",
+  landing_feat_heading: "Community & investment features",
+
+  // Landing page — CTA banner
+  landing_cta_eyebrow: "Limited availability",
+  landing_cta_heading: "59 units available now",
+  landing_cta_text: "Browse the interactive master plan to explore available lots, view unit specs, and compare payment plans.",
+  landing_cta_btn: "Explore the master plan →",
+
+  // Landing page — contact
+  landing_contact_eyebrow: "Get in touch",
+  landing_contact_heading: "Enquire about a unit",
+  landing_contact_sub: "Our team is available to answer your questions and arrange a site visit.",
+  landing_form_name: "Full name",
+  landing_form_email: "Email address",
+  landing_form_phone: "Phone number (optional)",
+  landing_form_message: "Tell us about your interest (optional)",
+  landing_form_sending: "Sending…",
+  landing_form_thanks: "Thank you",
+  landing_form_touch: "We'll be in touch within 24 hours.",
+
+  // Landing page — footer
+  landing_footer_browse: "Browse Units",
+  landing_footer_contact: "Contact",
+  landing_footer_investor: "Investor Access",
 } as const;
 
 export type TranslationKey = keyof typeof en;
@@ -506,6 +572,72 @@ const ar: Record<TranslationKey, string> = {
   enquire_message: "رسالتك",
   enquire_send: "إرسال الاستفسار",
   enquire_success: "شكراً لك! سنتواصل معك خلال 24 ساعة.",
+
+  // Landing page — nav
+  landing_nav_typologies: "الأنواع",
+  landing_nav_location: "الموقع",
+  landing_nav_contact: "تواصل",
+  landing_nav_explore: "استكشف الوحدات",
+
+  // Landing page — hero
+  landing_hero_subtitle: "مجتمع مسوّر على قمة تل يضم ١٠١ مسكناً خاصاً يُطلّ على وادي الكورة — حيث يلتقي سحر الجبل بالبنية التحتية العصرية.",
+  landing_hero_browse: "استكشف الوحدات المتاحة ←",
+  landing_hero_enquire: "استفسر",
+  landing_stats_lots: "قطعة خاصة",
+  landing_stats_available: "متاح الآن",
+  landing_stats_phase_label: "جارٍ",
+
+  // Landing page — about
+  landing_about_eyebrow: "عن المشروع",
+  landing_about_heading: "١٠١ مسكن خاص على قمة التل",
+  landing_about_p1: "ديدح هيلز مجتمع سكني مسوّر مخطط على أرض مرتفعة في قضاء الكورة بشمال لبنان. يضم المشروع ١٠١ قطعة موزعة على أربعة أنواع سكنية — من الشقق العصرية إلى الفيلات المنفصلة الفسيحة.",
+  landing_about_p2: "تستفيد كل قطعة من بنية تحتية متكاملة — طرق معبّدة وكهرباء ومياه — ومحيط آمن، مما يتيح للسكان البناء والانتقال بثقة تامة.",
+  landing_about_lots: "قطعة",
+  landing_about_phases: "مراحل",
+  landing_about_masterplan: "المخطط العام · الكورة",
+
+  // Landing page — typologies section
+  landing_typo_eyebrow: "أنواع المساكن",
+  landing_typo_heading: "اختر مسكنك",
+  landing_typo_size: "المساحة",
+  landing_typo_beds: "غرف النوم",
+  landing_typo_from: "يبدأ من",
+  landing_typo_available: "متاح",
+  landing_typo_units: "وحدات",
+  landing_typo_view: "عرض الوحدات ←",
+  landing_typo_cta: "استكشف جميع الوحدات على المخطط ←",
+
+  // Landing page — location
+  landing_loc_eyebrow: "أين نحن",
+  landing_loc_heading: "الكورة، شمال لبنان",
+  landing_loc_text: "يقع ديدح هيلز على تضاريس مرتفعة في قضاء الكورة، ويتمتع بإطلالات خلابة على الوادي المحيط والبحر الأبيض المتوسط. تشتهر المنطقة بكرومها من الزيتون ومناخها المعتدل وقربها من طرابلس وطريق بيروت-طرابلس.",
+
+  // Landing page — features
+  landing_feat_eyebrow: "ما يتضمنه المشروع",
+  landing_feat_heading: "مميزات المجتمع والاستثمار",
+
+  // Landing page — CTA banner
+  landing_cta_eyebrow: "توافر محدود",
+  landing_cta_heading: "٥٩ وحدة متاحة الآن",
+  landing_cta_text: "استكشف المخطط التفاعلي للاطلاع على القطع المتاحة ومواصفات الوحدات ومقارنة خطط الدفع.",
+  landing_cta_btn: "استكشف المخطط ←",
+
+  // Landing page — contact
+  landing_contact_eyebrow: "تواصل معنا",
+  landing_contact_heading: "استفسر عن وحدة",
+  landing_contact_sub: "فريقنا متاح للإجابة على استفساراتك وترتيب زيارة للموقع.",
+  landing_form_name: "الاسم الكامل",
+  landing_form_email: "البريد الإلكتروني",
+  landing_form_phone: "رقم الهاتف (اختياري)",
+  landing_form_message: "أخبرنا عن اهتمامك (اختياري)",
+  landing_form_sending: "جارٍ الإرسال…",
+  landing_form_thanks: "شكراً لك",
+  landing_form_touch: "سنتواصل معك خلال ٢٤ ساعة.",
+
+  // Landing page — footer
+  landing_footer_browse: "استكشف الوحدات",
+  landing_footer_contact: "تواصل",
+  landing_footer_investor: "دخول المستثمرين",
 } as const;
 
 export const translations: Record<Lang, Record<TranslationKey, string>> = { en, ar };

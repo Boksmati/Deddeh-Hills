@@ -1,106 +1,49 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "@/i18n/useTranslations";
+import LanguageToggle from "@/components/ui/LanguageToggle";
 
 /* ─── Design tokens — extracted from Deddeh Hills logo ──────── */
 const C = {
   // Page surfaces
-  bg:       "#F4F9EF",   // barely-green white — main light background
-  bgAlt:    "#EAF4E1",   // richer tint for alternating sections
+  bg:       "#F4F9EF",
+  bgAlt:    "#EAF4E1",
   white:    "#FFFFFF",
 
   // Dark hero / footer
-  darkBg:   "#1A3810",   // deep forest green (echoes dark swoosh arc)
+  darkBg:   "#1A3810",
   darkAlt:  "#213F15",
 
   // Logo greens
-  hills:    "#78BF42",   // "HILLS" text — primary brand CTA
-  hillsHov: "#67AA34",   // hover state
-  deep:     "#3D7A24",   // dark swoosh — headlines, depth
-  mid:      "#62AE35",   // middle swoosh
-  light:    "#95CC58",   // lightest swoosh arc
+  hills:    "#78BF42",
+  hillsHov: "#67AA34",
+  deep:     "#3D7A24",
+  mid:      "#62AE35",
+  light:    "#95CC58",
   lightBg:  "rgba(120,191,66,0.10)",
 
   // Text
-  ink:      "#373737",   // charcoal — matches "DEDDEH" gray
-  muted:    "#6A7B5F",   // greenish-gray secondary text
-  mutedDark:"rgba(255,255,255,0.58)",   // secondary text on dark bg
+  ink:       "#373737",
+  muted:     "#6A7B5F",
+  mutedDark: "rgba(255,255,255,0.58)",
 
   // Borders
-  border:   "#C8E0B5",
-  faint:    "rgba(62,122,36,0.13)",
-  faintDark:"rgba(255,255,255,0.10)",
+  border:    "#C8E0B5",
+  faint:     "rgba(62,122,36,0.13)",
+  faintDark: "rgba(255,255,255,0.10)",
 };
 
-/* ─── Typology card data — greens only ──────────────────────── */
-const TYPOLOGIES = [
-  {
-    id: "villa_2f",
-    label: "Villa (2 Floors)",
-    badge: "V2F",
-    color: C.mid,
-    colorBg: "rgba(98,174,53,0.10)",
-    beds: "4–5 br",
-    size: "250–350 m²",
-    from: "$750K",
-    count: 28,
-    desc: "Standalone two-floor villa with private garden and underground parking.",
-  },
-  {
-    id: "villa_3f",
-    label: "Villa (3 Floors)",
-    badge: "V3F",
-    color: C.deep,
-    colorBg: "rgba(61,122,36,0.10)",
-    beds: "5–6 br",
-    size: "400–600 m²",
-    from: "$1.1M",
-    count: 12,
-    desc: "Spacious three-floor villa — ideal for extended families with panoramic views.",
-  },
-  {
-    id: "twin_villa",
-    label: "Twin Villa",
-    badge: "TWIN",
-    color: C.hills,
-    colorBg: "rgba(120,191,66,0.10)",
-    beds: "3–4 br",
-    size: "200–280 m²",
-    from: "$550K",
-    count: 35,
-    desc: "Semi-detached paired villa offering community living with private outdoor space.",
-  },
-  {
-    id: "apartments",
-    label: "Apartments & Duplexes",
-    badge: "APT",
-    color: "#5AAE28",
-    colorBg: "rgba(90,174,40,0.10)",
-    beds: "2–3 br",
-    size: "120–220 m²",
-    from: "$280K",
-    count: 26,
-    desc: "Contemporary apartments and duplex units with shared amenities.",
-  },
-];
-
-/* ─── Features ──────────────────────────────────────────────── */
-const FEATURES = [
-  { icon: "🔒", label: "Gated community",       sub: "24/7 secured perimeter" },
-  { icon: "🛣️", label: "Paved internal roads",  sub: "Full infrastructure built" },
-  { icon: "⚡", label: "Independent electricity",sub: "On-site generator supply" },
-  { icon: "💧", label: "Fresh water supply",     sub: "Dedicated water network" },
-  { icon: "🌿", label: "Landscaped commons",     sub: "Green shared spaces" },
-  { icon: "🏔️", label: "Mountain & sea views",   sub: "Panoramic hilltop position" },
-  { icon: "📋", label: "Flexible payment plans", sub: "Off-plan staged payments" },
-  { icon: "🏗️", label: "Off-plan pricing",       sub: "Lock in pre-launch rates" },
-];
-
-/* ─── Enquiry form ───────────────────────────────────────────── */
+/* ─── Enquiry form — bilingual ────────────────────────────────── */
 function EnquiryForm() {
+  const { t, isRTL } = useTranslations();
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
-  const [sent, setSent] = useState(false);
+  const [sent, setSent]     = useState(false);
   const [sending, setSending] = useState(false);
+
+  const bFont = isRTL
+    ? "'Noto Sans Arabic', system-ui, sans-serif"
+    : "'DM Sans', system-ui, sans-serif";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -120,8 +63,8 @@ function EnquiryForm() {
           display: "flex", alignItems: "center", justifyContent: "center",
           margin: "0 auto 16px", fontSize: 22,
         }}>✓</div>
-        <p style={{ color: C.deep, fontWeight: 600, marginBottom: 8, fontSize: 16 }}>Thank you</p>
-        <p style={{ color: C.muted, fontSize: 14 }}>We&apos;ll be in touch within 24 hours.</p>
+        <p style={{ color: C.deep, fontWeight: 600, marginBottom: 8, fontSize: 16, fontFamily: bFont }}>{t("landing_form_thanks")}</p>
+        <p style={{ color: C.muted, fontSize: 14, fontFamily: bFont }}>{t("landing_form_touch")}</p>
       </div>
     );
   }
@@ -130,9 +73,10 @@ function EnquiryForm() {
     width: "100%", padding: "12px 14px",
     background: C.white, border: `1.5px solid ${C.border}`,
     borderRadius: 10, color: C.ink, fontSize: 14,
-    fontFamily: "'DM Sans', system-ui, sans-serif",
+    fontFamily: bFont,
     outline: "none", boxSizing: "border-box", resize: "none",
     transition: "border-color 0.2s",
+    direction: isRTL ? "rtl" : "ltr",
   };
 
   const field = (key: keyof typeof form, placeholder: string, type = "text", rows?: number) => {
@@ -142,12 +86,8 @@ function EnquiryForm() {
         setForm((p) => ({ ...p, [key]: e.target.value })),
       placeholder,
       style: inputStyle,
-      onFocus: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        e.currentTarget.style.borderColor = C.hills;
-      },
-      onBlur: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        e.currentTarget.style.borderColor = C.border;
-      },
+      onFocus:  (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => { e.currentTarget.style.borderColor = C.hills; },
+      onBlur:   (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => { e.currentTarget.style.borderColor = C.border; },
     };
     if (rows) return <textarea key={key} rows={rows} {...shared} />;
     return <input key={key} type={type} {...shared} />;
@@ -157,11 +97,11 @@ function EnquiryForm() {
   return (
     <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <div className="dh-form-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-        {field("name", "Full name")}
-        {field("email", "Email address", "email")}
+        {field("name",  t("landing_form_name"))}
+        {field("email", t("landing_form_email"), "email")}
       </div>
-      {field("phone", "Phone number (optional)", "tel")}
-      {field("message", "Tell us about your interest (optional)", "text", 3)}
+      {field("phone",   t("landing_form_phone"), "tel")}
+      {field("message", t("landing_form_message"), "text", 3)}
       <button
         type="submit"
         disabled={!canSubmit}
@@ -171,14 +111,14 @@ function EnquiryForm() {
           border: "none", borderRadius: 10,
           color: canSubmit ? C.white : C.muted,
           fontSize: 14, fontWeight: 600,
-          fontFamily: "'DM Sans', system-ui, sans-serif",
+          fontFamily: bFont,
           cursor: canSubmit ? "pointer" : "not-allowed",
           transition: "all 0.2s", marginTop: 4,
         }}
         onMouseOver={e => { if (canSubmit) (e.currentTarget as HTMLButtonElement).style.background = C.hillsHov; }}
         onMouseOut={e => { if (canSubmit) (e.currentTarget as HTMLButtonElement).style.background = C.hills; }}
       >
-        {sending ? "Sending…" : "Send Enquiry"}
+        {sending ? t("landing_form_sending") : t("enquire_send")}
       </button>
     </form>
   );
@@ -186,18 +126,112 @@ function EnquiryForm() {
 
 /* ─── Main landing page ─────────────────────────────────────── */
 export default function LandingPage() {
+  const { t, lang, isRTL } = useTranslations();
   const [scrolled, setScrolled] = useState(false);
 
+  /* ── Font helpers ─────────────────────────────────────────── */
+  const bFont = isRTL
+    ? "'Noto Sans Arabic', system-ui, sans-serif"
+    : "'DM Sans', system-ui, sans-serif";
+  const hFont = isRTL
+    ? "'Noto Sans Arabic', system-ui, sans-serif"
+    : "'Playfair Display', Georgia, serif";
+
+  /* ── Bilingual data ───────────────────────────────────────── */
+  const TYPOLOGIES = [
+    {
+      id: "villa_2f",
+      label: lang === "ar" ? "فيلا (طابقان)" : "Villa (2 Floors)",
+      badge: "V2F",
+      color: C.mid,
+      colorBg: "rgba(98,174,53,0.10)",
+      beds: "4–5 br",
+      size: "250–350 m²",
+      from: "$750K",
+      count: 28,
+      desc: lang === "ar"
+        ? "فيلا مستقلة بطابقين مع حديقة خاصة وموقف سيارات تحت الأرض."
+        : "Standalone two-floor villa with private garden and underground parking.",
+    },
+    {
+      id: "villa_3f",
+      label: lang === "ar" ? "فيلا (ثلاثة طوابق)" : "Villa (3 Floors)",
+      badge: "V3F",
+      color: C.deep,
+      colorBg: "rgba(61,122,36,0.10)",
+      beds: "5–6 br",
+      size: "400–600 m²",
+      from: "$1.1M",
+      count: 12,
+      desc: lang === "ar"
+        ? "فيلا فسيحة بثلاثة طوابق — مثالية للعائلات الممتدة مع إطلالات بانورامية."
+        : "Spacious three-floor villa — ideal for extended families with panoramic views.",
+    },
+    {
+      id: "twin_villa",
+      label: lang === "ar" ? "فيلا توأم" : "Twin Villa",
+      badge: "TWIN",
+      color: C.hills,
+      colorBg: "rgba(120,191,66,0.10)",
+      beds: "3–4 br",
+      size: "200–280 m²",
+      from: "$550K",
+      count: 35,
+      desc: lang === "ar"
+        ? "فيلا مزدوجة شبه منفصلة تجمع بين الحياة المجتمعية والمساحة الخارجية الخاصة."
+        : "Semi-detached paired villa offering community living with private outdoor space.",
+    },
+    {
+      id: "apartments",
+      label: lang === "ar" ? "شقق وديبلكس" : "Apartments & Duplexes",
+      badge: "APT",
+      color: "#5AAE28",
+      colorBg: "rgba(90,174,40,0.10)",
+      beds: "2–3 br",
+      size: "120–220 m²",
+      from: "$280K",
+      count: 26,
+      desc: lang === "ar"
+        ? "شقق وديبلكس عصرية مع مرافق مشتركة."
+        : "Contemporary apartments and duplex units with shared amenities.",
+    },
+  ];
+
+  const FEATURES = [
+    { icon: "🔒", label: lang === "ar" ? "مجتمع مسوّر"          : "Gated community",         sub: lang === "ar" ? "محيط مؤمّن ٢٤/٧"                  : "24/7 secured perimeter"      },
+    { icon: "🛣️", label: lang === "ar" ? "طرق داخلية معبّدة"    : "Paved internal roads",    sub: lang === "ar" ? "بنية تحتية متكاملة"               : "Full infrastructure built"    },
+    { icon: "⚡", label: lang === "ar" ? "كهرباء مستقلة"         : "Independent electricity",  sub: lang === "ar" ? "مولدات كهرباء في الموقع"          : "On-site generator supply"     },
+    { icon: "💧", label: lang === "ar" ? "إمداد مياه عذبة"       : "Fresh water supply",       sub: lang === "ar" ? "شبكة مياه مخصصة"                  : "Dedicated water network"      },
+    { icon: "🌿", label: lang === "ar" ? "مساحات خضراء مشتركة"  : "Landscaped commons",       sub: lang === "ar" ? "مساحات خضراء مشتركة"              : "Green shared spaces"          },
+    { icon: "🏔️", label: lang === "ar" ? "إطلالات جبلية وبحرية" : "Mountain & sea views",     sub: lang === "ar" ? "موقع على قمة التل"                : "Panoramic hilltop position"   },
+    { icon: "📋", label: lang === "ar" ? "خطط دفع مرنة"         : "Flexible payment plans",   sub: lang === "ar" ? "دفعات مرحلية قبل الإنشاء"         : "Off-plan staged payments"     },
+    { icon: "🏗️", label: lang === "ar" ? "أسعار ما قبل الإنشاء" : "Off-plan pricing",         sub: lang === "ar" ? "احجز بأسعار ما قبل الإطلاق"       : "Lock in pre-launch rates"     },
+  ];
+
+  const DISTANCES = [
+    { place: lang === "ar" ? "وسط طرابلس"      : "Tripoli city centre",  time: "25 min" },
+    { place: lang === "ar" ? "بيروت"            : "Beirut",               time: "75 min" },
+    { place: lang === "ar" ? "تقاطع الشيخا"    : "Chekka interchange",   time: "12 min" },
+    { place: lang === "ar" ? "البترون"          : "Batroun",              time: "20 min" },
+  ];
+
+  const LOC_FEATURES = [
+    { icon: "🏔️", text: lang === "ar" ? "ارتفاع على التل مع إطلالات على الوادي والبحر"  : "Hilltop elevation with valley and sea views"    },
+    { icon: "🛤️", text: lang === "ar" ? "وصول مباشر من الطريق الرئيسي للكورة"           : "Direct access from the Koura main road"         },
+    { icon: "🌳", text: lang === "ar" ? "محاط بكروم الزيتون وأشجار الصنوبر"              : "Surrounded by olive groves and pine trees"      },
+    { icon: "☀️", text: lang === "ar" ? "مناخ متوسطي — صيف دافئ وجاف"                   : "Mediterranean climate — warm, dry summers"      },
+    { icon: "🔇", text: lang === "ar" ? "منطقة سكنية هادئة بعيداً عن الازدحام العمراني" : "Quiet residential area, away from urban density"},
+  ];
+
+  /* ── CSS injection (fonts + animations) ──────────────────── */
   useEffect(() => {
     const id = "dh-landing-styles";
     if (!document.getElementById(id)) {
       const el = document.createElement("style");
       el.id = id;
       el.textContent = `
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        .dh-serif { font-family: 'Playfair Display', Georgia, serif; }
-        .dh-sans  { font-family: 'DM Sans', system-ui, sans-serif; }
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(24px); }
           to   { opacity: 1; transform: translateY(0); }
@@ -210,24 +244,15 @@ export default function LandingPage() {
         .fade-up-5 { animation-delay: 0.56s; }
         a { text-decoration: none; color: inherit; }
         ::placeholder { color: #9DB090; }
-        /* ── Responsive ── */
-        @media (max-width: 640px) {
-          .dh-nav-links    { display: none !important; }
-          .dh-about-grid   { grid-template-columns: 1fr !important; gap: 32px !important; }
-          .dh-location-grid{ grid-template-columns: 1fr !important; gap: 32px !important; }
-          .dh-form-2col    { grid-template-columns: 1fr !important; }
-          .dh-hero-content { padding-left: 16px !important; padding-right: 16px !important; }
-        }
       `;
       document.head.appendChild(el);
     }
-
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* ── Nav ─────────────────────────────────────────────────────── */
+  /* ── Nav ──────────────────────────────────────────────────── */
   const Nav = () => (
     <nav className="dh-sans" style={{
       position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
@@ -260,35 +285,39 @@ export default function LandingPage() {
       {/* Desktop links — hidden on mobile via dh-nav-links */}
       <div className="dh-nav-links" style={{ display: "flex", alignItems: "center", gap: 28, fontSize: 13 }}>
         {[
-          { label: "Typologies", href: "#typologies" },
-          { label: "Location",   href: "#location"   },
-          { label: "Contact",    href: "#contact"     },
+          { label: t("landing_nav_typologies"), href: "#typologies" },
+          { label: t("landing_nav_location"),   href: "#location"   },
+          { label: t("landing_nav_contact"),    href: "#contact"    },
         ].map(({ label, href }) => (
           <a key={href} href={href}
-            style={{ color: scrolled ? C.muted : "rgba(255,255,255,0.75)", transition: "color 0.2s" }}
+            style={{ color: scrolled ? C.muted : "rgba(255,255,255,0.75)", transition: "color 0.2s", fontFamily: bFont }}
             onMouseOver={e => (e.currentTarget.style.color = scrolled ? C.deep : C.white)}
             onMouseOut={e => (e.currentTarget.style.color = scrolled ? C.muted : "rgba(255,255,255,0.75)")}
           >{label}</a>
         ))}
       </div>
-      {/* CTA — always visible on all screen sizes */}
-      <a
-        href="/customer"
-        style={{
-          padding: "8px 20px", background: C.hills, color: C.white,
-          borderRadius: 8, fontWeight: 600, fontSize: 13,
-          transition: "background 0.2s", flexShrink: 0,
-          fontFamily: "'DM Sans', system-ui, sans-serif",
-        }}
-        onMouseOver={e => (e.currentTarget.style.background = C.hillsHov)}
-        onMouseOut={e => (e.currentTarget.style.background = C.hills)}
-      >
-        Explore Units
-      </a>
+
+      {/* Lang toggle + CTA — always visible */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+        <LanguageToggle className={scrolled ? "" : "border-white/30 bg-white/10 text-white hover:bg-white/20"} />
+        <a
+          href="/customer"
+          style={{
+            padding: "8px 20px", background: C.hills, color: C.white,
+            borderRadius: 8, fontWeight: 600, fontSize: 13,
+            transition: "background 0.2s",
+            fontFamily: bFont,
+          }}
+          onMouseOver={e => (e.currentTarget.style.background = C.hillsHov)}
+          onMouseOut={e => (e.currentTarget.style.background = C.hills)}
+        >
+          {t("landing_nav_explore")}
+        </a>
+      </div>
     </nav>
   );
 
-  /* ── Hero — deep forest green, not black ───────────────────── */
+  /* ── Hero ─────────────────────────────────────────────────── */
   const Hero = () => (
     <section style={{
       minHeight: "100dvh", position: "relative",
@@ -296,72 +325,70 @@ export default function LandingPage() {
       alignItems: "center", justifyContent: "center",
       padding: "120px 24px 80px", overflow: "hidden",
     }}>
-      {/* Master plan background */}
       <div style={{
         position: "absolute", inset: 0, zIndex: 0,
         backgroundImage: "url('/master-plan.png')",
         backgroundSize: "cover", backgroundPosition: "center 30%",
         opacity: 0.15, filter: "saturate(0.4) hue-rotate(40deg)",
       }} />
-      {/* Gradient — deep forest green (echoes dark swoosh arc) */}
       <div style={{
         position: "absolute", inset: 0, zIndex: 1,
         background: `linear-gradient(160deg, ${C.darkBg} 0%, #1E4710 35%, #163310 65%, ${C.darkBg} 100%)`,
       }} />
-      {/* Subtle vignette */}
       <div style={{
         position: "absolute", inset: 0, zIndex: 2,
         background: "radial-gradient(ellipse 80% 60% at 50% 50%, transparent 40%, rgba(10,22,6,0.55) 100%)",
       }} />
 
-      {/* Content */}
       <div style={{ position: "relative", zIndex: 3, textAlign: "center", maxWidth: 760 }}>
         <p className="dh-sans fade-up fade-up-1" style={{
           color: C.light, fontSize: 11, fontWeight: 500,
           letterSpacing: "0.24em", textTransform: "uppercase", marginBottom: 20,
+          fontFamily: bFont,
         }}>
-          Koura · North Lebanon
+          {lang === "ar" ? "الكورة · شمال لبنان" : "Koura · North Lebanon"}
         </p>
 
         <h1 className="dh-serif fade-up fade-up-2" style={{
           fontSize: "clamp(52px, 8.5vw, 96px)", fontWeight: 600,
           color: C.white, lineHeight: 1.0, marginBottom: 24,
-          letterSpacing: "-0.02em",
+          letterSpacing: isRTL ? "0" : "-0.02em",
+          fontFamily: hFont,
         }}>
-          Deddeh Hills
+          {lang === "ar" ? "ديدح هيلز" : "Deddeh Hills"}
         </h1>
 
         <p className="dh-sans fade-up fade-up-3" style={{
           fontSize: "clamp(15px, 2vw, 18px)", color: C.mutedDark,
           lineHeight: 1.68, maxWidth: 520, margin: "0 auto 44px", fontWeight: 300,
+          fontFamily: bFont,
         }}>
-          A gated hilltop community of 101 private residences overlooking
-          the Koura valley — where mountain living meets modern infrastructure.
+          {t("landing_hero_subtitle")}
         </p>
 
         <div className="fade-up fade-up-4" style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
           <a href="/customer" style={{
             padding: "15px 34px", background: C.hills, color: C.white,
             borderRadius: 10, fontWeight: 600, fontSize: 15,
-            fontFamily: "'DM Sans', system-ui, sans-serif",
+            fontFamily: bFont,
             transition: "background 0.2s", display: "inline-block",
           }}
             onMouseOver={e => (e.currentTarget.style.background = C.hillsHov)}
             onMouseOut={e => (e.currentTarget.style.background = C.hills)}
           >
-            Browse Available Units →
+            {t("landing_hero_browse")}
           </a>
           <a href="#contact" style={{
             padding: "15px 34px", background: "transparent",
             color: C.white, border: `1.5px solid rgba(255,255,255,0.28)`,
             borderRadius: 10, fontWeight: 400, fontSize: 15,
-            fontFamily: "'DM Sans', system-ui, sans-serif",
+            fontFamily: bFont,
             transition: "border-color 0.2s", display: "inline-block",
           }}
             onMouseOver={e => { e.currentTarget.style.borderColor = C.light; }}
             onMouseOut={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.28)"; }}
           >
-            Enquire
+            {t("landing_hero_enquire")}
           </a>
         </div>
       </div>
@@ -376,24 +403,24 @@ export default function LandingPage() {
         borderRadius: 14, overflow: "hidden",
       }}>
         {[
-          { value: "101",     label: "Private lots"  },
-          { value: "4",       label: "Typologies"    },
-          { value: "59",      label: "Available now" },
-          { value: "Phase 1", label: "Underway"      },
+          { value: "101",     label: t("landing_stats_lots")       },
+          { value: "4",       label: t("landing_nav_typologies")   },
+          { value: "59",      label: t("landing_stats_available")  },
+          { value: lang === "ar" ? "المرحلة ١" : "Phase 1", label: t("landing_stats_phase_label") },
         ].map((s, i) => (
           <div key={s.label} style={{
             padding: "16px 30px", textAlign: "center",
             borderRight: i < 3 ? "1px solid rgba(149,204,88,0.18)" : "none",
           }}>
-            <div className="dh-serif" style={{ fontSize: 22, fontWeight: 600, color: C.white }}>{s.value}</div>
-            <div style={{ fontSize: 11, color: C.light, marginTop: 3, letterSpacing: "0.07em" }}>{s.label}</div>
+            <div className="dh-serif" style={{ fontSize: 22, fontWeight: 600, color: C.white, fontFamily: hFont }}>{s.value}</div>
+            <div style={{ fontSize: 11, color: C.light, marginTop: 3, letterSpacing: "0.07em", fontFamily: bFont }}>{s.label}</div>
           </div>
         ))}
       </div>
     </section>
   );
 
-  /* ── About — light ─────────────────────────────────────────── */
+  /* ── About ────────────────────────────────────────────────── */
   const About = () => (
     <section style={{ padding: "96px 24px", background: C.white }}>
       <div className="dh-about-grid" style={{
@@ -405,40 +432,40 @@ export default function LandingPage() {
           <p className="dh-sans" style={{
             color: C.hills, fontSize: 11, letterSpacing: "0.18em",
             textTransform: "uppercase", marginBottom: 16, fontWeight: 600,
-          }}>About the project</p>
+            fontFamily: bFont,
+          }}>{t("landing_about_eyebrow")}</p>
           <h2 className="dh-serif" style={{
             fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 600,
             color: C.ink, lineHeight: 1.15, marginBottom: 24,
+            fontFamily: hFont,
           }}>
-            101 private residences on a hilltop estate
+            {t("landing_about_heading")}
           </h2>
           <p className="dh-sans" style={{
             color: C.muted, fontSize: 15, lineHeight: 1.78, marginBottom: 20, fontWeight: 300,
+            fontFamily: bFont,
           }}>
-            Deddeh Hills is a master-planned gated community set on elevated land in the Koura district
-            of North Lebanon. The development spans 101 lots across four residential typologies —
-            from contemporary apartments to spacious standalone villas.
+            {t("landing_about_p1")}
           </p>
           <p className="dh-sans" style={{
             color: C.muted, fontSize: 15, lineHeight: 1.78, fontWeight: 300,
+            fontFamily: bFont,
           }}>
-            Every plot benefits from complete infrastructure — paved roads, electricity, water —
-            and a secure perimeter, allowing residents to build and move in with confidence.
+            {t("landing_about_p2")}
           </p>
 
-          {/* Mini-stats row */}
           <div style={{
             display: "flex", gap: 28, marginTop: 36,
             paddingTop: 32, borderTop: `1px solid ${C.border}`,
           }}>
             {[
-              { val: "101", lbl: "Lots" },
-              { val: "4",   lbl: "Typologies" },
-              { val: "3",   lbl: "Phases" },
+              { val: "101", lbl: t("landing_about_lots")      },
+              { val: "4",   lbl: t("landing_nav_typologies")  },
+              { val: "3",   lbl: t("landing_about_phases")    },
             ].map(s => (
               <div key={s.lbl}>
-                <div className="dh-serif" style={{ fontSize: 28, fontWeight: 700, color: C.deep }}>{s.val}</div>
-                <div className="dh-sans" style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>{s.lbl}</div>
+                <div className="dh-serif" style={{ fontSize: 28, fontWeight: 700, color: C.deep, fontFamily: hFont }}>{s.val}</div>
+                <div className="dh-sans" style={{ fontSize: 12, color: C.muted, marginTop: 2, fontFamily: bFont }}>{s.lbl}</div>
               </div>
             ))}
           </div>
@@ -456,21 +483,22 @@ export default function LandingPage() {
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
           <div style={{
-            position: "absolute", bottom: 16, left: 16,
+            position: "absolute", bottom: 16,
+            ...(isRTL ? { right: 16 } : { left: 16 }),
             background: "rgba(255,255,255,0.88)",
             backdropFilter: "blur(8px)",
             borderRadius: 10, padding: "8px 14px",
             display: "flex", alignItems: "center", gap: 8,
           }}>
             <div style={{ width: 8, height: 8, borderRadius: "50%", background: C.hills }} />
-            <span className="dh-sans" style={{ fontSize: 12, color: C.ink, fontWeight: 500 }}>Master plan · Koura</span>
+            <span className="dh-sans" style={{ fontSize: 12, color: C.ink, fontWeight: 500, fontFamily: bFont }}>{t("landing_about_masterplan")}</span>
           </div>
         </div>
       </div>
     </section>
   );
 
-  /* ── Typologies ─────────────────────────────────────────────── */
+  /* ── Typologies ───────────────────────────────────────────── */
   const Typologies = () => (
     <section id="typologies" style={{ padding: "96px 24px", background: C.bg }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
@@ -478,12 +506,13 @@ export default function LandingPage() {
           <p className="dh-sans" style={{
             color: C.hills, fontSize: 11, letterSpacing: "0.18em",
             textTransform: "uppercase", marginBottom: 14, fontWeight: 600,
-          }}>Residence types</p>
+            fontFamily: bFont,
+          }}>{t("landing_typo_eyebrow")}</p>
           <h2 className="dh-serif" style={{
             fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 600,
-            color: C.ink, lineHeight: 1.2,
+            color: C.ink, lineHeight: 1.2, fontFamily: hFont,
           }}>
-            Choose your residence
+            {t("landing_typo_heading")}
           </h2>
         </div>
 
@@ -492,8 +521,8 @@ export default function LandingPage() {
           gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
           gap: 20,
         }}>
-          {TYPOLOGIES.map((t) => (
-            <a key={t.id} href="/customer" style={{
+          {TYPOLOGIES.map((ty) => (
+            <a key={ty.id} href="/customer" style={{
               display: "block",
               background: C.white,
               border: `1.5px solid ${C.border}`,
@@ -504,8 +533,8 @@ export default function LandingPage() {
               onMouseOver={e => {
                 const el = e.currentTarget as HTMLElement;
                 el.style.transform = "translateY(-5px)";
-                el.style.borderColor = t.color;
-                el.style.boxShadow = `0 8px 32px ${t.color}28`;
+                el.style.borderColor = ty.color;
+                el.style.boxShadow = `0 8px 32px ${ty.color}28`;
               }}
               onMouseOut={e => {
                 const el = e.currentTarget as HTMLElement;
@@ -514,45 +543,39 @@ export default function LandingPage() {
                 el.style.boxShadow = "none";
               }}
             >
-              {/* Color bar */}
-              <div style={{ width: 40, height: 4, borderRadius: 2, background: t.color, marginBottom: 20 }} />
-
+              <div style={{ width: 40, height: 4, borderRadius: 2, background: ty.color, marginBottom: 20 }} />
               <div className="dh-sans" style={{
                 fontSize: 10, fontWeight: 700, letterSpacing: "0.14em",
-                textTransform: "uppercase", color: t.color, marginBottom: 8,
-              }}>{t.badge}</div>
-
+                textTransform: "uppercase", color: ty.color, marginBottom: 8, fontFamily: bFont,
+              }}>{ty.badge}</div>
               <h3 className="dh-serif" style={{
                 fontSize: 22, fontWeight: 600, color: C.ink,
-                marginBottom: 10, lineHeight: 1.2,
-              }}>{t.label}</h3>
-
+                marginBottom: 10, lineHeight: 1.2, fontFamily: hFont,
+              }}>{ty.label}</h3>
               <p className="dh-sans" style={{
-                fontSize: 13, color: C.muted, lineHeight: 1.6, marginBottom: 20,
-              }}>{t.desc}</p>
-
+                fontSize: 13, color: C.muted, lineHeight: 1.6, marginBottom: 20, fontFamily: bFont,
+              }}>{ty.desc}</p>
               <div className="dh-sans" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {[
-                  { k: "Size",          v: t.size,          accent: false },
-                  { k: "Bedrooms",      v: t.beds,          accent: false },
-                  { k: "Starting from", v: t.from,          accent: true  },
-                  { k: "Available",     v: `${t.count} units`, accent: false },
+                  { k: t("landing_typo_size"), v: ty.size,                           accent: false },
+                  { k: t("landing_typo_beds"), v: ty.beds,                           accent: false },
+                  { k: t("landing_typo_from"), v: ty.from,                           accent: true  },
+                  { k: t("landing_typo_available"), v: `${ty.count} ${t("landing_typo_units")}`, accent: false },
                 ].map(row => (
                   <div key={row.k} style={{
                     display: "flex", justifyContent: "space-between",
                     fontSize: 12, paddingBottom: 8,
                     borderBottom: `1px solid ${C.border}`,
                   }}>
-                    <span style={{ color: C.muted }}>{row.k}</span>
-                    <span style={{ color: row.accent ? t.color : C.ink, fontWeight: row.accent ? 700 : 500, fontFamily: row.accent ? "'Playfair Display', serif" : "inherit" }}>
+                    <span style={{ color: C.muted, fontFamily: bFont }}>{row.k}</span>
+                    <span style={{ color: row.accent ? ty.color : C.ink, fontWeight: row.accent ? 700 : 500, fontFamily: row.accent ? hFont : bFont }}>
                       {row.v}
                     </span>
                   </div>
                 ))}
               </div>
-
-              <div style={{ marginTop: 16, fontSize: 12, color: t.color, fontWeight: 500 }}>
-                View units →
+              <div style={{ marginTop: 16, fontSize: 12, color: ty.color, fontWeight: 500, fontFamily: bFont }}>
+                {t("landing_typo_view")}
               </div>
             </a>
           ))}
@@ -563,7 +586,7 @@ export default function LandingPage() {
             display: "inline-block", padding: "13px 32px",
             border: `1.5px solid ${C.hills}`,
             color: C.hills, borderRadius: 10, fontSize: 14, fontWeight: 600,
-            transition: "background 0.2s, color 0.2s",
+            transition: "background 0.2s, color 0.2s", fontFamily: bFont,
           }}
             onMouseOver={e => {
               (e.currentTarget as HTMLElement).style.background = C.hills;
@@ -574,54 +597,46 @@ export default function LandingPage() {
               (e.currentTarget as HTMLElement).style.color = C.hills;
             }}
           >
-            Explore all units on the master plan →
+            {t("landing_typo_cta")}
           </a>
         </div>
       </div>
     </section>
   );
 
-  /* ── Location ───────────────────────────────────────────────── */
+  /* ── Location ─────────────────────────────────────────────── */
   const Location = () => (
     <section id="location" style={{ padding: "96px 24px", background: C.white }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 56 }}>
           <p className="dh-sans" style={{
             color: C.hills, fontSize: 11, letterSpacing: "0.18em",
-            textTransform: "uppercase", marginBottom: 14, fontWeight: 600,
-          }}>Where we are</p>
+            textTransform: "uppercase", marginBottom: 14, fontWeight: 600, fontFamily: bFont,
+          }}>{t("landing_loc_eyebrow")}</p>
           <h2 className="dh-serif" style={{
             fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 600,
-            color: C.ink, lineHeight: 1.2,
-          }}>Koura, North Lebanon</h2>
+            color: C.ink, lineHeight: 1.2, fontFamily: hFont,
+          }}>{t("landing_loc_heading")}</h2>
         </div>
 
         <div className="dh-location-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 64, alignItems: "start" }}>
           <div>
             <p className="dh-sans" style={{
-              color: C.muted, fontSize: 15, lineHeight: 1.78, marginBottom: 32, fontWeight: 300,
+              color: C.muted, fontSize: 15, lineHeight: 1.78, marginBottom: 32, fontWeight: 300, fontFamily: bFont,
             }}>
-              Situated on elevated terrain in the Koura district, Deddeh Hills commands
-              sweeping views of the surrounding valley and the distant Mediterranean.
-              The area is known for its olive groves, mild climate, and proximity to
-              both Tripoli and the Beirut–Tripoli highway.
+              {t("landing_loc_text")}
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-              {[
-                { place: "Tripoli city centre",  time: "25 min" },
-                { place: "Beirut",               time: "75 min" },
-                { place: "Chekka interchange",   time: "12 min" },
-                { place: "Batroun",              time: "20 min" },
-              ].map((d) => (
+              {DISTANCES.map((d) => (
                 <div key={d.place} style={{
                   display: "flex", justifyContent: "space-between",
                   alignItems: "center", padding: "14px 0",
                   borderBottom: `1px solid ${C.border}`,
                 }}>
-                  <span className="dh-sans" style={{ color: C.muted, fontSize: 14 }}>{d.place}</span>
+                  <span className="dh-sans" style={{ color: C.muted, fontSize: 14, fontFamily: bFont }}>{d.place}</span>
                   <span className="dh-sans" style={{
-                    color: C.deep, fontSize: 14, fontWeight: 600,
+                    color: C.deep, fontSize: 14, fontWeight: 600, fontFamily: bFont,
                     background: C.lightBg, padding: "4px 14px", borderRadius: 20,
                   }}>{d.time}</span>
                 </div>
@@ -629,7 +644,6 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Location feature card */}
           <div style={{
             background: C.bg, border: `1.5px solid ${C.border}`,
             borderRadius: 20, padding: "36px 30px",
@@ -642,21 +656,18 @@ export default function LandingPage() {
                 display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20,
               }}>📍</div>
               <div>
-                <div className="dh-serif" style={{ color: C.ink, fontSize: 18, fontWeight: 600 }}>Deddeh, Koura</div>
-                <div className="dh-sans" style={{ color: C.muted, fontSize: 13 }}>North Lebanon</div>
+                <div className="dh-serif" style={{ color: C.ink, fontSize: 18, fontWeight: 600, fontFamily: hFont }}>
+                  {lang === "ar" ? "دده، الكورة" : "Deddeh, Koura"}
+                </div>
+                <div className="dh-sans" style={{ color: C.muted, fontSize: 13, fontFamily: bFont }}>
+                  {lang === "ar" ? "شمال لبنان" : "North Lebanon"}
+                </div>
               </div>
             </div>
-
-            {[
-              { icon: "🏔️", text: "Hilltop elevation with valley and sea views" },
-              { icon: "🛤️", text: "Direct access from the Koura main road" },
-              { icon: "🌳", text: "Surrounded by olive groves and pine trees" },
-              { icon: "☀️", text: "Mediterranean climate — warm, dry summers" },
-              { icon: "🔇", text: "Quiet residential area, away from urban density" },
-            ].map((f) => (
+            {LOC_FEATURES.map((f) => (
               <div key={f.text} style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 14 }}>
                 <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>{f.icon}</span>
-                <span className="dh-sans" style={{ color: C.muted, fontSize: 13, lineHeight: 1.55 }}>{f.text}</span>
+                <span className="dh-sans" style={{ color: C.muted, fontSize: 13, lineHeight: 1.55, fontFamily: bFont }}>{f.text}</span>
               </div>
             ))}
           </div>
@@ -665,19 +676,19 @@ export default function LandingPage() {
     </section>
   );
 
-  /* ── Features ───────────────────────────────────────────────── */
+  /* ── Features ─────────────────────────────────────────────── */
   const Features = () => (
     <section style={{ padding: "96px 24px", background: C.bg }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 56 }}>
           <p className="dh-sans" style={{
             color: C.hills, fontSize: 11, letterSpacing: "0.18em",
-            textTransform: "uppercase", marginBottom: 14, fontWeight: 600,
-          }}>What&apos;s included</p>
+            textTransform: "uppercase", marginBottom: 14, fontWeight: 600, fontFamily: bFont,
+          }}>{t("landing_feat_eyebrow")}</p>
           <h2 className="dh-serif" style={{
             fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 600,
-            color: C.ink,
-          }}>Community &amp; investment features</h2>
+            color: C.ink, fontFamily: hFont,
+          }}>{t("landing_feat_heading")}</h2>
         </div>
 
         <div style={{
@@ -704,8 +715,8 @@ export default function LandingPage() {
               }}
             >
               <span style={{ fontSize: 24 }}>{f.icon}</span>
-              <div className="dh-sans" style={{ color: C.ink, fontWeight: 600, fontSize: 14 }}>{f.label}</div>
-              <div className="dh-sans" style={{ color: C.muted, fontSize: 12, lineHeight: 1.55 }}>{f.sub}</div>
+              <div className="dh-sans" style={{ color: C.ink, fontWeight: 600, fontSize: 14, fontFamily: bFont }}>{f.label}</div>
+              <div className="dh-sans" style={{ color: C.muted, fontSize: 12, lineHeight: 1.55, fontFamily: bFont }}>{f.sub}</div>
             </div>
           ))}
         </div>
@@ -713,14 +724,13 @@ export default function LandingPage() {
     </section>
   );
 
-  /* ── CTA banner — rich brand green ─────────────────────────── */
+  /* ── CTA banner ───────────────────────────────────────────── */
   const CTABanner = () => (
     <section style={{
       padding: "88px 24px", textAlign: "center",
       background: `linear-gradient(135deg, ${C.deep} 0%, ${C.mid} 55%, ${C.hills} 100%)`,
       position: "relative", overflow: "hidden",
     }}>
-      {/* Subtle pattern overlay */}
       <div style={{
         position: "absolute", inset: 0,
         backgroundImage: "url('/master-plan.png')",
@@ -730,58 +740,57 @@ export default function LandingPage() {
       <div style={{ maxWidth: 600, margin: "0 auto", position: "relative" }}>
         <p className="dh-sans" style={{
           color: "rgba(255,255,255,0.72)", fontSize: 11, letterSpacing: "0.18em",
-          textTransform: "uppercase", marginBottom: 16, fontWeight: 500,
-        }}>Limited availability</p>
+          textTransform: "uppercase", marginBottom: 16, fontWeight: 500, fontFamily: bFont,
+        }}>{t("landing_cta_eyebrow")}</p>
         <h2 className="dh-serif" style={{
           fontSize: "clamp(30px, 4vw, 52px)", fontWeight: 600,
-          color: C.white, marginBottom: 16, lineHeight: 1.1,
-        }}>59 units available now</h2>
+          color: C.white, marginBottom: 16, lineHeight: 1.1, fontFamily: hFont,
+        }}>{t("landing_cta_heading")}</h2>
         <p className="dh-sans" style={{
-          color: "rgba(255,255,255,0.72)", fontSize: 15, marginBottom: 40, lineHeight: 1.68,
+          color: "rgba(255,255,255,0.72)", fontSize: 15, marginBottom: 40, lineHeight: 1.68, fontFamily: bFont,
         }}>
-          Browse the interactive master plan to explore available lots,
-          view unit specs, and compare payment plans.
+          {t("landing_cta_text")}
         </p>
         <a href="/customer" className="dh-sans" style={{
           display: "inline-block", padding: "16px 40px",
           background: C.white, color: C.deep,
           borderRadius: 10, fontSize: 15, fontWeight: 700,
-          transition: "opacity 0.2s",
+          transition: "opacity 0.2s", fontFamily: bFont,
         }}
           onMouseOver={e => (e.currentTarget.style.opacity = "0.9")}
           onMouseOut={e => (e.currentTarget.style.opacity = "1")}
         >
-          Explore the master plan →
+          {t("landing_cta_btn")}
         </a>
       </div>
     </section>
   );
 
-  /* ── Contact ────────────────────────────────────────────────── */
+  /* ── Contact ──────────────────────────────────────────────── */
   const Contact = () => (
     <section id="contact" style={{ padding: "96px 24px", background: C.white }}>
       <div style={{ maxWidth: 560, margin: "0 auto", textAlign: "center" }}>
         <p className="dh-sans" style={{
           color: C.hills, fontSize: 11, letterSpacing: "0.18em",
-          textTransform: "uppercase", marginBottom: 14, fontWeight: 600,
-        }}>Get in touch</p>
+          textTransform: "uppercase", marginBottom: 14, fontWeight: 600, fontFamily: bFont,
+        }}>{t("landing_contact_eyebrow")}</p>
         <h2 className="dh-serif" style={{
           fontSize: "clamp(28px, 4vw, 40px)", fontWeight: 600,
-          color: C.ink, marginBottom: 12,
-        }}>Enquire about a unit</h2>
+          color: C.ink, marginBottom: 12, fontFamily: hFont,
+        }}>{t("landing_contact_heading")}</h2>
         <p className="dh-sans" style={{
-          color: C.muted, fontSize: 14, marginBottom: 40, lineHeight: 1.68,
+          color: C.muted, fontSize: 14, marginBottom: 40, lineHeight: 1.68, fontFamily: bFont,
         }}>
-          Our team is available to answer your questions and arrange a site visit.
+          {t("landing_contact_sub")}
         </p>
-        <div style={{ textAlign: "left" }}>
+        <div style={{ textAlign: isRTL ? "right" : "left" }}>
           <EnquiryForm />
         </div>
       </div>
     </section>
   );
 
-  /* ── Footer ─────────────────────────────────────────────────── */
+  /* ── Footer ───────────────────────────────────────────────── */
   const Footer = () => (
     <footer className="dh-sans" style={{
       padding: "32px 32px",
@@ -798,30 +807,30 @@ export default function LandingPage() {
         }}>
           <span className="dh-serif" style={{ color: C.hills, fontSize: 11, fontWeight: 700 }}>DH</span>
         </div>
-        <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 13 }}>
-          Deddeh Hills · Koura, North Lebanon
+        <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 13, fontFamily: bFont }}>
+          {lang === "ar" ? "ديدح هيلز · الكورة، شمال لبنان" : "Deddeh Hills · Koura, North Lebanon"}
         </span>
       </div>
 
       <div style={{ display: "flex", gap: 24, fontSize: 12, color: "rgba(255,255,255,0.45)" }}>
         {[
-          { label: "Browse Units",    href: "/customer"  },
-          { label: "Contact",         href: "#contact"   },
-          { label: "Investor Access", href: "/investor"  },
+          { label: t("landing_footer_browse"),   href: "/customer" },
+          { label: t("landing_footer_contact"),  href: "#contact"  },
+          { label: t("landing_footer_investor"), href: "/investor" },
         ].map(({ label, href }) => (
-          <a key={href} href={href} style={{ transition: "color 0.2s" }}
+          <a key={href} href={href} style={{ transition: "color 0.2s", fontFamily: bFont }}
             onMouseOver={e => (e.currentTarget.style.color = C.light)}
             onMouseOut={e => (e.currentTarget.style.color = "rgba(255,255,255,0.45)")}
           >{label}</a>
         ))}
       </div>
 
-      <span style={{ color: "rgba(255,255,255,0.22)", fontSize: 12 }}>© 2025 Deddeh Hills</span>
+      <span style={{ color: "rgba(255,255,255,0.22)", fontSize: 12, fontFamily: bFont }}>© 2025 Deddeh Hills</span>
     </footer>
   );
 
   return (
-    <div className="dh-sans" style={{ background: C.white, minHeight: "100vh" }}>
+    <div className="dh-sans" dir={isRTL ? "rtl" : "ltr"} style={{ background: C.white, minHeight: "100vh" }}>
       <Nav />
       <Hero />
       <About />

@@ -78,6 +78,12 @@ html {
 .dh-serif { font-family: 'Playfair Display', Georgia, serif; }
 .dh-sans  { font-family: 'DM Sans', system-ui, sans-serif; }
 
+/* RTL: override landing page fonts to Noto Sans Arabic */
+[dir="rtl"] .dh-serif,
+[dir="rtl"] .dh-sans {
+  font-family: 'Noto Sans Arabic', 'Segoe UI', system-ui, sans-serif;
+}
+
 /* ── Landing page responsive breakpoints ── */
 @media (max-width: 640px) {
   /* Nav: hide text links, keep CTA button */
