@@ -898,15 +898,15 @@ export default function CustomerPage() {
         <div className="max-w-7xl mx-auto px-5 pt-8 pb-7">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
-              {/* Eyebrow */}
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: C.forest }}>
+              {/* Eyebrow — click to return to landing page */}
+              <a href="/" className="flex items-center gap-3 mb-5 w-fit group" style={{ textDecoration: "none" }}>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-opacity group-hover:opacity-80" style={{ background: C.forest }}>
                   <span className="font-bold text-xs" style={{ color: C.white, fontFamily: "'DM Sans', system-ui, sans-serif" }}>DH</span>
                 </div>
-                <div className="text-[10px] uppercase tracking-[0.2em]" style={{ color: C.gold, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                <div className="text-[10px] uppercase tracking-[0.2em] transition-opacity group-hover:opacity-70" style={{ color: C.gold, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
                   Koura, North Lebanon
                 </div>
-              </div>
+              </a>
               {/* Title */}
               <h1 className="dh-serif font-bold leading-none mb-3" style={{ fontSize: "clamp(2rem,6vw,3.75rem)", color: C.white }}>
                 Deddeh Hills
