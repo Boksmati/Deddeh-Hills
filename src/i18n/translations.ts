@@ -317,6 +317,12 @@ const en = {
   landing_footer_browse: "Browse Units",
   landing_footer_contact: "Contact",
   landing_footer_investor: "Investor Access",
+
+  // Landing page — building standards
+  landing_specs_eyebrow: "Building Standards",
+  landing_specs_heading: "Architecture of timeless character",
+  landing_specs_sub: "All residences at Deddeh Hills conform to a unified architectural charter — ensuring a cohesive, premium streetscape that honours North Lebanese building heritage.",
+  landing_specs_note: "All construction must follow Deddeh Hills' approved architectural plans and building charter. The developer holds power of attorney to maintain road and garden easements on behalf of all owners.",
 } as const;
 
 export type TranslationKey = keyof typeof en;
@@ -638,6 +644,12 @@ const ar: Record<TranslationKey, string> = {
   landing_footer_browse: "استكشف الوحدات",
   landing_footer_contact: "تواصل",
   landing_footer_investor: "دخول المستثمرين",
+
+  // Landing page — building standards
+  landing_specs_eyebrow: "معايير البناء",
+  landing_specs_heading: "عمارة ذات طابع خالد",
+  landing_specs_sub: "تلتزم جميع مساكن ديدح هيلز بميثاق معماري موحد — يضمن مشهداً راقياً ومتجانساً يُجسّد الموروث المعماري اللبناني الشمالي الأصيل.",
+  landing_specs_note: "يجب أن يتوافق كل بناء مع المخططات المعمارية المعتمدة لديدح هيلز وميثاق البناء. يمتلك المطوّر توكيلاً قانونياً للحفاظ على ارتفاقات الطرق والحدائق لصالح جميع الملاك.",
 } as const;
 
 export const translations: Record<Lang, Record<TranslationKey, string>> = { en, ar };

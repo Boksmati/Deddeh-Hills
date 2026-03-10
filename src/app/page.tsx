@@ -223,6 +223,51 @@ export default function LandingPage() {
     { icon: "🔇", text: lang === "ar" ? "منطقة سكنية هادئة بعيداً عن الازدحام العمراني" : "Quiet residential area, away from urban density"},
   ];
 
+  const BUILDING_SPECS = [
+    {
+      icon: "🪨",
+      title: lang === "ar" ? "كسوة الحجر الطبيعي"      : "Natural Stone Cladding",
+      desc:  lang === "ar"
+        ? "تستلزم جميع الواجهات الأربع كسوة حجر طبيعي بنسبة ≥٨٠٪ — السمة المعمارية الأيقونية للشمال اللبناني."
+        : "All four facades require ≥80% natural stone cladding — the defining mark of North Lebanese heritage architecture.",
+    },
+    {
+      icon: "🏠",
+      title: lang === "ar" ? "أسقف قرميدية تقليدية"    : "Traditional Tiled Roofs",
+      desc:  lang === "ar"
+        ? "يُغطى ما لا يقل عن ٨٠٪ من مساحة السقف بالقرميد الفخاري التقليدي، للحفاظ على سيلويت التل."
+        : "A minimum of 80% of each roof surface must be covered in traditional clay tile, preserving the hillside silhouette.",
+    },
+    {
+      icon: "📐",
+      title: lang === "ar" ? "مقياس معماري منخفض"       : "Low-Rise Scale",
+      desc:  lang === "ar"
+        ? "أقصى ارتفاع للمبنى ٨م + ١م لحافة القرميد، مما يحافظ على تناسق المسكن مع تضاريس التل."
+        : "Maximum 8m building height + 1m for the tile ridge — every home stays proportional to the natural hillside terrain.",
+    },
+    {
+      icon: "↔️",
+      title: lang === "ar" ? "ارتدادات سخية"            : "Generous Setbacks",
+      desc:  lang === "ar"
+        ? "ارتدادات لا تقل عن ٥م عن الطرق الداخلية والعامة، تضمن الخصوصية وإطلالات مفتوحة."
+        : "Minimum 5m setbacks from all internal and public roads — ensuring privacy and open sight lines across the estate.",
+    },
+    {
+      icon: "✨",
+      title: lang === "ar" ? "واجهات خالية من المعدات"  : "Clutter-Free Facades",
+      desc:  lang === "ar"
+        ? "لا يُسمح بأي معدات ميكانيكية أو مكيفات أو تركيبات تقنية ظاهرة على أي واجهة خارجية."
+        : "No visible mechanical equipment, AC units, or technical installations permitted on any external elevation.",
+    },
+    {
+      icon: "🚗",
+      title: lang === "ar" ? "مواقف سيارات خاصة"        : "Private Parking",
+      desc:  lang === "ar"
+        ? "مواقفان مخصصان على الأقل لكل وحدة سكنية، مدمجان ضمن حدود القطعة الخاصة."
+        : "Minimum two dedicated parking spaces per residential unit, integrated within the private plot boundary.",
+    },
+  ];
+
   /* ── CSS injection (fonts + animations) ──────────────────── */
   useEffect(() => {
     const id = "dh-landing-styles";
@@ -724,6 +769,102 @@ export default function LandingPage() {
     </section>
   );
 
+  /* ── Building Standards ───────────────────────────────────── */
+  const BuildingSpecs = () => (
+    <section style={{ padding: "96px 24px", background: C.white, borderTop: `1px solid ${C.border}` }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+
+        {/* Header */}
+        <div style={{ textAlign: "center", marginBottom: 56 }}>
+          <p className="dh-sans" style={{
+            color: C.hills, fontSize: 11, letterSpacing: "0.18em",
+            textTransform: "uppercase", marginBottom: 14, fontWeight: 600,
+            fontFamily: bFont,
+          }}>{t("landing_specs_eyebrow")}</p>
+          <h2 className="dh-serif" style={{
+            fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 600,
+            color: C.ink, lineHeight: 1.2, marginBottom: 16,
+            fontFamily: hFont,
+          }}>
+            {t("landing_specs_heading")}
+          </h2>
+          <p className="dh-sans" style={{
+            color: C.muted, fontSize: 15, lineHeight: 1.72,
+            maxWidth: 620, margin: "0 auto", fontWeight: 300,
+            fontFamily: bFont,
+          }}>
+            {t("landing_specs_sub")}
+          </p>
+        </div>
+
+        {/* Specs grid */}
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(310px, 1fr))",
+          gap: 18,
+          marginBottom: 40,
+        }}>
+          {BUILDING_SPECS.map((spec) => (
+            <div key={spec.title} style={{
+              background: C.bg,
+              border: `1.5px solid ${C.border}`,
+              borderRadius: 16,
+              padding: "26px 22px",
+              display: "flex", gap: 18, alignItems: "flex-start",
+              transition: "border-color 0.2s, box-shadow 0.2s",
+            }}
+              onMouseOver={e => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.borderColor = C.hills;
+                el.style.boxShadow = `0 4px 20px ${C.hills}16`;
+              }}
+              onMouseOut={e => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.borderColor = C.border;
+                el.style.boxShadow = "none";
+              }}
+            >
+              {/* Icon bubble */}
+              <div style={{
+                width: 48, height: 48, borderRadius: 12, flexShrink: 0,
+                background: C.white, border: `1.5px solid ${C.hills}30`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 22,
+              }}>
+                {spec.icon}
+              </div>
+              {/* Text */}
+              <div>
+                <div className="dh-sans" style={{
+                  color: C.ink, fontWeight: 700, fontSize: 14,
+                  marginBottom: 6, fontFamily: bFont,
+                }}>
+                  {spec.title}
+                </div>
+                <div className="dh-sans" style={{
+                  color: C.muted, fontSize: 13, lineHeight: 1.6,
+                  fontFamily: bFont,
+                }}>
+                  {spec.desc}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Footer note */}
+        <p className="dh-sans" style={{
+          textAlign: "center", color: C.muted, fontSize: 12,
+          lineHeight: 1.65, fontFamily: bFont,
+          borderTop: `1px solid ${C.border}`, paddingTop: 28,
+          maxWidth: 700, margin: "0 auto",
+        }}>
+          {t("landing_specs_note")}
+        </p>
+      </div>
+    </section>
+  );
+
   /* ── CTA banner ───────────────────────────────────────────── */
   const CTABanner = () => (
     <section style={{
@@ -837,6 +978,7 @@ export default function LandingPage() {
       <Typologies />
       <Location />
       <Features />
+      <BuildingSpecs />
       <CTABanner />
       <Contact />
       <Footer />
