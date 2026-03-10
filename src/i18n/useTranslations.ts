@@ -31,9 +31,19 @@ export function useSetLang(): (l: Lang) => void {
 export function useTranslations() {
   const lang = useLang();
   const setLang = useSetLang();
-  // Guard against SSR/client hydration mismatch: always render "en" until mounted
+  // Guard against SSR/client hydration mismatch: always render "en" until mounted.
+  // On mount, also sync the Zustand store from localStorage so page-reload
+  // correctly restores the last-chosen language (the store IIFE may run
+  // server-side with window===undefined and persist "en" through hydration).
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    const stored = typeof window !== "undefined"
+      ? (localStorage.getItem("dh_lang") as Lang | null)
+      : null;
+    if (stored && stored !== lang) setLang(stored);
+    setMounted(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const activeLang: Lang = mounted ? lang : "en";
   const isRTL = mounted ? lang === "ar" : false;
