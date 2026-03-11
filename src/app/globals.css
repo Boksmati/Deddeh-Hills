@@ -4,16 +4,18 @@
 
 :root {
   --dh-green: #2D5A27;
-  --dh-gold: #C5A55A;
+  --dh-hills: #78BF42;
+  --dh-light: #95CC58;
   --dh-slate: #3A4A5C;
   --dh-cream: #F5F0E8;
-  --dh-dark: #1A1A2E;
+  --dh-dark: #1A3810;
+  --dh-bg: #F4F9EF;
 }
 
 body {
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
-  background: #f8f9fa;
-  color: #1a1a2e;
+  font-family: "DM Sans", system-ui, -apple-system, sans-serif;
+  background: #F4F9EF;
+  color: #373737;
 }
 
 /* Smooth scrolling */
@@ -46,7 +48,7 @@ html {
   stroke-width: 2.5;
 }
 .lot-polygon.selected {
-  stroke: #1a1a2e;
+  stroke: #1A3810;
   stroke-width: 3;
   stroke-dasharray: 6 3;
   animation: dash 1s linear infinite;

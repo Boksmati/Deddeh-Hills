@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useSimulationStore } from "@/store/simulation-store";
 import { LOTS } from "@/data/lots";
 import { DEVELOPMENT_TYPES, PHASE_COLORS, PHASE_LABELS } from "@/data/development-types";
@@ -39,7 +39,13 @@ const STATUSES: LotStatus[] = ["available", "reserved", "under_contract", "sold"
 export default function StatusPage() {
   const assignments = useSimulationStore((s) => s.assignments);
   const lotStatuses = useSimulationStore((s) => s.lotStatuses);
-  const { t } = useTranslations();
+  const phaseRevenueTargets = useSimulationStore((s) => s.phaseRevenueTargets);
+  const setPhaseRevenueTarget = useSimulationStore((s) => s.setPhaseRevenueTarget);
+  const { t, lang } = useTranslations();
+
+  // Track which phase is being edited (target input open)
+  const [editingPhase, setEditingPhase] = useState<1 | 2 | 3 | null>(null);
+  const [targetDraft, setTargetDraft] = useState("");
 
   // Build STATUS_META with translated labels
   const STATUS_META: Record<LotStatus, { label: string; color: string; bg: string; text: string }> = {
@@ -268,12 +274,17 @@ export default function StatusPage() {
           <div className="space-y-5">
             {data.phases.map((p) => {
               const phaseColor = PHASE_COLORS[p.phase] === "#E5E7EB" ? "#6B7280" : PHASE_COLORS[p.phase];
+              const target = phaseRevenueTargets[p.phase as 1 | 2 | 3] ?? 0;
+              const hasTarget = target > 0 && p.phaseRevenue > 0;
+              const deltaPct = hasTarget ? (p.phaseRevenue - target) / target : 0;
+              const onTrack = deltaPct >= 0;
+              const isEditing = editingPhase === p.phase;
               return (
                 <div key={p.phase}>
                   <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span
-                        className="w-2 h-2 rounded-full"
+                        className="w-2 h-2 rounded-full flex-shrink-0"
                         style={{ backgroundColor: phaseColor }}
                       />
                       <span className="text-sm font-semibold text-gray-800">
@@ -282,6 +293,53 @@ export default function StatusPage() {
                       <span className="text-xs text-gray-400">
                         {p.lotCount} {t("lots")} &middot; {p.phaseUnits} units &middot; {fmtUSD(p.phaseRevenue)}
                       </span>
+                      {/* ── Target badge / editor ── */}
+                      {isEditing ? (
+                        <form
+                          className="flex items-center gap-1"
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            const val = parseFloat(targetDraft.replace(/[$,MmKk]/g, "")) * (
+                              /[Mm]/.test(targetDraft) ? 1_000_000 : /[Kk]/.test(targetDraft) ? 1_000 : 1
+                            );
+                            if (!isNaN(val)) setPhaseRevenueTarget(p.phase as 1 | 2 | 3, val);
+                            setEditingPhase(null);
+                          }}
+                        >
+                          <input
+                            autoFocus
+                            value={targetDraft}
+                            onChange={(e) => setTargetDraft(e.target.value)}
+                            onBlur={() => setEditingPhase(null)}
+                            className="w-24 px-2 py-0.5 text-xs border border-blue-300 rounded-md bg-blue-50 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                            placeholder={lang === "ar" ? "مثال: 12M" : "e.g. 12M"}
+                          />
+                          <button type="submit" className="text-blue-600 text-xs font-semibold hover:text-blue-800">✓</button>
+                        </form>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setTargetDraft(target > 0 ? fmtUSD(target).replace("$", "") : "");
+                            setEditingPhase(p.phase as 1 | 2 | 3);
+                          }}
+                          className="flex items-center gap-1 text-[10px] text-gray-400 hover:text-blue-500 transition-colors"
+                          title={t("set_target")}
+                        >
+                          <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                          {target > 0 ? (
+                            <span>{t("revenue_target")}: {fmtUSD(target)}</span>
+                          ) : (
+                            <span className="italic">{t("set_target")}</span>
+                          )}
+                        </button>
+                      )}
+                      {/* ── Delta vs projection ── */}
+                      {hasTarget && !isEditing && (
+                        <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${onTrack ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"}`}>
+                          {onTrack ? "+" : ""}{(deltaPct * 100).toFixed(1)}% {onTrack ? t("on_track") : t("below_target")}
+                        </span>
+                      )}
                     </div>
                     <div className="flex items-center gap-3 text-xs">
                       {STATUSES.map((s) => (

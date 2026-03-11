@@ -289,6 +289,32 @@ export default function LandingPage() {
         .fade-up-5 { animation-delay: 0.56s; }
         a { text-decoration: none; color: inherit; }
         ::placeholder { color: #9DB090; }
+        /* Stats bar — absolute on desktop, flows in flex on mobile */
+        .dh-stats-bar {
+          position: absolute; bottom: 52px; left: 50%; transform: translateX(-50%);
+          z-index: 3; display: flex; flex-wrap: nowrap; justify-content: center;
+          background: rgba(255,255,255,0.06); backdrop-filter: blur(16px);
+          border: 1px solid rgba(149,204,88,0.22); border-radius: 14px; overflow: hidden;
+          white-space: nowrap;
+        }
+        @media (max-width: 640px) {
+          .dh-stats-bar {
+            position: relative; bottom: auto; left: auto; transform: none;
+            width: calc(100% - 0px); margin-top: 36px; flex-wrap: wrap;
+            white-space: normal;
+          }
+          .dh-stats-bar > div {
+            flex: 1 1 calc(50% - 2px); min-width: 0;
+            padding: 14px 12px !important;
+          }
+          /* remove right border on 2nd cell (end of first row) */
+          .dh-stats-bar > div:nth-child(2) { border-right: none !important; }
+          /* add bottom border between rows */
+          .dh-stats-bar > div:nth-child(1),
+          .dh-stats-bar > div:nth-child(2) {
+            border-bottom: 1px solid rgba(149,204,88,0.18);
+          }
+        }
       `;
       document.head.appendChild(el);
     }
@@ -397,10 +423,10 @@ export default function LandingPage() {
         <h1 className="dh-serif fade-up fade-up-2" style={{
           fontSize: "clamp(52px, 8.5vw, 96px)", fontWeight: 600,
           color: C.white, lineHeight: 1.0, marginBottom: 24,
-          letterSpacing: isRTL ? "0" : "-0.02em",
-          fontFamily: hFont,
+          letterSpacing: "-0.02em",
+          fontFamily: "'Playfair Display', Georgia, 'Times New Roman', serif",
         }}>
-          {lang === "ar" ? "ديدح هيلز" : "Deddeh Hills"}
+          Deddeh Hills
         </h1>
 
         <p className="dh-sans fade-up fade-up-3" style={{
@@ -439,14 +465,7 @@ export default function LandingPage() {
       </div>
 
       {/* Stats bar */}
-      <div className="fade-up fade-up-5 dh-sans" style={{
-        position: "absolute", bottom: 52, left: "50%", transform: "translateX(-50%)",
-        zIndex: 3, display: "flex", flexWrap: "wrap", justifyContent: "center",
-        background: "rgba(255,255,255,0.06)",
-        backdropFilter: "blur(16px)",
-        border: `1px solid rgba(149,204,88,0.22)`,
-        borderRadius: 14, overflow: "hidden",
-      }}>
+      <div className="fade-up fade-up-5 dh-sans dh-stats-bar">
         {[
           { value: "101",     label: t("landing_stats_lots")       },
           { value: "4",       label: t("landing_nav_typologies")   },

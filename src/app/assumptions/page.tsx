@@ -8,6 +8,8 @@ import { DevelopmentType, TypeAssumption } from "@/types";
 import { calculateSimulationSummary, calculateLotFinancials } from "@/engine/financial-engine";
 import LanguageToggle from "@/components/ui/LanguageToggle";
 import { useTranslations } from "@/i18n/useTranslations";
+import { useInvestmentConfig } from "@/hooks/useInvestmentConfig";
+import { computeContinuationCost, computeWaterfall } from "@/lib/investment-layers";
 
 const EDITABLE_TYPES: DevelopmentType[] = ["twin_villa", "villa_2f", "villa_3f", "apartments", "lot_sale"];
 
@@ -54,6 +56,35 @@ export default function AssumptionsPage() {
   const assignments = useSimulationStore((s) => s.assignments);
   const investorSharePct = useSimulationStore((s) => s.investorSharePct);
   const { t } = useTranslations();
+
+  // ── Three-Party Investment Config
+  const { config, setConfig, saveConfig, l1Returns, waterfall, phasedPricing, isLoading: configLoading } = useInvestmentConfig();
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
+  const [showInsights, setShowInsights] = useState(false);
+
+  const continuationCost = useMemo(
+    () => computeContinuationCost(config, 30),
+    [config]
+  );
+
+  const waterfallWithPriority = useMemo(
+    () => computeWaterfall({ ...config, priorityEnabled: true }, 0),
+    [config]
+  );
+
+  async function handleSaveInvestmentConfig() {
+    setSaveStatus("saving");
+    await saveConfig();
+    setSaveStatus("saved");
+    setTimeout(() => setSaveStatus("idle"), 2000);
+  }
+
+  function updatePhaseLandPrice(phaseIdx: number, newPrice: number) {
+    const updated = config.phaseLandPrices.map((p, i) =>
+      i === phaseIdx ? { ...p, pricePerSqm: newPrice } : p
+    );
+    setConfig({ phaseLandPrices: updated });
+  }
 
   const summary = useMemo(() => {
     const arr = Array.from(assignments.values());
@@ -471,6 +502,189 @@ export default function AssumptionsPage() {
           </div>
         </div>
 
+        {/* ── Three-Party Investment Config ── */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div>
+              <h2 className="text-sm font-semibold text-gray-900">{t("inv_config_section_title")}</h2>
+              <p className="text-xs text-gray-400 mt-0.5">{t("inv_config_section_desc")}</p>
+            </div>
+            <button
+              onClick={() => setShowInsights((s) => !s)}
+              className="px-3 py-1.5 text-xs text-dh-green border border-dh-green/30 bg-dh-green/5 hover:bg-dh-green/10 rounded-lg transition-colors"
+            >
+              {showInsights ? "▲" : "▼"} {t("inv_config_insight_title")}
+            </button>
+          </div>
+
+          {configLoading ? (
+            <div className="p-6 text-xs text-gray-400 animate-pulse">Loading config…</div>
+          ) : (
+            <div className="p-6 space-y-8">
+
+              {/* Ownership */}
+              <section>
+                <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3">{t("inv_config_ownership")}</h3>
+                <div className="grid grid-cols-2 gap-4 max-w-sm">
+                  <ConfigField
+                    label={t("inv_config_owner_share")} unit="%"
+                    value={+(config.ownerSharePerPlot * 100).toFixed(2)}
+                    step={0.5} min={50} max={99}
+                    onChange={(v) => setConfig({ ownerSharePerPlot: +(v / 100).toFixed(4), l1InvestorShare: +(1 - v / 100).toFixed(4) })}
+                  />
+                  <ConfigField
+                    label={t("inv_config_l1_share")} unit="%"
+                    value={+(config.l1InvestorShare * 100).toFixed(2)}
+                    step={0.5} min={1} max={50}
+                    onChange={(v) => setConfig({ l1InvestorShare: +(v / 100).toFixed(4), ownerSharePerPlot: +(1 - v / 100).toFixed(4) })}
+                  />
+                </div>
+                {Math.abs(config.ownerSharePerPlot + config.l1InvestorShare - 1) > 0.001 && (
+                  <p className="mt-2 text-xs text-red-500">⚠ Ownership shares must sum to 100%</p>
+                )}
+              </section>
+
+              {/* Layer 1 */}
+              <section>
+                <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3">{t("inv_config_l1_section")}</h3>
+                <div className="grid grid-cols-3 gap-4 max-w-2xl">
+                  <ConfigField label={t("inv_config_l1_fund_size")} unit="$" value={config.l1FundSize} step={100000} min={0} max={20000000}
+                    onChange={(v) => setConfig({ l1FundSize: v })} />
+                  <ConfigField label={t("inv_config_l1_entry")} unit="$/m²" value={config.l1EntryPrice} step={5} min={100} max={500}
+                    onChange={(v) => setConfig({ l1EntryPrice: v })} />
+                  <ConfigField label={t("inv_config_l1_exit_cap")} unit="$/m²" value={config.l1ExitPriceCap} step={5} min={100} max={600}
+                    onChange={(v) => setConfig({ l1ExitPriceCap: v })} />
+                  <ConfigField label={t("inv_config_l1_timeline")} unit="yrs" value={config.l1Timeline} step={0.5} min={1} max={10}
+                    onChange={(v) => setConfig({ l1Timeline: v })} />
+                  <ConfigField label={t("inv_config_l1_exit_cap_years")} unit="yrs" value={config.l1ExitCapYears} step={1} min={1} max={10}
+                    onChange={(v) => setConfig({ l1ExitCapYears: v })} />
+                </div>
+              </section>
+
+              {/* Layer 2 */}
+              <section>
+                <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3">{t("inv_config_l2_section")}</h3>
+                <div className="grid grid-cols-3 gap-4 max-w-2xl">
+                  <ConfigField label={t("inv_config_cash_pct_const")} unit="%" value={+(config.cashPctOfConstruction * 100).toFixed(0)} step={5} min={20} max={100}
+                    onChange={(v) => setConfig({ cashPctOfConstruction: v / 100 })} />
+                  <ConfigField label={t("inv_config_priority_pct")} unit="%" value={+(config.priorityReturnPct * 100).toFixed(0)} step={1} min={0} max={30}
+                    onChange={(v) => setConfig({ priorityReturnPct: v / 100 })} />
+                  <ConfigField label={t("inv_config_profit_investor")} unit="%" value={+(config.profitSplitInvestor * 100).toFixed(0)} step={5} min={10} max={90}
+                    onChange={(v) => setConfig({ profitSplitInvestor: +(v / 100).toFixed(2), profitSplitOwner: +(1 - v / 100).toFixed(2) })} />
+                  <ConfigField label={t("inv_config_profit_owner")} unit="%" value={+(config.profitSplitOwner * 100).toFixed(0)} step={5} min={10} max={90}
+                    onChange={(v) => setConfig({ profitSplitOwner: +(v / 100).toFixed(2), profitSplitInvestor: +(1 - v / 100).toFixed(2) })} />
+                  <ConfigField label={t("inv_config_villas_total")} unit="" value={config.investorFundedVillas} step={1} min={1} max={50}
+                    onChange={(v) => setConfig({ investorFundedVillas: v })} />
+                  <ConfigField label={t("inv_config_villas_min")} unit="" value={config.minVillasToBuild} step={1} min={1} max={20}
+                    onChange={(v) => setConfig({ minVillasToBuild: v })} />
+                </div>
+                <label className="flex items-center gap-2 mt-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={config.priorityEnabled}
+                    onChange={(e) => setConfig({ priorityEnabled: e.target.checked })}
+                    className="w-4 h-4 accent-dh-green"
+                  />
+                  <span className="text-xs text-gray-700">{t("inv_config_priority_enabled")}</span>
+                </label>
+              </section>
+
+              {/* Phased Land Pricing */}
+              <section>
+                <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3">{t("inv_config_phase_pricing")}</h3>
+                <table className="text-xs border border-gray-100 rounded-lg overflow-hidden w-full max-w-2xl">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="text-left px-4 py-2 font-semibold text-gray-500">Phase</th>
+                      <th className="text-center px-4 py-2 font-semibold text-gray-500">Land Price ($/m²)</th>
+                      <th className="text-center px-4 py-2 font-semibold text-gray-500">Villa Profit (L2)</th>
+                      <th className="text-center px-4 py-2 font-semibold text-gray-500">L2 ROI on Cash</th>
+                      <th className="text-center px-4 py-2 font-semibold text-gray-500">Owner Take / Villa</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {config.phaseLandPrices.map((p, i) => {
+                      const pp = phasedPricing[i];
+                      return (
+                        <tr key={p.phase} className="border-t border-gray-100">
+                          <td className="px-4 py-2.5 font-medium text-gray-700">Phase {p.phase}</td>
+                          <td className="px-4 py-2.5 text-center">
+                            <input
+                              type="number"
+                              value={p.pricePerSqm}
+                              step={5} min={100} max={1000}
+                              onChange={(e) => updatePhaseLandPrice(i, parseFloat(e.target.value) || p.pricePerSqm)}
+                              className="w-24 text-center px-2 py-1 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-dh-green focus:ring-1 focus:ring-dh-green/20 tabular-nums"
+                            />
+                          </td>
+                          <td className="px-4 py-2.5 text-center tabular-nums text-emerald-700 font-medium">
+                            {pp ? fmtUSD(pp.villaProfit) : "—"}
+                          </td>
+                          <td className="px-4 py-2.5 text-center tabular-nums font-bold text-dh-green">
+                            {pp ? pct(pp.investorROI) : "—"}
+                          </td>
+                          <td className="px-4 py-2.5 text-center tabular-nums text-gray-600">
+                            {pp ? fmtUSD(pp.ownerTake) : "—"}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </section>
+
+              {/* Admin Live Insights */}
+              {showInsights && (
+                <section className="bg-dh-green/5 border border-dh-green/20 rounded-xl p-5">
+                  <h3 className="text-xs font-semibold text-dh-green uppercase tracking-wide mb-4">
+                    {t("inv_config_insight_title")}
+                  </h3>
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    <InsightCard
+                      label={t("inv_config_l1_roi")}
+                      value={pct(l1Returns.roi)}
+                      sub={`IRR ${pct(l1Returns.irr)} · ${l1Returns.sqmAcquired.toLocaleString()} m²`}
+                    />
+                    <InsightCard
+                      label={t("inv_config_l2_roi_a")}
+                      value={pct(waterfall.l2InvestorROI)}
+                      sub={`Cash ${fmtUSD(waterfall.l2InvestorCash)} · Profit ${fmtUSD(waterfall.l2InvestorProfit)}`}
+                    />
+                    <InsightCard
+                      label={t("inv_config_l2_roi_b")}
+                      value={pct(waterfallWithPriority.l2InvestorROI)}
+                      sub={`Priority ${fmtUSD(waterfallWithPriority.priorityAmount)}`}
+                    />
+                    <InsightCard
+                      label={t("inv_config_owner_per_villa")}
+                      value={fmtUSD(waterfall.ownerTotal)}
+                      sub={`Land ${fmtUSD(waterfall.ownerLandEquity)} + Profit ${fmtUSD(waterfall.ownerProfit)}`}
+                    />
+                    <InsightCard
+                      label={t("inv_config_continuation_cost")}
+                      value={fmtUSD(continuationCost.costOfKeeping)}
+                      sub={`Exit ${fmtUSD(continuationCost.exitTotal)} vs Stay ${fmtUSD(continuationCost.stayTotal)}`}
+                    />
+                  </div>
+                </section>
+              )}
+
+              {/* Save */}
+              <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
+                <button
+                  onClick={handleSaveInvestmentConfig}
+                  disabled={saveStatus === "saving"}
+                  className="px-5 py-2 text-xs font-semibold text-white bg-dh-green hover:bg-dh-green/90 disabled:opacity-50 rounded-lg transition-colors"
+                >
+                  {saveStatus === "saving" ? "Saving…" : saveStatus === "saved" ? t("inv_config_saved") : t("inv_config_save")}
+                </button>
+                <span className="text-xs text-gray-400">Saved to Redis — applies to all connected users</span>
+              </div>
+
+            </div>
+          )}
+        </div>
+
       </div>
     </div>
   );
@@ -495,5 +709,54 @@ function InputCell({
       onChange={(e) => onChange(e.target.value)}
       className="w-20 text-center px-2 py-1 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-dh-green focus:ring-1 focus:ring-dh-green/20 tabular-nums"
     />
+  );
+}
+
+function ConfigField({
+  label,
+  value,
+  step,
+  min,
+  max,
+  unit,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  step: number;
+  min: number;
+  max: number;
+  unit: string;
+  onChange: (v: number) => void;
+}) {
+  return (
+    <div className="flex flex-col gap-1">
+      <label className="text-[10px] text-gray-500 font-medium leading-tight">{label}</label>
+      <div className="flex items-center gap-1.5">
+        <input
+          type="number"
+          value={value}
+          step={step}
+          min={min}
+          max={max}
+          onChange={(e) => {
+            const v = parseFloat(e.target.value);
+            if (!isNaN(v)) onChange(Math.max(min, Math.min(max, v)));
+          }}
+          className="w-24 text-center px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-dh-green focus:ring-1 focus:ring-dh-green/20 tabular-nums"
+        />
+        {unit && <span className="text-[10px] text-gray-400 whitespace-nowrap">{unit}</span>}
+      </div>
+    </div>
+  );
+}
+
+function InsightCard({ label, value, sub }: { label: string; value: string; sub: string }) {
+  return (
+    <div className="bg-white border border-dh-green/15 rounded-lg p-3">
+      <p className="text-[10px] text-gray-500 font-medium mb-1 leading-tight">{label}</p>
+      <p className="text-lg font-bold text-dh-green tabular-nums">{value}</p>
+      <p className="text-[10px] text-gray-400 mt-0.5 leading-tight">{sub}</p>
+    </div>
   );
 }

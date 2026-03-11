@@ -3,7 +3,21 @@
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-/* ─── Isolated form component so useSearchParams() works inside Suspense ─── */
+/* ─── Brand tokens (matches customer/investor pages) ─────────────────────── */
+const C = {
+  bg:      "#F4F9EF",                   // barely-green white
+  bgCard:  "#FFFFFF",                   // card surface
+  ink:     "#1C2010",                   // deep dark ink
+  forest:  "#3D7A24",                   // primary CTA green
+  brand:   "#78BF42",                   // accent brand green
+  brandBg: "rgba(120,191,66,0.12)",     // light green badge bg
+  brandBd: "rgba(61,122,36,0.25)",      // green badge border
+  border:  "#C8E0B5",                   // green-tinted border
+  muted:   "#6A7B5F",                   // secondary text
+  error:   "#dc2626",                   // red error
+} as const;
+
+/* ─── Isolated form (useSearchParams inside Suspense) ────────────────────── */
 function GateForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -14,7 +28,6 @@ function GateForm() {
   const [loading, setLoading] = useState(false);
   const [shake, setShake] = useState(false);
 
-  // Inject fonts client-side to avoid SSR hydration mismatch
   useEffect(() => {
     const id = "dh-gate-styles";
     if (!document.getElementById(id)) {
@@ -35,18 +48,32 @@ function GateForm() {
         }
         .shake { animation: shake 0.45s ease; }
         @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(16px); }
+          from { opacity: 0; transform: translateY(14px); }
           to   { opacity: 1; transform: translateY(0); }
         }
-        .fade-up   { animation: fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
+        .fade-up   { animation: fadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
         .fade-up-1 { animation-delay: 0.05s; }
-        .fade-up-2 { animation-delay: 0.15s; }
-        .fade-up-3 { animation-delay: 0.25s; }
-        .fade-up-4 { animation-delay: 0.35s; }
+        .fade-up-2 { animation-delay: 0.12s; }
+        .fade-up-3 { animation-delay: 0.20s; }
+        .fade-up-4 { animation-delay: 0.28s; }
+        .dh-input:focus {
+          outline: none;
+          border-color: #3D7A24 !important;
+          box-shadow: 0 0 0 3px rgba(120,191,66,0.18);
+        }
+        .dh-btn:hover:not(:disabled) {
+          background: #2d5e1b !important;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 14px rgba(61,122,36,0.28);
+        }
+        .dh-btn:active:not(:disabled) {
+          transform: translateY(0);
+        }
+        .dh-btn { transition: all 0.18s ease; }
       `;
       document.head.appendChild(el);
     }
-    setTimeout(() => inputRef.current?.focus(), 400);
+    setTimeout(() => inputRef.current?.focus(), 350);
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -85,7 +112,7 @@ function GateForm() {
       className="dh-sans"
       style={{
         minHeight: "100dvh",
-        background: "#12180F",
+        background: C.bg,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -95,15 +122,15 @@ function GateForm() {
         overflow: "hidden",
       }}
     >
-      {/* Subtle radial glow */}
+      {/* Decorative green radial bloom */}
       <div
         aria-hidden
         style={{
           position: "absolute",
           inset: 0,
           backgroundImage: `
-            radial-gradient(ellipse 80% 60% at 50% 0%, rgba(161,138,68,0.08) 0%, transparent 60%),
-            radial-gradient(ellipse 60% 40% at 50% 100%, rgba(161,138,68,0.05) 0%, transparent 60%)
+            radial-gradient(ellipse 70% 55% at 50% -5%, rgba(120,191,66,0.14) 0%, transparent 65%),
+            radial-gradient(ellipse 50% 35% at 80% 100%, rgba(61,122,36,0.07) 0%, transparent 60%)
           `,
           pointerEvents: "none",
         }}
@@ -119,24 +146,25 @@ function GateForm() {
           textAlign: "center",
         }}
       >
-        {/* Monogram */}
+        {/* DH monogram badge */}
         <div
           className="fade-up fade-up-1"
           style={{
             display: "inline-flex",
             alignItems: "center",
             justifyContent: "center",
-            width: 52,
-            height: 52,
-            borderRadius: 12,
-            background: "rgba(161,138,68,0.15)",
-            border: "1px solid rgba(161,138,68,0.3)",
-            marginBottom: 28,
+            width: 54,
+            height: 54,
+            borderRadius: 14,
+            background: C.brandBg,
+            border: `1.5px solid ${C.brandBd}`,
+            marginBottom: 24,
+            boxShadow: "0 2px 12px rgba(61,122,36,0.10)",
           }}
         >
           <span
             className="dh-serif"
-            style={{ color: "#A18A44", fontSize: 22, fontWeight: 600, letterSpacing: "0.02em", lineHeight: 1 }}
+            style={{ color: C.forest, fontSize: 22, fontWeight: 700, letterSpacing: "0.02em", lineHeight: 1 }}
           >
             DH
           </span>
@@ -145,7 +173,14 @@ function GateForm() {
         {/* Eyebrow */}
         <p
           className="dh-sans fade-up fade-up-1"
-          style={{ color: "#A18A44", fontSize: 11, fontWeight: 500, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}
+          style={{
+            color: C.forest,
+            fontSize: 10.5,
+            fontWeight: 600,
+            letterSpacing: "0.20em",
+            textTransform: "uppercase",
+            marginBottom: 10,
+          }}
         >
           Private Preview
         </p>
@@ -153,7 +188,14 @@ function GateForm() {
         {/* Title */}
         <h1
           className="dh-serif fade-up fade-up-2"
-          style={{ color: "#F5F0E8", fontSize: 36, fontWeight: 600, letterSpacing: "-0.01em", lineHeight: 1.15, marginBottom: 12 }}
+          style={{
+            color: C.ink,
+            fontSize: 38,
+            fontWeight: 600,
+            letterSpacing: "-0.01em",
+            lineHeight: 1.12,
+            marginBottom: 10,
+          }}
         >
           Deddeh Hills
         </h1>
@@ -161,19 +203,38 @@ function GateForm() {
         {/* Subtitle */}
         <p
           className="dh-sans fade-up fade-up-2"
-          style={{ color: "rgba(245,240,232,0.45)", fontSize: 14, fontWeight: 400, lineHeight: 1.6, marginBottom: 40 }}
+          style={{
+            color: C.muted,
+            fontSize: 14,
+            fontWeight: 400,
+            lineHeight: 1.6,
+            marginBottom: 36,
+          }}
         >
           Enter your access code to continue.
         </p>
+
+        {/* Divider */}
+        <div
+          className="fade-up fade-up-2"
+          style={{
+            width: 40,
+            height: 2,
+            background: `linear-gradient(90deg, transparent, ${C.brand}, transparent)`,
+            margin: "-20px auto 32px",
+            borderRadius: 2,
+          }}
+        />
 
         {/* Form */}
         <form
           onSubmit={handleSubmit}
           className={`fade-up fade-up-3${shake ? " shake" : ""}`}
-          style={{ display: "flex", flexDirection: "column", gap: 12 }}
+          style={{ display: "flex", flexDirection: "column", gap: 10 }}
         >
           <input
             ref={inputRef}
+            className="dh-sans dh-input"
             type="text"
             value={code}
             onChange={(e) => { setCode(e.target.value); setError(""); }}
@@ -184,44 +245,43 @@ function GateForm() {
             style={{
               width: "100%",
               padding: "13px 16px",
-              background: "rgba(245,240,232,0.05)",
-              border: error ? "1px solid rgba(239,68,68,0.6)" : "1px solid rgba(245,240,232,0.12)",
+              background: C.bgCard,
+              border: `1.5px solid ${error ? C.error : C.border}`,
               borderRadius: 10,
-              color: "#F5F0E8",
+              color: C.ink,
               fontSize: 15,
               fontFamily: "'DM Sans', system-ui, sans-serif",
-              letterSpacing: "0.08em",
-              outline: "none",
-              transition: "border-color 0.2s",
+              letterSpacing: "0.07em",
               boxSizing: "border-box",
               textAlign: "center",
+              transition: "border-color 0.2s",
             }}
-            onFocus={(e) => { e.currentTarget.style.borderColor = "rgba(161,138,68,0.6)"; }}
-            onBlur={(e) => { e.currentTarget.style.borderColor = error ? "rgba(239,68,68,0.6)" : "rgba(245,240,232,0.12)"; }}
           />
 
           {error && (
-            <p style={{ color: "rgba(239,68,68,0.9)", fontSize: 13, margin: "0 0 4px", lineHeight: 1.4 }}>
+            <p style={{ color: C.error, fontSize: 13, margin: "2px 0 2px", lineHeight: 1.4 }}>
               {error}
             </p>
           )}
 
           <button
             type="submit"
+            className="dh-btn"
             disabled={loading || !code.trim()}
             style={{
               width: "100%",
               padding: "13px 16px",
-              background: loading || !code.trim() ? "rgba(161,138,68,0.25)" : "rgba(161,138,68,0.9)",
+              background: loading || !code.trim()
+                ? `rgba(61,122,36,0.22)`
+                : C.forest,
               border: "none",
               borderRadius: 10,
-              color: loading || !code.trim() ? "rgba(245,240,232,0.4)" : "#12180F",
+              color: loading || !code.trim() ? `rgba(61,122,36,0.45)` : "#FFFFFF",
               fontSize: 14,
               fontWeight: 600,
               fontFamily: "'DM Sans', system-ui, sans-serif",
               letterSpacing: "0.06em",
               cursor: loading || !code.trim() ? "not-allowed" : "pointer",
-              transition: "all 0.2s",
             }}
           >
             {loading ? "Verifying…" : "Enter"}
@@ -231,7 +291,13 @@ function GateForm() {
         {/* Footer */}
         <p
           className="dh-sans fade-up fade-up-4"
-          style={{ color: "rgba(245,240,232,0.2)", fontSize: 12, marginTop: 40, letterSpacing: "0.02em" }}
+          style={{
+            color: C.muted,
+            fontSize: 11.5,
+            marginTop: 36,
+            letterSpacing: "0.04em",
+            opacity: 0.6,
+          }}
         >
           Koura, North Lebanon
         </p>

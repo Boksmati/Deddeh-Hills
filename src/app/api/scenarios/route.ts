@@ -1,9 +1,5 @@
 import { NextResponse } from "next/server";
-import { readFileSync, writeFileSync, mkdirSync } from "fs";
-import { join } from "path";
-
-const DATA_DIR = join(process.cwd(), "data");
-const DATA_FILE = join(DATA_DIR, "scenarios.json");
+import { dbGet, dbSet } from "@/lib/kv";
 
 interface StoredScenario {
   id: string;
@@ -17,32 +13,21 @@ interface StoredScenario {
   investorModel?: unknown;
 }
 
-function readScenarios(): StoredScenario[] {
-  try {
-    return JSON.parse(readFileSync(DATA_FILE, "utf-8"));
-  } catch {
-    return [];
-  }
+async function readScenarios(): Promise<StoredScenario[]> {
+  return dbGet<StoredScenario[]>("scenarios", []);
 }
 
-function writeScenarios(scenarios: StoredScenario[]) {
-  try {
-    mkdirSync(DATA_DIR, { recursive: true });
-    writeFileSync(DATA_FILE, JSON.stringify(scenarios, null, 2));
-  } catch (e) {
-    console.error("Failed to write scenarios file:", e);
-  }
+async function writeScenarios(scenarios: StoredScenario[]): Promise<void> {
+  return dbSet("scenarios", scenarios);
 }
 
-// GET /api/scenarios — list all
 export async function GET() {
-  return NextResponse.json(readScenarios());
+  return NextResponse.json(await readScenarios());
 }
 
-// POST /api/scenarios — create or update (upsert by id)
 export async function POST(req: Request) {
-  const body = await req.json() as StoredScenario;
-  const scenarios = readScenarios();
+  const body = (await req.json()) as StoredScenario;
+  const scenarios = await readScenarios();
   const idx = scenarios.findIndex((s) => s.id === body.id);
   const now = new Date().toISOString();
   if (idx >= 0) {
@@ -50,16 +35,15 @@ export async function POST(req: Request) {
   } else {
     scenarios.push({ ...body, updatedAt: now });
   }
-  writeScenarios(scenarios);
+  await writeScenarios(scenarios);
   return NextResponse.json({ ok: true, id: body.id });
 }
 
-// DELETE /api/scenarios?id=xxx — delete one
 export async function DELETE(req: Request) {
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
-  const scenarios = readScenarios().filter((s) => s.id !== id);
-  writeScenarios(scenarios);
+  const scenarios = (await readScenarios()).filter((s) => s.id !== id);
+  await writeScenarios(scenarios);
   return NextResponse.json({ ok: true });
 }

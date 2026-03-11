@@ -145,9 +145,10 @@ function Chip({ active, onClick, dot, children }: {
 
 // ─── Enquire Modal ─────────────────────────────────────────────────────────────
 function EnquireModal({
-  unitLabel, onClose, lang, t,
+  unitLabel, lotId, unitId, onClose, lang, t,
 }: {
-  unitLabel: string; onClose: () => void; lang: string; t: (k: string) => string;
+  unitLabel: string; lotId?: number; unitId?: string;
+  onClose: () => void; lang: string; t: (k: string) => string;
 }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -159,6 +160,8 @@ function EnquireModal({
   );
   const [errors, setErrors] = useState<{ name?: string; email?: string }>({});
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   useEffect(() => {
     if (submitted) {
@@ -167,13 +170,27 @@ function EnquireModal({
     }
   }, [submitted, onClose]);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const errs: typeof errors = {};
     if (!name.trim())  errs.name  = lang === "ar" ? "الاسم مطلوب"             : "Name is required";
     if (!email.trim()) errs.email = lang === "ar" ? "البريد الإلكتروني مطلوب" : "Email is required";
     if (Object.keys(errs).length) { setErrors(errs); return; }
-    setSubmitted(true);
+    setSubmitting(true);
+    setSubmitError("");
+    try {
+      const res = await fetch("/api/enquire", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name.trim(), email: email.trim(), phone: phone.trim() || undefined, message: message.trim(), unitLabel, lotId, unitId }),
+      });
+      if (!res.ok) throw new Error("server error");
+      setSubmitted(true);
+    } catch {
+      setSubmitError(t("enquire_error"));
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -225,10 +242,13 @@ function EnquireModal({
                 className="w-full rounded-lg px-3 py-2 text-sm resize-none focus:outline-none"
                 style={{ border: `1.5px solid ${C.border}`, background: C.bg, color: C.ink }} />
             </div>
-            <button type="submit"
-              className="w-full py-3 rounded-xl font-semibold text-sm transition-all"
+            {submitError && (
+              <p className="text-red-500 text-xs text-center -mt-1">{submitError}</p>
+            )}
+            <button type="submit" disabled={submitting}
+              className="w-full py-3 rounded-xl font-semibold text-sm transition-all disabled:opacity-60"
               style={{ background: C.forest, color: C.white }}>
-              {t("enquire_send")}
+              {submitting ? (lang === "ar" ? "جارٍ الإرسال…" : "Sending…") : t("enquire_send")}
             </button>
           </form>
         )}
@@ -471,7 +491,7 @@ function UnitDetail({ sel, lang, t, projectSpecs, onClose, onEnquire, wide = fal
                           <svg className="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke={C.border} strokeWidth="1.5">
                             <rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9h18M9 9v12M3 15h6"/><path d="M12 9v3h6v-3"/>
                           </svg>
-                          <span className="text-[10px]" style={{ color: C.border }}>Floor plan</span>
+                          <span className="text-[10px]" style={{ color: C.border }}>{t("floor_plan_coming_soon")}</span>
                         </div>
                       </div>
                     </div>
@@ -510,11 +530,7 @@ function UnitDetail({ sel, lang, t, projectSpecs, onClose, onEnquire, wide = fal
                         <svg className="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke={C.border} strokeWidth="1.5">
                           <rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9h18M9 9v12M3 15h6"/><path d="M12 9v3h6v-3"/>
                         </svg>
-                        <span className="text-[10px]" style={{ color: C.border }}>
-                          {lang === "ar"
-                            ? `مخطط ${FLOOR_LABELS[unit.floors[floorIdx]]?.ar}`
-                            : `${FLOOR_LABELS[unit.floors[floorIdx]]?.en} floor plan`}
-                        </span>
+                        <span className="text-[10px]" style={{ color: C.border }}>{t("floor_plan_coming_soon")}</span>
                       </div>
                       <div className="absolute bottom-2 start-2 text-[9px] px-2 py-0.5 rounded-full backdrop-blur-sm" style={{ background: "rgba(28,32,16,0.4)", color: C.white }}>
                         {lang === "ar" ? FLOOR_LABELS[unit.floors[floorIdx]]?.ar : FLOOR_LABELS[unit.floors[floorIdx]]?.en}
@@ -1201,10 +1217,7 @@ export default function CustomerPage() {
               </p>
               {totalAssigned === 0 && (
                 <p className="text-xs mt-2" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
-                  {lang === "ar" ? "لم يتم تهيئة أي قطعة." : "No lots configured yet."}{" "}
-                  <a href="/simulator" style={{ color: C.forest }} className="underline">
-                    {lang === "ar" ? "انتقل إلى المحاكي" : "Go to Simulator"}
-                  </a>
+                  {lang === "ar" ? "لم يتم تهيئة أي قطعة." : "No lots configured yet."}
                 </p>
               )}
             </div>
@@ -1624,6 +1637,8 @@ export default function CustomerPage() {
               ? `${t("lot_id")} ${enquireUnit.unit.lotId} — ${enquireUnit.unit.labelAr}`
               : `Lot ${enquireUnit.unit.lotId} — ${enquireUnit.unit.label}`
           }
+          lotId={enquireUnit.unit.lotId}
+          unitId={enquireUnit.unit.id}
           lang={lang}
           t={t as (k: string) => string}
           onClose={() => setEnquireUnit(null)}

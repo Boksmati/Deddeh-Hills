@@ -5,29 +5,50 @@ export async function POST(request: NextRequest) {
   const { code } = body as { code?: string };
 
   const accessCode = process.env.ACCESS_CODE;
+  const adminCode = process.env.ADMIN_CODE;
 
-  // If ACCESS_CODE env var is not set, always allow (local dev convenience)
+  // No ACCESS_CODE set — always allow (local dev convenience)
   if (!accessCode) {
-    const res = NextResponse.json({ success: true });
+    const res = NextResponse.json({ success: true, role: "admin" });
+    res.cookies.set("dh_role", "admin", cookieOpts());
     return res;
   }
 
-  if (!code || code.trim() !== accessCode) {
-    return NextResponse.json(
-      { success: false, error: "Invalid access code" },
-      { status: 401 }
-    );
+  if (!code) {
+    return NextResponse.json({ success: false, error: "No code provided" }, { status: 401 });
   }
 
-  // Set the access cookie and return success
-  const res = NextResponse.json({ success: true });
-  res.cookies.set("dh_access", accessCode, {
+  const trimmed = code.trim();
+
+  // ── Admin code check (higher privilege) ──────────────────────────────────
+  if (adminCode && trimmed === adminCode) {
+    const res = NextResponse.json({ success: true, role: "admin" });
+    res.cookies.set("dh_access", accessCode, cookieOpts()); // also grants general access
+    res.cookies.set("dh_role", "admin", cookieOpts());
+    return res;
+  }
+
+  // ── General access code ───────────────────────────────────────────────────
+  if (trimmed === accessCode) {
+    const res = NextResponse.json({ success: true, role: "user" });
+    res.cookies.set("dh_access", accessCode, cookieOpts());
+    // Clear any lingering admin role cookie
+    res.cookies.set("dh_role", "user", cookieOpts());
+    return res;
+  }
+
+  return NextResponse.json(
+    { success: false, error: "Invalid access code" },
+    { status: 401 }
+  );
+}
+
+function cookieOpts() {
+  return {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: "lax" as const,
     path: "/",
     maxAge: 60 * 60 * 24 * 30, // 30 days
-  });
-
-  return res;
+  };
 }

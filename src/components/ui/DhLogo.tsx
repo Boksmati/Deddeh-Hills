@@ -1,9 +1,13 @@
+import type { CSSProperties } from "react";
+
 export default function DhLogo({
   className,
   variant = "dark",
+  style,
 }: {
   className?: string;
   variant?: "light" | "dark";
+  style?: CSSProperties;
 }) {
   const textColor = variant === "light" ? "#ffffff" : "#374151";
   const subColor = variant === "light" ? "#d1fae5" : "#6b7280";
@@ -12,6 +16,7 @@ export default function DhLogo({
     <svg
       viewBox="0 0 180 56"
       className={className}
+      style={style}
       aria-label="Deddeh Hills"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

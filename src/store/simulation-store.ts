@@ -99,8 +99,14 @@ interface SimulationState {
   setTicketSize: (size: number) => void;
   setInvestorTickets: (tickets: Record<1 | 2 | 3, number>) => void;
 
+  // Phase revenue targets (admin-set, shown on /status alongside projection)
+  phaseRevenueTargets: { 1: number; 2: number; 3: number };
+
   // Actions — Project Specs
   setProjectSpecs: (specs: ProjectSpecs) => void;
+
+  // Actions — Phase Revenue Targets
+  setPhaseRevenueTarget: (phase: 1 | 2 | 3, target: number) => void;
 
   // Actions — Calibration
   initCenterOverrides: () => Promise<void>;
@@ -159,6 +165,26 @@ const LS_LOT_STATUSES_KEY = "dh-lot-statuses";
 const LS_INVESTOR_PCT_KEY = "dh-investor-pct";
 const LS_ASSUMPTIONS_KEY = "dh-type-assumptions";
 const LS_INVESTOR_MODEL_KEY = "dh-investor-model";
+const LS_PROJECT_SPECS_KEY = "dh-project-specs";
+const LS_PHASE_TARGETS_KEY = "dh-phase-targets";
+
+const DEFAULT_PHASE_TARGETS: { 1: number; 2: number; 3: number } = { 1: 0, 2: 0, 3: 0 };
+
+function loadPhaseTargets(): { 1: number; 2: number; 3: number } {
+  if (typeof window === "undefined") return DEFAULT_PHASE_TARGETS;
+  try {
+    const str = localStorage.getItem(LS_PHASE_TARGETS_KEY);
+    if (!str) return DEFAULT_PHASE_TARGETS;
+    return { ...DEFAULT_PHASE_TARGETS, ...JSON.parse(str) };
+  } catch {
+    return DEFAULT_PHASE_TARGETS;
+  }
+}
+
+function savePhaseTargets(targets: { 1: number; 2: number; 3: number }) {
+  if (typeof window === "undefined") return;
+  try { localStorage.setItem(LS_PHASE_TARGETS_KEY, JSON.stringify(targets)); } catch { /* ignore */ }
+}
 
 const DEFAULT_INVESTOR_MODEL_STATE = {
   investorModel: "share" as InvestorModel,
@@ -271,6 +297,24 @@ function saveTypeAssumptions(assumptions: Record<DevelopmentType, TypeAssumption
   } catch { /* ignore */ }
 }
 
+function loadProjectSpecs(): ProjectSpecs | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const str = localStorage.getItem(LS_PROJECT_SPECS_KEY);
+    if (!str) return null;
+    return JSON.parse(str) as ProjectSpecs;
+  } catch {
+    return null;
+  }
+}
+
+function saveProjectSpecs(specs: ProjectSpecs) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(LS_PROJECT_SPECS_KEY, JSON.stringify(specs));
+  } catch { /* ignore */ }
+}
+
 function createDefaultAssignments(): Map<number, LotAssignment> {
   const map = new Map<number, LotAssignment>();
   for (const lot of LOTS) {
@@ -302,6 +346,8 @@ interface PersistedServerState {
   investorSharePct: number;
   typeAssumptions: Record<DevelopmentType, TypeAssumption>;
   investorModel: typeof DEFAULT_INVESTOR_MODEL_STATE;
+  projectSpecs?: ProjectSpecs;
+  phaseRevenueTargets?: { 1: number; 2: number; 3: number };
 }
 
 function buildServerState(s: SimulationState): PersistedServerState {
@@ -319,6 +365,8 @@ function buildServerState(s: SimulationState): PersistedServerState {
       ticketSize: s.ticketSize,
       investorTickets: s.investorTickets,
     },
+    projectSpecs: s.projectSpecs,
+    phaseRevenueTargets: s.phaseRevenueTargets,
   };
 }
 
@@ -382,7 +430,8 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   holdPeriodYears: _initialInvestorModel.holdPeriodYears,
   ticketSize: _initialInvestorModel.ticketSize,
   investorTickets: _initialInvestorModel.investorTickets,
-  projectSpecs: DEFAULT_PROJECT_SPECS,
+  projectSpecs: loadProjectSpecs() ?? DEFAULT_PROJECT_SPECS,
+  phaseRevenueTargets: loadPhaseTargets(),
   calibrationMode: false,
   lotCenterOverrides: new Map(),
 
@@ -569,6 +618,11 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
       saveInvestorPct(investorSharePct);
       saveTypeAssumptions(typeAssumptions);
       saveInvestorModel(im);
+      if (data.projectSpecs) saveProjectSpecs(data.projectSpecs);
+      const phaseRevenueTargets = data.phaseRevenueTargets
+        ? { ...DEFAULT_PHASE_TARGETS, ...data.phaseRevenueTargets }
+        : undefined;
+      if (phaseRevenueTargets) savePhaseTargets(phaseRevenueTargets);
 
       set({
         assignments,
@@ -582,6 +636,8 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
         holdPeriodYears: im.holdPeriodYears,
         ticketSize: im.ticketSize,
         investorTickets: im.investorTickets,
+        ...(data.projectSpecs ? { projectSpecs: data.projectSpecs } : {}),
+        ...(phaseRevenueTargets ? { phaseRevenueTargets } : {}),
       });
     } catch { /* server unavailable, localStorage already loaded */ }
   },
@@ -716,7 +772,16 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   },
 
   setProjectSpecs: (specs) => {
+    saveProjectSpecs(specs);
     set({ projectSpecs: specs });
+  },
+
+  setPhaseRevenueTarget: (phase, target) => {
+    set((s) => {
+      const next = { ...s.phaseRevenueTargets, [phase]: target };
+      savePhaseTargets(next);
+      return { phaseRevenueTargets: next };
+    });
   },
 
   initCenterOverrides: async () => {
@@ -760,7 +825,9 @@ if (typeof window !== "undefined") {
       state.cashToStartPct !== prevState.cashToStartPct ||
       state.priorityReturnRate !== prevState.priorityReturnRate ||
       state.holdPeriodYears !== prevState.holdPeriodYears ||
-      state.ticketSize !== prevState.ticketSize
+      state.ticketSize !== prevState.ticketSize ||
+      state.projectSpecs !== prevState.projectSpecs ||
+      state.phaseRevenueTargets !== prevState.phaseRevenueTargets
     ) {
       queueServerSave(buildServerState(state));
     }

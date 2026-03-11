@@ -14,6 +14,7 @@ import LanguageToggle from "@/components/ui/LanguageToggle";
 import { useSimulationStore } from "@/store/simulation-store";
 import { useTranslations } from "@/i18n/useTranslations";
 import ProjectSpecsEditor from "@/components/admin/ProjectSpecsEditor";
+import { useRole } from "@/hooks/useRole";
 
 export default function Home() {
   const sidebarRef = useRef<HTMLDivElement>(null);
@@ -22,6 +23,11 @@ export default function Home() {
   const initStateFromServer = useSimulationStore((s) => s.initStateFromServer);
   const loadScenariosFromServer = useSimulationStore((s) => s.loadScenariosFromServer);
   const { t } = useTranslations();
+  const role = useRole();
+  // Treat loading (null) as admin to avoid flash of hidden controls for admin users.
+  // Investor controls will disappear once role loads (~50ms).
+  const isAdmin = role !== "investor";
+  const isInvestor = role === "investor";
 
   useEffect(() => {
     initCenterOverrides();
@@ -36,46 +42,79 @@ export default function Home() {
   }, [selectedLotIds]);
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
+    <div className="h-screen flex flex-col" style={{ background: "#F4F9EF" }}>
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between flex-shrink-0">
-        <DhLogo className="h-10" />
+      <header
+        className="px-6 py-3 flex items-center justify-between flex-shrink-0"
+        style={{ background: "#1A3810" }}
+      >
+        <DhLogo className="h-10" variant="light" />
         <div className="flex items-center gap-2">
-          <a
-            href="/status"
-            className="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors"
-          >
-            {t("nav_status")}
-          </a>
-          <a
-            href="/assumptions"
-            className="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors"
-          >
-            {t("nav_assumptions")}
-          </a>
+          {isInvestor && (
+            <span className="px-3 py-1.5 bg-white/10 text-white/80 text-xs font-medium rounded-lg border border-white/20">
+              Read-only view
+            </span>
+          )}
+          {isAdmin && (
+            <>
+              <a
+                href="/status"
+                className="px-3 py-1.5 text-white/70 text-xs font-medium rounded-lg hover:bg-white/10 hover:text-white transition-colors"
+              >
+                {t("nav_status")}
+              </a>
+              <a
+                href="/assumptions"
+                className="px-3 py-1.5 text-white/70 text-xs font-medium rounded-lg hover:bg-white/10 hover:text-white transition-colors"
+              >
+                {t("nav_assumptions")}
+              </a>
+            </>
+          )}
           <a
             href="/investor"
-            className="px-3 py-1.5 bg-dh-green text-white text-xs font-medium rounded-lg hover:bg-dh-green/90 transition-colors"
+            className="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
+            style={{ background: "#78BF42", color: "#fff" }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "#67AA34")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "#78BF42")}
           >
             {t("nav_investor")}
           </a>
-          <a
-            href="/customer"
-            className="px-3 py-1.5 bg-slate-700 text-white text-xs font-medium rounded-lg hover:bg-slate-800 transition-colors"
-          >
-            {t("nav_customer")}
-          </a>
+          {isAdmin && (
+            <a
+              href="/customer"
+              className="px-3 py-1.5 bg-white/10 text-white text-xs font-medium rounded-lg hover:bg-white/20 transition-colors"
+            >
+              {t("nav_customer")}
+            </a>
+          )}
+          {isAdmin && (
+            <>
+              <div className="w-px h-4 bg-white/20 mx-1" />
+              <a
+                href="/admin"
+                className="px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors"
+                style={{ background: "rgba(255,255,255,0.08)", color: "#95CC58", borderColor: "rgba(255,255,255,0.2)" }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.15)")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.08)")}
+              >
+                Admin ⚙️
+              </a>
+            </>
+          )}
           <LanguageToggle />
         </div>
       </header>
 
-      {/* Toolbar */}
-      <div className="px-6 py-3 bg-white border-b border-gray-100 flex-shrink-0">
-        <Toolbar />
-      </div>
+      {/* Toolbar — admin only */}
+      {isAdmin && (
+        <div className="px-6 py-2.5 border-b border-gray-200 flex-shrink-0" style={{ background: "#fff" }}>
+          <Toolbar />
+        </div>
+      )}
 
-      {/* Selection Toolbar */}
-      {selectedLotIds.size > 0 && (
+      {/* Selection Toolbar — admin only */}
+      {isAdmin && selectedLotIds.size > 0 && (
         <div className="px-6 py-2 flex-shrink-0">
           <SelectionToolbar />
         </div>
@@ -95,20 +134,24 @@ export default function Home() {
 
         {/* Right Sidebar */}
         <div ref={sidebarRef} className="w-80 flex-shrink-0 flex flex-col gap-4 overflow-y-auto">
-          {/* Lot Configuration Panel */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-            <div className="px-4 py-3 bg-gray-50 border-b border-gray-100 rounded-t-xl">
-              <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                {t("lot_config_header")}
-              </h2>
+          {/* Lot Configuration Panel — admin only */}
+          {isAdmin && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+              <div className="px-4 py-3 bg-gray-50 border-b border-gray-100 rounded-t-xl">
+                <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  {t("lot_config_header")}
+                </h2>
+              </div>
+              <LotConfigPanel />
             </div>
-            <LotConfigPanel />
-          </div>
+          )}
 
-          {/* Phase Manager */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-            <PhaseManager />
-          </div>
+          {/* Phase Manager — admin only */}
+          {isAdmin && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+              <PhaseManager />
+            </div>
+          )}
 
           {/* Development Mix */}
           <DevelopmentMix />
@@ -116,8 +159,8 @@ export default function Home() {
           {/* Phase Comparison */}
           <ProfitBreakdown />
 
-          {/* Project Specs Editor (admin) */}
-          <ProjectSpecsEditor />
+          {/* Project Specs Editor — admin only */}
+          {isAdmin && <ProjectSpecsEditor />}
         </div>
       </div>
     </div>
