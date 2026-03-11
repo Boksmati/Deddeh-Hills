@@ -10,6 +10,9 @@ import { ProjectSpecs } from "@/data/project-specs";
 import LanguageToggle from "@/components/ui/LanguageToggle";
 import { useTranslations } from "@/i18n/useTranslations";
 import CustomerMap from "@/components/customer/CustomerMap";
+import type { LotPricing } from "@/lib/investment-layers";
+import LOT_PRICES_RAW from "@/data/lot-prices.json";
+const LOT_PRICES = LOT_PRICES_RAW as LotPricing[];
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const C = {
@@ -286,6 +289,7 @@ function UnitDetail({ sel, lang, t, projectSpecs, onClose, onEnquire, wide = fal
   const isUnavailable = status !== "available";
   const isLotSale = devType === "lot_sale";
   const lotRow = LOTS.find(l => l.id === unit.lotId);
+  const lotPricing = LOT_PRICES.find(l => l.lot === unit.lotId);
   const unitTitle = lang === "ar"
     ? `${t("lot_id")} ${unit.lotId} — ${unit.labelAr}`
     : `Lot ${unit.lotId} — ${unit.label}`;
@@ -362,6 +366,11 @@ function UnitDetail({ sel, lang, t, projectSpecs, onClose, onEnquire, wide = fal
                         ~{fmtUSD(Math.round(unit.price / unit.areaSqm))}{t("per_sqm")}
                       </div>
                     )}
+                    {isLotSale && lotPricing && (
+                      <div className="text-[10px] mt-1" style={{ color: C.muted }} dir="ltr">
+                        ${lotPricing.price_sqm.toLocaleString()}{t("per_sqm")} {lang === "ar" ? "أرض" : "land"}
+                      </div>
+                    )}
                   </div>
                   {estimatedResale > 0 && !isUnavailable && !isLotSale && (
                     <div className="text-end">
@@ -387,6 +396,7 @@ function UnitDetail({ sel, lang, t, projectSpecs, onClose, onEnquire, wide = fal
                 ...(unit.gardenSqm > 0  ? [{ label: t("garden"),   value: `${fmt(unit.gardenSqm)} m²`  }] : []),
                 ...(unit.terraceSqm > 0 ? [{ label: t("terrace"),  value: `${fmt(unit.terraceSqm)} m²` }] : []),
                 { label: lang === "ar" ? "سفلي مكشوف" : "OUG", value: lotRow?.oug_allowed ? "✓" : "—" },
+                ...(lotPricing ? [{ label: t("phase_per_lot_retail"), value: `$${lotPricing.price_sqm.toLocaleString()}/m²` }] : []),
               ].map(({ label, value }) => (
                 <div key={label} className="rounded-xl py-2.5 px-3" style={{ background: C.bg, border: `1px solid ${C.sand}` }}>
                   <div className="text-[9px] uppercase tracking-wider mb-0.5" style={{ color: C.gold }}>{label}</div>

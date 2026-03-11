@@ -353,6 +353,27 @@ export function layer2SensitivityMatrix(
 //
 // CONTINUATION: Phase 1 only. Phase 2+ at $312-350/sqm market rates.
 
+/**
+ * Per-lot retail pricing record — loaded from src/data/lot-prices.json.
+ * villa_selling_sqm = price_sqm + 1000 (the "+$1,000 premium rule")
+ */
+export interface LotPricing {
+  /** Lot number (1–103) */
+  lot: number;
+  /** Retail land price per sqm (from master plan) */
+  price_sqm: number;
+  /** Villa selling price = price_sqm + 1000 */
+  villa_selling_sqm: number;
+  /** CRM/sales status */
+  status: "available" | "sold" | "booked";
+  /** Primary view category */
+  view: "sea_view" | "sea_mountain" | "mountain_sea" | "partial_sea" | "mountain";
+  /** Zone label */
+  zone: string;
+  /** Development phase assigned by admin (1/2/3) */
+  phase?: 1 | 2 | 3;
+}
+
 export interface InvestmentConfig {
   /** Landowner's share of each plot (e.g. 0.885) */
   ownerSharePerPlot: number;
@@ -399,6 +420,17 @@ export interface InvestmentConfig {
 
   /** Phased land pricing (escalates per phase) */
   phaseLandPrices: { phase: number; pricePerSqm: number }[];
+
+  /**
+   * Land transfer pricing mode (ADMIN-ONLY — never show formula to investor).
+   * "discount": transfer_price = lot.price_sqm − landTransferDiscount
+   * "flat":     transfer_price = landTransferFlat (same for all lots)
+   */
+  landTransferMode: "flat" | "discount";
+  /** Flat transfer price per sqm (used when landTransferMode = "flat") */
+  landTransferFlat: number;
+  /** Discount off retail price per sqm (used when landTransferMode = "discount") */
+  landTransferDiscount: number;
 
   /** L2 investor's share of remaining profit (e.g. 0.50) */
   profitSplitInvestor: number;
@@ -489,9 +521,33 @@ export const DEFAULT_INVESTMENT_CONFIG: InvestmentConfig = {
   profitSplitOwner: 0.50,
   priorityReturnPct: 0.10,
   priorityEnabled: false,
+
+  landTransferMode: "discount",
+  landTransferFlat: 275,
+  landTransferDiscount: 100,
 };
 
 // ─── Three-Party Calculation Functions ────────────────────────────────────────
+
+/**
+ * Resolve per-lot land transfer price from config + lot.
+ * ADMIN-ONLY formula — never expose to investor.
+ */
+function resolveLandTransferPrice(
+  config: InvestmentConfig,
+  lot?: LotPricing,
+  phaseIndex = 0,
+): number {
+  if (lot) {
+    return config.landTransferMode === "discount"
+      ? lot.price_sqm - config.landTransferDiscount
+      : config.landTransferFlat;
+  }
+  return (
+    config.phaseLandPrices[phaseIndex]?.pricePerSqm ??
+    config.phaseLandPrices[0].pricePerSqm
+  );
+}
 
 /**
  * Compute per-villa waterfall distribution across all three parties.
@@ -499,15 +555,17 @@ export const DEFAULT_INVESTMENT_CONFIG: InvestmentConfig = {
  * CRITICAL FIX: cashPctOfConstruction applies to construction cost ONLY,
  * not to land transfer. Land transfer is settled from sale proceeds.
  *
- * @param phaseIndex — 0-based index into config.phaseLandPrices
+ * @param phaseIndex — 0-based index into config.phaseLandPrices (ignored when lot provided)
+ * @param lot        — optional per-lot pricing for per-lot calculations
  */
 export function computeWaterfall(
   config: InvestmentConfig,
   phaseIndex = 0,
+  lot?: LotPricing,
 ): WaterfallResult {
-  const landPrice =
-    config.phaseLandPrices[phaseIndex]?.pricePerSqm ??
-    config.phaseLandPrices[0].pricePerSqm;
+  const landPrice = resolveLandTransferPrice(config, lot, phaseIndex);
+  // Villa selling price: per-lot if available, else config default
+  const sellingPriceSqm = lot ? lot.villa_selling_sqm : config.sellingPriceSqm;
 
   const totalLand = config.landPerVilla * landPrice;
   const l1LandPayment = totalLand * config.l1InvestorShare;
@@ -519,7 +577,7 @@ export function computeWaterfall(
   // CRITICAL: cash % applies to construction only, NOT to land transfer
   const l2InvestorCash = constructionCost * config.cashPctOfConstruction + softCost;
 
-  const revenue = config.buaPerVilla * config.sellingPriceSqm;
+  const revenue = config.buaPerVilla * sellingPriceSqm;
   const afterRepayments = revenue - l2InvestorCash - l1LandPayment - ownerLandEquity;
 
   const priorityAmount = config.priorityEnabled
@@ -707,4 +765,85 @@ export function computePhasedLandPricing(config: InvestmentConfig): Array<{
       ownerTake: wf.ownerTotal, // ADMIN-ONLY
     };
   });
+}
+
+export interface PhaseMetrics {
+  /** Average retail land price ($/sqm) of lots in this phase */
+  avgLandRetail: number;
+  /** Average land transfer price (after discount/flat) */
+  avgLandTransfer: number;
+  /** Average villa selling price ($/sqm) */
+  avgVillaSell: number;
+  /** Average profit to L2 investor per villa */
+  avgL2Profit: number;
+  /** Average L2 ROI on cash */
+  avgL2ROI: number;
+  /** Total villa count (lots × villasPerPlot) */
+  totalVillas: number;
+  /** Total L2 cash required */
+  totalCashNeeded: number;
+  /** Total villa revenue */
+  totalRevenue: number;
+  /** Total L2 profit */
+  totalProfit: number;
+}
+
+/**
+ * Aggregate per-lot waterfall results for a phase.
+ * Each lot produces config.villasPerPlot villas.
+ * NOTE: avgLandTransfer and per-lot margins are ADMIN-ONLY.
+ */
+export function computePhaseMetrics(
+  config: InvestmentConfig,
+  lots: LotPricing[],
+): PhaseMetrics {
+  if (lots.length === 0) {
+    return {
+      avgLandRetail: 0,
+      avgLandTransfer: 0,
+      avgVillaSell: 0,
+      avgL2Profit: 0,
+      avgL2ROI: 0,
+      totalVillas: 0,
+      totalCashNeeded: 0,
+      totalRevenue: 0,
+      totalProfit: 0,
+    };
+  }
+
+  const villasPerLot = config.villasPerPlot;
+
+  const results = lots.map((lot) => computeWaterfall(config, 0, lot));
+
+  const avgLandRetail =
+    lots.reduce((s, l) => s + l.price_sqm, 0) / lots.length;
+  const avgLandTransfer =
+    lots.reduce((s, l) => s + resolveLandTransferPrice(config, l), 0) /
+    lots.length;
+  const avgVillaSell =
+    lots.reduce((s, l) => s + l.villa_selling_sqm, 0) / lots.length;
+  const avgL2Profit =
+    results.reduce((s, wf) => s + wf.l2InvestorProfit, 0) / results.length;
+  const avgL2ROI =
+    results.reduce((s, wf) => s + wf.l2InvestorROI, 0) / results.length;
+
+  const totalVillas = lots.length * villasPerLot;
+  const totalCashNeeded =
+    results.reduce((s, wf) => s + wf.l2InvestorCash, 0) * villasPerLot;
+  const totalRevenue =
+    results.reduce((s, wf) => s + wf.revenue, 0) * villasPerLot;
+  const totalProfit =
+    results.reduce((s, wf) => s + wf.l2InvestorProfit, 0) * villasPerLot;
+
+  return {
+    avgLandRetail,
+    avgLandTransfer,
+    avgVillaSell,
+    avgL2Profit,
+    avgL2ROI,
+    totalVillas,
+    totalCashNeeded,
+    totalRevenue,
+    totalProfit,
+  };
 }

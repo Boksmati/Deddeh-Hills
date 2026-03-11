@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSimulationStore } from "@/store/simulation-store";
 import { LOTS } from "@/data/lots";
 import { DEVELOPMENT_TYPES, PHASE_COLORS } from "@/data/development-types";
@@ -9,7 +9,10 @@ import {
   calculateMassingSummary,
 } from "@/engine/financial-engine";
 import { useInvestmentConfig } from "@/hooks/useInvestmentConfig";
-import { computeWaterfall, type InvestmentConfig } from "@/lib/investment-layers";
+import { computeWaterfall, computePhaseMetrics, type InvestmentConfig, type LotPricing } from "@/lib/investment-layers";
+import LOT_PRICES_RAW from "@/data/lot-prices.json";
+
+const LOT_PRICES = LOT_PRICES_RAW as LotPricing[];
 import DhLogo from "@/components/ui/DhLogo";
 import LanguageToggle from "@/components/ui/LanguageToggle";
 import { useTranslations } from "@/i18n/useTranslations";
@@ -148,6 +151,37 @@ export default function InvestorPage() {
     [config]
   );
   const activeWaterfall = waterfallModel === "priority" ? waterfallPriority : waterfall;
+
+  // Per-lot phase assignments (investor-visible: retail prices + averages only)
+  const [lotPhases, setLotPhases] = useState<Record<number, 1 | 2 | 3>>({});
+  useEffect(() => {
+    fetch("/api/lots/phases")
+      .then((r) => (r.ok ? r.json() : {}))
+      .then((data: Record<string, number>) => {
+        const parsed: Record<number, 1 | 2 | 3> = {};
+        for (const [k, v] of Object.entries(data)) {
+          const n = parseInt(k, 10);
+          if ([1, 2, 3].includes(v)) parsed[n] = v as 1 | 2 | 3;
+        }
+        setLotPhases(parsed);
+      })
+      .catch(() => {});
+  }, []);
+
+  // Phase-level lot metrics (investor sees avg retail + sell price, no transfer formula)
+  const lotPhaseMetrics = useMemo(() => {
+    const out: Partial<Record<1 | 2 | 3, ReturnType<typeof computePhaseMetrics>>> = {};
+    ([1, 2, 3] as const).forEach((ph) => {
+      const phLots = LOT_PRICES.map((l) => ({
+        ...l,
+        phase: lotPhases[l.lot] as 1 | 2 | 3 | undefined,
+      })).filter((l) => l.phase === ph);
+      if (phLots.length > 0) {
+        out[ph] = computePhaseMetrics(config, phLots);
+      }
+    });
+    return out;
+  }, [lotPhases, config]);
 
   // L1 ticket sizes
   const L1_TICKETS = [100_000, 200_000, 300_000, 500_000, 1_000_000];
@@ -455,26 +489,48 @@ export default function InvestorPage() {
                 <thead>
                   <tr className="bg-gray-50 border-b border-gray-100">
                     <th className="text-left px-4 py-3 font-semibold text-gray-500">Phase</th>
-                    <th className="text-center px-4 py-3 font-semibold text-gray-500">Land Price</th>
+                    <th className="text-center px-4 py-3 font-semibold text-gray-500">
+                      {t("phase_avg_land_retail")}
+                    </th>
+                    <th className="text-center px-4 py-3 font-semibold text-gray-500">
+                      {t("phase_avg_villa_sell")}
+                    </th>
                     <th className="text-center px-4 py-3 font-semibold text-gray-500">{t("inv_your_profit")}</th>
-                    <th className="text-center px-4 py-3 font-semibold text-dh-green">{t("inv_your_roi")}</th>
+                    <th className="text-center px-4 py-3 font-semibold text-dh-green">{t("phase_avg_l2_roi")}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {config.phaseLandPrices.map((p, i) => {
                     const pp = phasedPricing[i];
+                    const pm = lotPhaseMetrics[p.phase as 1 | 2 | 3];
                     return (
                       <tr key={p.phase} className="border-t border-gray-100">
                         <td className="px-4 py-3 font-medium text-gray-700">
                           Phase {p.phase}
                           {i === 0 && <span className="ml-2 px-1.5 py-0.5 bg-dh-green/10 text-dh-green rounded text-[9px] font-bold">BEST ENTRY</span>}
+                          {pm && (
+                            <div className="text-[9px] text-gray-400 mt-0.5 font-normal">
+                              {pm.totalVillas} {lang === "ar" ? "فيلا" : "villas"} · {formatUSD(pm.totalCashNeeded)} total cash
+                            </div>
+                          )}
                         </td>
-                        <td className="px-4 py-3 text-center tabular-nums text-gray-600">${p.pricePerSqm}/m²</td>
+                        <td className="px-4 py-3 text-center tabular-nums text-gray-600">
+                          {pm ? (
+                            <span className="font-medium">${pm.avgLandRetail.toFixed(0)}/m²</span>
+                          ) : (
+                            <span className="text-gray-400">${p.pricePerSqm}/m²</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-center tabular-nums text-gray-600">
+                          {pm ? (
+                            <span className="font-medium">${pm.avgVillaSell.toFixed(0)}/m²</span>
+                          ) : "—"}
+                        </td>
                         <td className="px-4 py-3 text-center tabular-nums font-medium text-emerald-700">
-                          {pp ? formatUSD(pp.villaProfit) : "—"}
+                          {pm ? formatUSD(pm.avgL2Profit) : (pp ? formatUSD(pp.villaProfit) : "—")}
                         </td>
                         <td className="px-4 py-3 text-center tabular-nums font-bold text-dh-green">
-                          {pp ? formatPct(pp.investorROI) : "—"}
+                          {pm ? formatPct(pm.avgL2ROI) : (pp ? formatPct(pp.investorROI) : "—")}
                         </td>
                       </tr>
                     );

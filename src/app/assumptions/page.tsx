@@ -9,7 +9,10 @@ import { calculateSimulationSummary, calculateLotFinancials } from "@/engine/fin
 import LanguageToggle from "@/components/ui/LanguageToggle";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useInvestmentConfig } from "@/hooks/useInvestmentConfig";
-import { computeContinuationCost, computeWaterfall } from "@/lib/investment-layers";
+import { computeContinuationCost, computeWaterfall, computePhaseMetrics, type LotPricing } from "@/lib/investment-layers";
+import LOT_PRICES_RAW from "@/data/lot-prices.json";
+
+const LOT_PRICES = LOT_PRICES_RAW as LotPricing[];
 
 const EDITABLE_TYPES: DevelopmentType[] = ["twin_villa", "villa_2f", "villa_3f", "apartments", "lot_sale"];
 
@@ -61,6 +64,51 @@ export default function AssumptionsPage() {
   const { config, setConfig, saveConfig, l1Returns, waterfall, phasedPricing, isLoading: configLoading } = useInvestmentConfig();
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   const [showInsights, setShowInsights] = useState(false);
+
+  // ── Phase assignment state
+  const [lotPhases, setLotPhases] = useState<Record<number, 1 | 2 | 3>>({});
+  const [phasesSaveStatus, setPhasesSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
+
+  useEffect(() => {
+    fetch("/api/lots/phases")
+      .then((r) => (r.ok ? r.json() : {}))
+      .then((data: Record<string, number>) => {
+        const parsed: Record<number, 1 | 2 | 3> = {};
+        for (const [k, v] of Object.entries(data)) {
+          const n = parseInt(k, 10);
+          if ([1, 2, 3].includes(v)) parsed[n] = v as 1 | 2 | 3;
+        }
+        setLotPhases(parsed);
+      })
+      .catch(() => {});
+  }, []);
+
+  async function saveLotPhases() {
+    setPhasesSaveStatus("saving");
+    await fetch("/api/lots/phases", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(lotPhases),
+    });
+    setPhasesSaveStatus("saved");
+    setTimeout(() => setPhasesSaveStatus("idle"), 2000);
+  }
+
+  // Lots annotated with their current phase assignment
+  const lotsWithPhases: LotPricing[] = LOT_PRICES.map((l) => ({
+    ...l,
+    phase: lotPhases[l.lot] as 1 | 2 | 3 | undefined,
+  }));
+
+  // Per-phase metrics (investor-facing: avgLandRetail, avgVillaSell, avgL2ROI)
+  const phaseMetrics = useMemo(() => {
+    const out: Record<1 | 2 | 3, ReturnType<typeof computePhaseMetrics>> = {} as ReturnType<typeof Object>;
+    ([1, 2, 3] as const).forEach((ph) => {
+      const phLots = lotsWithPhases.filter((l) => l.phase === ph);
+      out[ph] = computePhaseMetrics(config, phLots);
+    });
+    return out;
+  }, [lotsWithPhases, config]);
 
   const continuationCost = useMemo(
     () => computeContinuationCost(config, 30),
@@ -589,6 +637,48 @@ export default function AssumptionsPage() {
                 </label>
               </section>
 
+              {/* Land Transfer Mode — ADMIN ONLY */}
+              <section className="bg-amber-50/60 border border-amber-200/60 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="px-2 py-0.5 text-[9px] font-bold text-amber-700 bg-amber-200 rounded-full uppercase tracking-wide">Admin Only</span>
+                  <h3 className="text-xs font-semibold text-amber-900 uppercase tracking-wide">{t("inv_config_land_transfer")}</h3>
+                </div>
+                <p className="text-[10px] text-amber-700 mb-4">{t("inv_config_land_transfer_hint")}</p>
+                <div className="flex gap-3 mb-4">
+                  {(["discount", "flat"] as const).map((mode) => (
+                    <button
+                      key={mode}
+                      onClick={() => setConfig({ landTransferMode: mode })}
+                      className={`px-4 py-2 rounded-lg text-xs font-medium transition-colors border ${
+                        config.landTransferMode === mode
+                          ? "bg-amber-600 text-white border-amber-600"
+                          : "bg-white text-amber-700 border-amber-300 hover:border-amber-500"
+                      }`}
+                    >
+                      {mode === "flat" ? t("inv_config_mode_flat") : t("inv_config_mode_discount")}
+                    </button>
+                  ))}
+                </div>
+                {config.landTransferMode === "flat" ? (
+                  <ConfigField
+                    label={t("inv_config_flat_rate")} unit="$/m²"
+                    value={config.landTransferFlat} step={5} min={100} max={500}
+                    onChange={(v) => setConfig({ landTransferFlat: v })}
+                  />
+                ) : (
+                  <ConfigField
+                    label={t("inv_config_discount_amount")} unit="$/m²"
+                    value={config.landTransferDiscount} step={5} min={0} max={300}
+                    onChange={(v) => setConfig({ landTransferDiscount: v })}
+                  />
+                )}
+                <p className="text-[10px] text-amber-600 mt-3 font-medium">
+                  {config.landTransferMode === "discount"
+                    ? `Example: $350 lot → transfer at $${350 - config.landTransferDiscount}/m²`
+                    : `All lots transfer at flat $${config.landTransferFlat}/m² regardless of retail price`}
+                </p>
+              </section>
+
               {/* Phased Land Pricing */}
               <section>
                 <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3">{t("inv_config_phase_pricing")}</h3>
@@ -631,6 +721,120 @@ export default function AssumptionsPage() {
                     })}
                   </tbody>
                 </table>
+              </section>
+
+              {/* Phase Assignment Tool — ADMIN ONLY */}
+              <section>
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide">{t("inv_config_phase_assignment")}</h3>
+                    <p className="text-[10px] text-gray-400 mt-0.5">{t("inv_config_phase_assign_hint")}</p>
+                  </div>
+                  <button
+                    onClick={saveLotPhases}
+                    disabled={phasesSaveStatus === "saving"}
+                    className="px-3 py-1.5 text-xs font-semibold text-white bg-dh-green hover:bg-dh-green/90 disabled:opacity-50 rounded-lg transition-colors"
+                  >
+                    {phasesSaveStatus === "saving" ? "Saving…" : phasesSaveStatus === "saved" ? "Saved!" : "Save Phases"}
+                  </button>
+                </div>
+
+                {/* Phase summary strip */}
+                <div className="grid grid-cols-3 gap-3 mb-4">
+                  {([1, 2, 3] as const).map((ph) => {
+                    const m = phaseMetrics[ph];
+                    const phLots = lotsWithPhases.filter((l) => l.phase === ph);
+                    const phColors = { 1: "#3b82f6", 2: "#f59e0b", 3: "#10b981" };
+                    return (
+                      <div key={ph} className="rounded-xl border p-3 text-xs" style={{ borderColor: phColors[ph] + "40", background: phColors[ph] + "08" }}>
+                        <div className="flex items-center gap-1.5 mb-2">
+                          <div className="w-2 h-2 rounded-full" style={{ background: phColors[ph] }} />
+                          <span className="font-semibold text-gray-700">Phase {ph}</span>
+                          <span className="ml-auto text-[10px] font-bold" style={{ color: phColors[ph] }}>
+                            {phLots.length} {t("inv_config_lots_in_phase")}
+                          </span>
+                        </div>
+                        {phLots.length === 0 ? (
+                          <p className="text-[10px] text-gray-400 italic">{t("no_lots_assigned")}</p>
+                        ) : (
+                          <div className="space-y-0.5 text-[10px] text-gray-600">
+                            <div className="flex justify-between">
+                              <span>{t("inv_config_avg_retail")}</span>
+                              <span className="font-medium tabular-nums">${m.avgLandRetail.toFixed(0)}/m²</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>{t("inv_config_avg_sell")}</span>
+                              <span className="font-medium tabular-nums">${m.avgVillaSell.toFixed(0)}/m²</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>{t("inv_config_avg_roi")}</span>
+                              <span className="font-bold tabular-nums" style={{ color: phColors[ph] }}>{(m.avgL2ROI * 100).toFixed(1)}%</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Lot assignment table — grouped by price tier */}
+                <div className="border border-gray-100 rounded-xl overflow-hidden">
+                  <table className="w-full text-[11px]">
+                    <thead>
+                      <tr className="bg-gray-50 border-b border-gray-100">
+                        <th className="text-left px-3 py-2 font-semibold text-gray-500 w-16">Lot</th>
+                        <th className="text-center px-2 py-2 font-semibold text-gray-500">Retail</th>
+                        <th className="text-center px-2 py-2 font-semibold text-gray-500">View</th>
+                        <th className="text-center px-2 py-2 font-semibold text-gray-500">Zone</th>
+                        <th className="text-center px-2 py-2 font-semibold text-gray-500">Status</th>
+                        <th className="text-center px-3 py-2 font-semibold text-gray-500">Phase</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {lotsWithPhases.map((lot) => {
+                        const statusColors: Record<string, string> = {
+                          available: "text-emerald-600 bg-emerald-50",
+                          sold: "text-red-600 bg-red-50",
+                          booked: "text-amber-600 bg-amber-50",
+                        };
+                        const phColors: Record<number, string> = { 1: "#3b82f6", 2: "#f59e0b", 3: "#10b981" };
+                        return (
+                          <tr key={lot.lot} className="border-b border-gray-50 hover:bg-gray-50/50">
+                            <td className="px-3 py-1.5 font-medium text-gray-700">#{lot.lot}</td>
+                            <td className="px-2 py-1.5 text-center tabular-nums text-gray-700 font-semibold">${lot.price_sqm}</td>
+                            <td className="px-2 py-1.5 text-center text-gray-500 capitalize">{lot.view.replace(/_/g, " ")}</td>
+                            <td className="px-2 py-1.5 text-center text-gray-500 capitalize">{lot.zone.replace(/_/g, " ")}</td>
+                            <td className="px-2 py-1.5 text-center">
+                              <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-semibold capitalize ${statusColors[lot.status] ?? ""}`}>
+                                {lot.status}
+                              </span>
+                            </td>
+                            <td className="px-3 py-1.5 text-center">
+                              <select
+                                value={lot.phase ?? ""}
+                                onChange={(e) => {
+                                  const v = e.target.value;
+                                  if (!v) {
+                                    setLotPhases((prev) => { const next = { ...prev }; delete next[lot.lot]; return next; });
+                                  } else {
+                                    setLotPhases((prev) => ({ ...prev, [lot.lot]: parseInt(v, 10) as 1 | 2 | 3 }));
+                                  }
+                                }}
+                                className="text-[10px] border border-gray-200 rounded-lg px-1.5 py-1 focus:outline-none focus:border-dh-green focus:ring-1 focus:ring-dh-green/20"
+                                style={{ color: lot.phase ? phColors[lot.phase] : "#9ca3af" }}
+                              >
+                                <option value="">{t("inv_config_unassigned")}</option>
+                                <option value="1">Phase 1</option>
+                                <option value="2">Phase 2</option>
+                                <option value="3">Phase 3</option>
+                              </select>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </section>
 
               {/* Admin Live Insights */}

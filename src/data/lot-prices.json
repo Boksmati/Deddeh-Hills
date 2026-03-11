@@ -1,0 +1,818 @@
+[
+  {
+    "lot": 1,
+    "price_sqm": 250,
+    "status": "available",
+    "view": "sea_view",
+    "zone": "north",
+    "villa_selling_sqm": 1250
+  },
+  {
+    "lot": 2,
+    "price_sqm": 250,
+    "status": "available",
+    "view": "sea_mountain",
+    "zone": "northeast",
+    "villa_selling_sqm": 1250
+  },
+  {
+    "lot": 3,
+    "price_sqm": 280,
+    "status": "booked",
+    "view": "sea_mountain",
+    "zone": "northeast",
+    "villa_selling_sqm": 1280
+  },
+  {
+    "lot": 4,
+    "price_sqm": 450,
+    "status": "sold",
+    "view": "sea_view",
+    "zone": "north",
+    "villa_selling_sqm": 1450
+  },
+  {
+    "lot": 5,
+    "price_sqm": 450,
+    "status": "sold",
+    "view": "sea_view",
+    "zone": "north",
+    "villa_selling_sqm": 1450
+  },
+  {
+    "lot": 6,
+    "price_sqm": 450,
+    "status": "sold",
+    "view": "sea_view",
+    "zone": "north",
+    "villa_selling_sqm": 1450
+  },
+  {
+    "lot": 7,
+    "price_sqm": 420,
+    "status": "sold",
+    "view": "sea_view",
+    "zone": "west",
+    "villa_selling_sqm": 1420
+  },
+  {
+    "lot": 8,
+    "price_sqm": 420,
+    "status": "sold",
+    "view": "sea_view",
+    "zone": "west",
+    "villa_selling_sqm": 1420
+  },
+  {
+    "lot": 9,
+    "price_sqm": 380,
+    "status": "sold",
+    "view": "partial_sea",
+    "zone": "west",
+    "villa_selling_sqm": 1380
+  },
+  {
+    "lot": 10,
+    "price_sqm": 350,
+    "status": "available",
+    "view": "partial_sea",
+    "zone": "west",
+    "villa_selling_sqm": 1350
+  },
+  {
+    "lot": 11,
+    "price_sqm": 350,
+    "status": "available",
+    "view": "partial_sea",
+    "zone": "southwest",
+    "villa_selling_sqm": 1350
+  },
+  {
+    "lot": 12,
+    "price_sqm": 350,
+    "status": "available",
+    "view": "mountain",
+    "zone": "southwest",
+    "villa_selling_sqm": 1350
+  },
+  {
+    "lot": 13,
+    "price_sqm": 350,
+    "status": "available",
+    "view": "mountain",
+    "zone": "south",
+    "villa_selling_sqm": 1350
+  },
+  {
+    "lot": 14,
+    "price_sqm": 350,
+    "status": "sold",
+    "view": "mountain",
+    "zone": "south",
+    "villa_selling_sqm": 1350
+  },
+  {
+    "lot": 15,
+    "price_sqm": 350,
+    "status": "sold",
+    "view": "mountain",
+    "zone": "south",
+    "villa_selling_sqm": 1350
+  },
+  {
+    "lot": 16,
+    "price_sqm": 350,
+    "status": "sold",
+    "view": "mountain",
+    "zone": "south",
+    "villa_selling_sqm": 1350
+  },
+  {
+    "lot": 17,
+    "price_sqm": 350,
+    "status": "sold",
+    "view": "mountain",
+    "zone": "central_west",
+    "villa_selling_sqm": 1350
+  },
+  {
+    "lot": 18,
+    "price_sqm": 350,
+    "status": "sold",
+    "view": "partial_sea",
+    "zone": "central_west",
+    "villa_selling_sqm": 1350
+  },
+  {
+    "lot": 19,
+    "price_sqm": 380,
+    "status": "sold",
+    "view": "partial_sea",
+    "zone": "central_west",
+    "villa_selling_sqm": 1380
+  },
+  {
+    "lot": 20,
+    "price_sqm": 380,
+    "status": "sold",
+    "view": "partial_sea",
+    "zone": "central_west",
+    "villa_selling_sqm": 1380
+  },
+  {
+    "lot": 21,
+    "price_sqm": 380,
+    "status": "sold",
+    "view": "partial_sea",
+    "zone": "central_west",
+    "villa_selling_sqm": 1380
+  },
+  {
+    "lot": 22,
+    "price_sqm": 350,
+    "status": "sold",
+    "view": "partial_sea",
+    "zone": "central_west",
+    "villa_selling_sqm": 1350
+  },
+  {
+    "lot": 23,
+    "price_sqm": 350,
+    "status": "sold",
+    "view": "mountain",
+    "zone": "central_west",
+    "villa_selling_sqm": 1350
+  },
+  {
+    "lot": 24,
+    "price_sqm": 380,
+    "status": "sold",
+    "view": "partial_sea",
+    "zone": "central",
+    "villa_selling_sqm": 1380
+  },
+  {
+    "lot": 25,
+    "price_sqm": 380,
+    "status": "sold",
+    "view": "partial_sea",
+    "zone": "central",
+    "villa_selling_sqm": 1380
+  },
+  {
+    "lot": 26,
+    "price_sqm": 380,
+    "status": "sold",
+    "view": "partial_sea",
+    "zone": "central",
+    "villa_selling_sqm": 1380
+  },
+  {
+    "lot": 27,
+    "price_sqm": 380,
+    "status": "sold",
+    "view": "partial_sea",
+    "zone": "central",
+    "villa_selling_sqm": 1380
+  },
+  {
+    "lot": 28,
+    "price_sqm": 380,
+    "status": "booked",
+    "view": "partial_sea",
+    "zone": "central",
+    "villa_selling_sqm": 1380
+  },
+  {
+    "lot": 29,
+    "price_sqm": 350,
+    "status": "booked",
+    "view": "mountain",
+    "zone": "central",
+    "villa_selling_sqm": 1350
+  },
+  {
+    "lot": 30,
+    "price_sqm": 350,
+    "status": "available",
+    "view": "mountain",
+    "zone": "south",
+    "villa_selling_sqm": 1350
+  },
+  {
+    "lot": 31,
+    "price_sqm": 350,
+    "status": "available",
+    "view": "mountain",
+    "zone": "south",
+    "villa_selling_sqm": 1350
+  },
+  {
+    "lot": 32,
+    "price_sqm": 420,
+    "status": "available",
+    "view": "mountain",
+    "zone": "south",
+    "villa_selling_sqm": 1420
+  },
+  {
+    "lot": 33,
+    "price_sqm": 420,
+    "status": "sold",
+    "view": "mountain",
+    "zone": "south",
+    "villa_selling_sqm": 1420
+  },
+  {
+    "lot": 34,
+    "price_sqm": 420,
+    "status": "sold",
+    "view": "mountain",
+    "zone": "south",
+    "villa_selling_sqm": 1420
+  },
+  {
+    "lot": 35,
+    "price_sqm": 420,
+    "status": "sold",
+    "view": "mountain",
+    "zone": "central_south",
+    "villa_selling_sqm": 1420
+  },
+  {
+    "lot": 36,
+    "price_sqm": 420,
+    "status": "sold",
+    "view": "mountain",
+    "zone": "central_south",
+    "villa_selling_sqm": 1420
+  },
+  {
+    "lot": 37,
+    "price_sqm": 380,
+    "status": "sold",
+    "view": "partial_sea",
+    "zone": "central",
+    "villa_selling_sqm": 1380
+  },
+  {
+    "lot": 38,
+    "price_sqm": 380,
+    "status": "sold",
+    "view": "partial_sea",
+    "zone": "central",
+    "villa_selling_sqm": 1380
+  },
+  {
+    "lot": 39,
+    "price_sqm": 380,
+    "status": "sold",
+    "view": "partial_sea",
+    "zone": "central",
+    "villa_selling_sqm": 1380
+  },
+  {
+    "lot": 40,
+    "price_sqm": 420,
+    "status": "sold",
+    "view": "sea_view",
+    "zone": "central",
+    "villa_selling_sqm": 1420
+  },
+  {
+    "lot": 41,
+    "price_sqm": 420,
+    "status": "sold",
+    "view": "sea_view",
+    "zone": "central",
+    "villa_selling_sqm": 1420
+  },
+  {
+    "lot": 42,
+    "price_sqm": 450,
+    "status": "sold",
+    "view": "sea_view",
+    "zone": "central",
+    "villa_selling_sqm": 1450
+  },
+  {
+    "lot": 43,
+    "price_sqm": 420,
+    "status": "sold",
+    "view": "sea_view",
+    "zone": "central",
+    "villa_selling_sqm": 1420
+  },
+  {
+    "lot": 44,
+    "price_sqm": 420,
+    "status": "sold",
+    "view": "sea_view",
+    "zone": "central",
+    "villa_selling_sqm": 1420
+  },
+  {
+    "lot": 45,
+    "price_sqm": 420,
+    "status": "sold",
+    "view": "partial_sea",
+    "zone": "central",
+    "villa_selling_sqm": 1420
+  },
+  {
+    "lot": 46,
+    "price_sqm": 450,
+    "status": "available",
+    "view": "sea_view",
+    "zone": "central_south",
+    "villa_selling_sqm": 1450
+  },
+  {
+    "lot": 47,
+    "price_sqm": 450,
+    "status": "available",
+    "view": "sea_view",
+    "zone": "central_south",
+    "villa_selling_sqm": 1450
+  },
+  {
+    "lot": 48,
+    "price_sqm": 450,
+    "status": "available",
+    "view": "mountain",
+    "zone": "south",
+    "villa_selling_sqm": 1450
+  },
+  {
+    "lot": 49,
+    "price_sqm": 450,
+    "status": "sold",
+    "view": "sea_view",
+    "zone": "central",
+    "villa_selling_sqm": 1450
+  },
+  {
+    "lot": 50,
+    "price_sqm": 450,
+    "status": "sold",
+    "view": "sea_view",
+    "zone": "central",
+    "villa_selling_sqm": 1450
+  },
+  {
+    "lot": 51,
+    "price_sqm": 450,
+    "status": "sold",
+    "view": "sea_view",
+    "zone": "central",
+    "villa_selling_sqm": 1450
+  },
+  {
+    "lot": 52,
+    "price_sqm": 450,
+    "status": "sold",
+    "view": "sea_view",
+    "zone": "central_north",
+    "villa_selling_sqm": 1450
+  },
+  {
+    "lot": 53,
+    "price_sqm": 450,
+    "status": "sold",
+    "view": "sea_view",
+    "zone": "central_north",
+    "villa_selling_sqm": 1450
+  },
+  {
+    "lot": 55,
+    "price_sqm": 450,
+    "status": "booked",
+    "view": "sea_view",
+    "zone": "central",
+    "villa_selling_sqm": 1450
+  },
+  {
+    "lot": 56,
+    "price_sqm": 450,
+    "status": "booked",
+    "view": "sea_view",
+    "zone": "central",
+    "villa_selling_sqm": 1450
+  },
+  {
+    "lot": 57,
+    "price_sqm": 420,
+    "status": "booked",
+    "view": "partial_sea",
+    "zone": "central",
+    "villa_selling_sqm": 1420
+  },
+  {
+    "lot": 58,
+    "price_sqm": 420,
+    "status": "booked",
+    "view": "partial_sea",
+    "zone": "central",
+    "villa_selling_sqm": 1420
+  },
+  {
+    "lot": 59,
+    "price_sqm": 450,
+    "status": "available",
+    "view": "partial_sea",
+    "zone": "central",
+    "villa_selling_sqm": 1450
+  },
+  {
+    "lot": 60,
+    "price_sqm": 450,
+    "status": "sold",
+    "view": "partial_sea",
+    "zone": "central",
+    "villa_selling_sqm": 1450
+  },
+  {
+    "lot": 61,
+    "price_sqm": 420,
+    "status": "available",
+    "view": "mountain",
+    "zone": "central_east",
+    "villa_selling_sqm": 1420
+  },
+  {
+    "lot": 62,
+    "price_sqm": 420,
+    "status": "available",
+    "view": "mountain",
+    "zone": "central_east",
+    "villa_selling_sqm": 1420
+  },
+  {
+    "lot": 63,
+    "price_sqm": 450,
+    "status": "available",
+    "view": "sea_view",
+    "zone": "central",
+    "villa_selling_sqm": 1450
+  },
+  {
+    "lot": 64,
+    "price_sqm": 450,
+    "status": "available",
+    "view": "sea_view",
+    "zone": "central",
+    "villa_selling_sqm": 1450
+  },
+  {
+    "lot": 65,
+    "price_sqm": 450,
+    "status": "available",
+    "view": "sea_view",
+    "zone": "central",
+    "villa_selling_sqm": 1450
+  },
+  {
+    "lot": 66,
+    "price_sqm": 450,
+    "status": "available",
+    "view": "sea_view",
+    "zone": "central_north",
+    "villa_selling_sqm": 1450
+  },
+  {
+    "lot": 67,
+    "price_sqm": 450,
+    "status": "sold",
+    "view": "sea_view",
+    "zone": "central_north",
+    "villa_selling_sqm": 1450
+  },
+  {
+    "lot": 68,
+    "price_sqm": 450,
+    "status": "sold",
+    "view": "sea_view",
+    "zone": "central_north",
+    "villa_selling_sqm": 1450
+  },
+  {
+    "lot": 69,
+    "price_sqm": 450,
+    "status": "available",
+    "view": "sea_view",
+    "zone": "central",
+    "villa_selling_sqm": 1450
+  },
+  {
+    "lot": 70,
+    "price_sqm": 450,
+    "status": "available",
+    "view": "sea_view",
+    "zone": "central",
+    "villa_selling_sqm": 1450
+  },
+  {
+    "lot": 71,
+    "price_sqm": 380,
+    "status": "available",
+    "view": "mountain_sea",
+    "zone": "east",
+    "villa_selling_sqm": 1380
+  },
+  {
+    "lot": 72,
+    "price_sqm": 450,
+    "status": "available",
+    "view": "mountain_sea",
+    "zone": "east",
+    "villa_selling_sqm": 1450
+  },
+  {
+    "lot": 73,
+    "price_sqm": 380,
+    "status": "available",
+    "view": "mountain_sea",
+    "zone": "east",
+    "villa_selling_sqm": 1380
+  },
+  {
+    "lot": 74,
+    "price_sqm": 380,
+    "status": "available",
+    "view": "mountain_sea",
+    "zone": "east",
+    "villa_selling_sqm": 1380
+  },
+  {
+    "lot": 75,
+    "price_sqm": 380,
+    "status": "available",
+    "view": "mountain_sea",
+    "zone": "east",
+    "villa_selling_sqm": 1380
+  },
+  {
+    "lot": 76,
+    "price_sqm": 350,
+    "status": "available",
+    "view": "mountain",
+    "zone": "east",
+    "villa_selling_sqm": 1350
+  },
+  {
+    "lot": 77,
+    "price_sqm": 330,
+    "status": "available",
+    "view": "mountain_sea",
+    "zone": "east",
+    "villa_selling_sqm": 1330
+  },
+  {
+    "lot": 78,
+    "price_sqm": 330,
+    "status": "available",
+    "view": "mountain_sea",
+    "zone": "east",
+    "villa_selling_sqm": 1330
+  },
+  {
+    "lot": 79,
+    "price_sqm": 400,
+    "status": "available",
+    "view": "mountain",
+    "zone": "east",
+    "villa_selling_sqm": 1400
+  },
+  {
+    "lot": 80,
+    "price_sqm": 420,
+    "status": "available",
+    "view": "mountain",
+    "zone": "east",
+    "villa_selling_sqm": 1420
+  },
+  {
+    "lot": 81,
+    "price_sqm": 420,
+    "status": "available",
+    "view": "mountain",
+    "zone": "east",
+    "villa_selling_sqm": 1420
+  },
+  {
+    "lot": 82,
+    "price_sqm": 300,
+    "status": "available",
+    "view": "mountain",
+    "zone": "east",
+    "villa_selling_sqm": 1300
+  },
+  {
+    "lot": 83,
+    "price_sqm": 300,
+    "status": "available",
+    "view": "mountain",
+    "zone": "southeast",
+    "villa_selling_sqm": 1300
+  },
+  {
+    "lot": 84,
+    "price_sqm": 280,
+    "status": "available",
+    "view": "mountain",
+    "zone": "southeast",
+    "villa_selling_sqm": 1280
+  },
+  {
+    "lot": 85,
+    "price_sqm": 280,
+    "status": "available",
+    "view": "mountain",
+    "zone": "southeast",
+    "villa_selling_sqm": 1280
+  },
+  {
+    "lot": 86,
+    "price_sqm": 280,
+    "status": "available",
+    "view": "mountain",
+    "zone": "southeast",
+    "villa_selling_sqm": 1280
+  },
+  {
+    "lot": 87,
+    "price_sqm": 250,
+    "status": "available",
+    "view": "mountain",
+    "zone": "south",
+    "villa_selling_sqm": 1250
+  },
+  {
+    "lot": 88,
+    "price_sqm": 250,
+    "status": "available",
+    "view": "mountain",
+    "zone": "south",
+    "villa_selling_sqm": 1250
+  },
+  {
+    "lot": 89,
+    "price_sqm": 250,
+    "status": "available",
+    "view": "mountain",
+    "zone": "south",
+    "villa_selling_sqm": 1250
+  },
+  {
+    "lot": 90,
+    "price_sqm": 250,
+    "status": "available",
+    "view": "mountain",
+    "zone": "south",
+    "villa_selling_sqm": 1250
+  },
+  {
+    "lot": 91,
+    "price_sqm": 250,
+    "status": "available",
+    "view": "mountain",
+    "zone": "south",
+    "villa_selling_sqm": 1250
+  },
+  {
+    "lot": 92,
+    "price_sqm": 280,
+    "status": "available",
+    "view": "mountain_sea",
+    "zone": "east",
+    "villa_selling_sqm": 1280
+  },
+  {
+    "lot": 93,
+    "price_sqm": 280,
+    "status": "available",
+    "view": "mountain_sea",
+    "zone": "east",
+    "villa_selling_sqm": 1280
+  },
+  {
+    "lot": 94,
+    "price_sqm": 300,
+    "status": "available",
+    "view": "mountain_sea",
+    "zone": "east",
+    "villa_selling_sqm": 1300
+  },
+  {
+    "lot": 95,
+    "price_sqm": 300,
+    "status": "available",
+    "view": "sea_mountain",
+    "zone": "northeast",
+    "villa_selling_sqm": 1300
+  },
+  {
+    "lot": 96,
+    "price_sqm": 300,
+    "status": "available",
+    "view": "sea_mountain",
+    "zone": "northeast",
+    "villa_selling_sqm": 1300
+  },
+  {
+    "lot": 97,
+    "price_sqm": 300,
+    "status": "available",
+    "view": "sea_mountain",
+    "zone": "northeast",
+    "villa_selling_sqm": 1300
+  },
+  {
+    "lot": 98,
+    "price_sqm": 250,
+    "status": "available",
+    "view": "sea_mountain",
+    "zone": "north",
+    "villa_selling_sqm": 1250
+  },
+  {
+    "lot": 99,
+    "price_sqm": 250,
+    "status": "available",
+    "view": "sea_mountain",
+    "zone": "north",
+    "villa_selling_sqm": 1250
+  },
+  {
+    "lot": 100,
+    "price_sqm": 250,
+    "status": "available",
+    "view": "sea_view",
+    "zone": "north",
+    "villa_selling_sqm": 1250
+  },
+  {
+    "lot": 101,
+    "price_sqm": 250,
+    "status": "available",
+    "view": "sea_view",
+    "zone": "north",
+    "villa_selling_sqm": 1250
+  },
+  {
+    "lot": 102,
+    "price_sqm": 350,
+    "status": "sold",
+    "view": "partial_sea",
+    "zone": "west",
+    "villa_selling_sqm": 1350
+  },
+  {
+    "lot": 103,
+    "price_sqm": 250,
+    "status": "sold",
+    "view": "sea_view",
+    "zone": "north",
+    "villa_selling_sqm": 1250
+  }
+]
