@@ -732,6 +732,7 @@ function MapUnitList({
 export default function CustomerPage() {
   const assignments         = useSimulationStore((s) => s.assignments);
   const lotStatuses         = useSimulationStore((s) => s.lotStatuses);
+  const lotGroups           = useSimulationStore((s) => s.lotGroups);
   const projectSpecs        = useSimulationStore((s) => s.projectSpecs);
   const initStateFromServer = useSimulationStore((s) => s.initStateFromServer);
   const { t, lang }         = useTranslations();
@@ -1099,6 +1100,7 @@ export default function CustomerPage() {
                 selectedLotId={selectedMapLotId}
                 lang={lang}
                 compact={!!mapLotEntry}
+                lotGroups={lotGroups}
               />
             </div>
 

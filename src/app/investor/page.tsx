@@ -106,6 +106,7 @@ export default function InvestorPage() {
   const assignments = useSimulationStore((s) => s.assignments);
   const typeAssumptions = useSimulationStore((s) => s.typeAssumptions);
   const investorSharePct = useSimulationStore((s) => s.investorSharePct);
+  const lotGroups = useSimulationStore((s) => s.lotGroups);
   const { t, lang } = useTranslations();
   const role = useRole();
 
@@ -120,8 +121,8 @@ export default function InvestorPage() {
 
   const summary = useMemo(() => {
     const assignmentsArr = Array.from(assignments.values());
-    return calculateSimulationSummary(LOTS, assignmentsArr, investorSharePct, typeAssumptions);
-  }, [assignments, investorSharePct, typeAssumptions]);
+    return calculateSimulationSummary(LOTS, assignmentsArr, investorSharePct, typeAssumptions, lotGroups);
+  }, [assignments, investorSharePct, typeAssumptions, lotGroups]);
 
   const massing = useMemo(() => {
     const assignmentsArr = Array.from(assignments.values());

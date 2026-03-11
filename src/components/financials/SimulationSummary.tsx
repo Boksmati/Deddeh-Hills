@@ -16,14 +16,15 @@ export default function SimulationSummaryBar() {
   const assignments = useSimulationStore((s) => s.assignments);
   const investorSharePct = useSimulationStore((s) => s.investorSharePct);
   const typeAssumptions = useSimulationStore((s) => s.typeAssumptions);
+  const lotGroups = useSimulationStore((s) => s.lotGroups);
   const { t } = useTranslations();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
   const summary = useMemo(() => {
     const assignmentsArr = Array.from(assignments.values());
-    return calculateSimulationSummary(LOTS, assignmentsArr, investorSharePct, typeAssumptions);
-  }, [assignments, investorSharePct]);
+    return calculateSimulationSummary(LOTS, assignmentsArr, investorSharePct, typeAssumptions, lotGroups);
+  }, [assignments, investorSharePct, typeAssumptions, lotGroups]);
 
   const cards = [
     {

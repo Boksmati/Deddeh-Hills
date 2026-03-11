@@ -23,13 +23,14 @@ export default function PhaseManager() {
   const selectLotsByPhase = useSimulationStore((s) => s.selectLotsByPhase);
   const setPhase = useSimulationStore((s) => s.setPhase);
   const typeAssumptions = useSimulationStore((s) => s.typeAssumptions);
+  const lotGroups = useSimulationStore((s) => s.lotGroups);
   const { t } = useTranslations();
 
   const phaseData = useMemo(() => {
     const assignArr = Array.from(assignments.values());
 
     const phases = ([1, 2, 3] as Phase[]).map((p) => {
-      const pf = calculatePhaseFinancials(LOTS, assignArr, p, typeAssumptions);
+      const pf = calculatePhaseFinancials(LOTS, assignArr, p, typeAssumptions, lotGroups);
       const lotIds = assignArr.filter((a) => a.phase === p).map((a) => a.lotId);
       return { phase: p, financials: pf, lotIds };
     });
@@ -41,7 +42,7 @@ export default function PhaseManager() {
     const totalUnphased = assignArr.filter((a) => a.phase === 0).length;
 
     return { phases, unassignedCount, totalUnphased };
-  }, [assignments, typeAssumptions]);
+  }, [assignments, typeAssumptions, lotGroups]);
 
   return (
     <div className="p-4 space-y-3">

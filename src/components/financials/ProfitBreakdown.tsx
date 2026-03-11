@@ -54,12 +54,13 @@ export default function ProfitBreakdown() {
   const assignments = useSimulationStore((s) => s.assignments);
   const investorSharePct = useSimulationStore((s) => s.investorSharePct);
   const typeAssumptions = useSimulationStore((s) => s.typeAssumptions);
+  const lotGroups = useSimulationStore((s) => s.lotGroups);
   const { t } = useTranslations();
 
   const summary = useMemo(() => {
     const arr = Array.from(assignments.values());
-    return calculateSimulationSummary(LOTS, arr, investorSharePct, typeAssumptions);
-  }, [assignments, investorSharePct, typeAssumptions]);
+    return calculateSimulationSummary(LOTS, arr, investorSharePct, typeAssumptions, lotGroups);
+  }, [assignments, investorSharePct, typeAssumptions, lotGroups]);
 
   const phases = summary.phaseBreakdown.filter((p) => p.lotCount > 0);
 

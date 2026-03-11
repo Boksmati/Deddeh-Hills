@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useSimulationStore } from "@/store/simulation-store";
 import { LOTS } from "@/data/lots";
 import { DEVELOPMENT_TYPES, PHASE_LABELS, PHASE_COLORS } from "@/data/development-types";
-import { calculateLotFinancials } from "@/engine/financial-engine";
+import { calculateLotFinancials, calculateGroupFinancials } from "@/engine/financial-engine";
 import { DevelopmentType, Phase, LotStatus } from "@/types";
 import MassingPanel from "@/components/phases/MassingPanel";
 import { useTranslations } from "@/i18n/useTranslations";
@@ -28,6 +28,10 @@ export default function LotConfigPanel() {
   const lotStatuses = useSimulationStore((s) => s.lotStatuses);
   const setLotStatus = useSimulationStore((s) => s.setLotStatus);
   const viewMode = useSimulationStore((s) => s.viewMode);
+  const lotGroups = useSimulationStore((s) => s.lotGroups);
+  const removeLotGroup = useSimulationStore((s) => s.removeLotGroup);
+  const setGroupCustomUnits = useSimulationStore((s) => s.setGroupCustomUnits);
+  const typeAssumptions = useSimulationStore((s) => s.typeAssumptions);
   const [showSpecSheet, setShowSpecSheet] = useState(false);
   const { t } = useTranslations();
 
@@ -55,8 +59,23 @@ export default function LotConfigPanel() {
   const currentPhase = firstAssignment?.phase ?? 0;
   const firstStatus: LotStatus = lotStatuses.get(firstLot.id) ?? "available";
 
-  // Calculate financials for single lot
-  const financials = !isMulti
+  // Check if the selected lot(s) are in a group
+  const activeGroup = lotGroups.find((g) =>
+    selectedIds.some((id) => g.lotIds.includes(id))
+  ) ?? null;
+  const groupLots: typeof LOTS = activeGroup
+    ? (activeGroup.lotIds
+        .map((id) => LOTS.find((l) => l.id === id))
+        .filter((l): l is typeof LOTS[0] => l !== undefined))
+    : [];
+  const groupFinancials = activeGroup && groupLots.length > 0
+    ? calculateGroupFinancials(groupLots, activeGroup, typeAssumptions)
+    : null;
+
+  // Calculate financials: group-aware
+  const financials = activeGroup
+    ? groupFinancials
+    : !isMulti
     ? calculateLotFinancials(firstLot, currentDevType)
     : null;
 
@@ -73,14 +92,90 @@ export default function LotConfigPanel() {
 
   return (
     <div className="p-4 space-y-5">
+      {/* Group Info Banner */}
+      {activeGroup && (
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50/60 p-3 space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <span className="text-emerald-700 text-sm font-bold">⊕</span>
+              <span className="text-xs font-semibold text-emerald-800">
+                {t("lot_group")}: {activeGroup.label ?? `Lots ${activeGroup.lotIds.join("+")}`}
+              </span>
+            </div>
+            <button
+              onClick={() => removeLotGroup(activeGroup.id)}
+              className="text-[10px] text-orange-600 hover:text-orange-800 font-medium px-2 py-0.5 rounded bg-orange-50 hover:bg-orange-100 transition-colors"
+            >
+              {t("ungroup")} ×
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-1.5 text-[10px]">
+            <div className="bg-white rounded p-1.5">
+              <div className="text-gray-400">{t("group_area")}</div>
+              <div className="font-semibold text-gray-700">
+                {formatNum(groupLots.reduce((s, l) => s + l.area_sqm, 0))} m²
+              </div>
+            </div>
+            <div className="bg-white rounded p-1.5">
+              <div className="text-gray-400">{t("group_bua")}</div>
+              <div className="font-semibold text-gray-700">
+                {formatNum(groupLots.reduce((s, l) => s + l.total_bua_sqm, 0))} m²
+              </div>
+            </div>
+          </div>
+          {/* Custom units override */}
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-gray-500 flex-1">{t("custom_units")}</span>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => {
+                  const cur = activeGroup.customUnits ?? (groupFinancials?.numUnits ?? 1);
+                  const next = Math.max(1, cur - 1);
+                  setGroupCustomUnits(activeGroup.id, next);
+                }}
+                className="w-5 h-5 rounded text-[11px] bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 flex items-center justify-center"
+              >
+                −
+              </button>
+              <span className="text-xs font-semibold text-emerald-700 tabular-nums w-6 text-center">
+                {activeGroup.customUnits ?? groupFinancials?.numUnits ?? "—"}
+              </span>
+              <button
+                onClick={() => {
+                  const cur = activeGroup.customUnits ?? (groupFinancials?.numUnits ?? 1);
+                  setGroupCustomUnits(activeGroup.id, cur + 1);
+                }}
+                className="w-5 h-5 rounded text-[11px] bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 flex items-center justify-center"
+              >
+                +
+              </button>
+              {activeGroup.customUnits !== undefined && (
+                <button
+                  onClick={() => setGroupCustomUnits(activeGroup.id, undefined)}
+                  className="text-[9px] text-gray-400 hover:text-gray-600 ml-0.5"
+                  title="Reset to auto"
+                >
+                  ↺
+                </button>
+              )}
+            </div>
+          </div>
+          <div className="text-[9px] text-emerald-600 font-medium">
+            {activeGroup.lotIds.length} {t("lots")} · {t("lot_group")}
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div>
         <h3 className="font-semibold text-gray-900 text-sm">
-          {isMulti
+          {activeGroup
+            ? (activeGroup.label ?? `Lots ${activeGroup.lotIds.join("+")}`)
+            : isMulti
             ? `${selectedLots.length} ${t("lots_selected")}`
             : `${t("lot_id")} #${firstLot.id}`}
         </h3>
-        {!isMulti && (
+        {!isMulti && !activeGroup && (
           <p className="text-xs text-gray-500 mt-0.5">
             {formatNum(firstLot.area_sqm)} {t("sqm")} &middot; {firstLot.max_floors}F
             &middot; {formatUSD(firstLot.zone_price_retail)}/{t("sqm")}

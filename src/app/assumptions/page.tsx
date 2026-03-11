@@ -14,6 +14,24 @@ import LOT_PRICES_RAW from "@/data/lot-prices.json";
 
 const LOT_PRICES = LOT_PRICES_RAW as LotPricing[];
 
+// ── Pre-computed lot averages for derived unit count display ──────────────────
+const AVG_LOT_AREA = LOTS.reduce((s, l) => s + l.area_sqm, 0) / LOTS.length;
+const AVG_LOT_EXPLOITATION = LOTS.reduce((s, l) => s + l.exploitation_ratio, 0) / LOTS.length;
+const OUG_FRACTION = LOTS.filter(l => l.oug_allowed).length / LOTS.length;
+
+/** Returns derived units count based on avg lot geometry + assumption params */
+function computeDerivedUnits(a: TypeAssumption): { units: number; avgSellable: number } {
+  if (a.avgUnitSize <= 0) return { units: 1, avgSellable: 0 };
+  const footprint = AVG_LOT_AREA * AVG_LOT_EXPLOITATION;
+  const netFootprint = footprint * (1 - a.commonAreaPct);
+  const baseBUA = netFootprint * a.maxFloors;
+  const balconies = baseBUA * 0.25;
+  const roofBUA = netFootprint;
+  const ougArea = netFootprint * OUG_FRACTION;
+  const avgSellable = baseBUA + balconies + roofBUA + ougArea;
+  return { units: Math.max(1, Math.round(avgSellable / a.avgUnitSize)), avgSellable };
+}
+
 const EDITABLE_TYPES: DevelopmentType[] = ["twin_villa", "villa_2f", "villa_3f", "apartments", "lot_sale"];
 
 function fmt(n: number) {
@@ -45,7 +63,6 @@ const FIELDS: FieldDef[] = [
   { key: "avgUnitSize",          label: "Avg Unit Size",       unit: "m²",     step: 10,  min: 0, max: 2000  },
   { key: "commonAreaPct",        label: "Common Area",         unit: "%",      step: 1,   min: 0, max: 80, isPercent: true },
   { key: "maxFloors",            label: "Max Floors",          unit: "floors", step: 1,   min: 1, max: 6    },
-  { key: "unitsPerLot",          label: "Units / Lot",         unit: "0=auto", step: 0.5, min: 0, max: 20,  hint: "0 = derive from area" },
   { key: "gardenAreaM",          label: "Garden",              unit: "m²/unit",step: 10,  min: 0, max: 2000, hint: "Outdoor area per unit" },
 ];
 
@@ -58,6 +75,7 @@ export default function AssumptionsPage() {
   const resetTypeAssumptions = useSimulationStore((s) => s.resetTypeAssumptions);
   const assignments = useSimulationStore((s) => s.assignments);
   const investorSharePct = useSimulationStore((s) => s.investorSharePct);
+  const lotGroups = useSimulationStore((s) => s.lotGroups);
   const { t } = useTranslations();
 
   // ── Three-Party Investment Config
@@ -167,7 +185,7 @@ export default function AssumptionsPage() {
 
   const isDisabledField = (type: DevelopmentType, field: FieldDef) =>
     type === "lot_sale" &&
-    ["constructionCostPerM", "avgUnitSize", "commonAreaPct", "maxFloors", "unitsPerLot", "gardenAreaM"].includes(field.key);
+    ["constructionCostPerM", "avgUnitSize", "commonAreaPct", "maxFloors", "gardenAreaM"].includes(field.key);
 
   // Derived metrics per type (read-only)
   function getDerived(type: DevelopmentType) {
@@ -175,7 +193,8 @@ export default function AssumptionsPage() {
     const grossPerM = a.sellingPricePerM - a.constructionCostPerM;
     const marginPct = a.sellingPricePerM > 0 ? grossPerM / a.sellingPricePerM : 0;
     const unitPrice = a.sellingPricePerM * a.avgUnitSize;
-    const totalLotM = (a.unitsPerLot > 0 ? a.unitsPerLot : 1) * (a.avgUnitSize + a.gardenAreaM);
+    const { units } = computeDerivedUnits(a);
+    const totalLotM = units * (a.avgUnitSize + a.gardenAreaM);
     return { grossPerM, marginPct, unitPrice, totalLotM };
   }
 
@@ -278,7 +297,7 @@ export default function AssumptionsPage() {
                     Max Floors<div className="font-normal text-gray-400">floors</div>
                   </th>
                   <th className="text-center px-4 py-2 font-semibold text-gray-500 whitespace-nowrap bg-emerald-50/30">
-                    Units / Lot<div className="font-normal text-gray-400">0=auto</div>
+                    Units / Lot<div className="font-normal text-emerald-400">calc.</div>
                   </th>
                   <th className="text-center px-4 py-2 font-semibold text-gray-500 whitespace-nowrap bg-emerald-50/30">
                     Garden<div className="font-normal text-gray-400">m²/unit</div>
@@ -301,7 +320,7 @@ export default function AssumptionsPage() {
                   const a = typeAssumptions[type];
                   const d = getDerived(type);
                   const pricingFields = FIELDS.slice(0, 2);
-                  const productFields = FIELDS.slice(2, 7);
+                  const productFields = FIELDS.slice(2, 6); // avgUnitSize, commonAreaPct, maxFloors, gardenAreaM
 
                   return (
                     <tr key={type} className="border-b border-gray-50 hover:bg-gray-50/50">
@@ -326,11 +345,45 @@ export default function AssumptionsPage() {
                         );
                       })}
 
-                      {/* Product fields */}
-                      {productFields.map((field, i) => {
+                      {/* Product fields: avgUnitSize, commonAreaPct, maxFloors */}
+                      {productFields.slice(0, 3).map((field, i) => {
                         const disabled = isDisabledField(type, field);
                         return (
                           <td key={field.key} className={`px-4 py-3 text-center ${i === 0 ? "border-l border-gray-100 bg-emerald-50/10" : "bg-emerald-50/10"}`}>
+                            {disabled ? (
+                              <span className="text-gray-300">—</span>
+                            ) : (
+                              <div className="flex flex-col items-center gap-0.5">
+                                <InputCell field={field} value={displayValue(type, field)} onChange={(v) => handleChange(type, field, v)} />
+                                {field.hint && <span className="text-[9px] text-gray-300 whitespace-nowrap">{field.hint}</span>}
+                              </div>
+                            )}
+                          </td>
+                        );
+                      })}
+
+                      {/* Units / Lot — always calculated, never editable */}
+                      <td className="px-4 py-3 text-center bg-emerald-50/10">
+                        {type === "lot_sale" ? (
+                          <span className="text-gray-300">—</span>
+                        ) : (() => {
+                          const { units, avgSellable } = computeDerivedUnits(a);
+                          return (
+                            <div className="flex flex-col items-center gap-0.5">
+                              <span className="font-semibold text-emerald-700">{units} units</span>
+                              <span className="text-[9px] text-gray-300 whitespace-nowrap">
+                                ~{Math.round(avgSellable)}m² ÷ {a.avgUnitSize}m²
+                              </span>
+                            </div>
+                          );
+                        })()}
+                      </td>
+
+                      {/* Product fields: gardenAreaM */}
+                      {productFields.slice(3).map((field) => {
+                        const disabled = isDisabledField(type, field);
+                        return (
+                          <td key={field.key} className="px-4 py-3 text-center bg-emerald-50/10">
                             {disabled ? (
                               <span className="text-gray-300">—</span>
                             ) : (
@@ -382,7 +435,7 @@ export default function AssumptionsPage() {
               <div className="w-3 h-3 rounded bg-amber-100" />
               <span>Derived (read-only)</span>
             </div>
-            <span className="ml-auto">Units/Lot = 0 means unit count is auto-derived from sellable area ÷ avg unit size</span>
+            <span className="ml-auto">Units/Lot = auto-derived from avg lot BUA ÷ avg unit size (based on 101-lot averages)</span>
           </div>
         </div>
 

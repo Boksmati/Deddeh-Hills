@@ -22,11 +22,15 @@ export function screenToSVG(
   return [svgPt.x, svgPt.y];
 }
 
+// Pre-build a centroid lookup (same as CustomerMap)
+const MASTER_CENTROID_MAP = new Map(LOT_POLYGONS.map((p) => [p.id, p.center]));
+
 export default function MasterPlanSVG() {
   const deselectAll = useSimulationStore((s) => s.deselectAll);
   const selectLotsByIds = useSimulationStore((s) => s.selectLotsByIds);
   const calibrationMode = useSimulationStore((s) => s.calibrationMode);
   const lotCenterOverrides = useSimulationStore((s) => s.lotCenterOverrides);
+  const lotGroups = useSimulationStore((s) => s.lotGroups);
 
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -232,6 +236,56 @@ export default function MasterPlanSVG() {
           {LOT_POLYGONS.map((polygon) => (
             <LotPolygonComponent key={polygon.id} polygon={polygon} />
           ))}
+
+          {/* Group connectors — dashed lines between grouped lot centroids */}
+          {lotGroups.map((group) => {
+            const centers = group.lotIds
+              .map((id) => {
+                const ov = lotCenterOverrides.get(id);
+                if (ov) return [ov[0], ov[1]] as [number, number];
+                return MASTER_CENTROID_MAP.get(id) ?? null;
+              })
+              .filter((c): c is [number, number] => c !== null);
+            if (centers.length < 2) return null;
+            return (
+              <g key={group.id} pointerEvents="none">
+                {centers.slice(0, -1).map((c, i) => {
+                  const next = centers[i + 1];
+                  return (
+                    <line
+                      key={i}
+                      x1={c[0]} y1={c[1]}
+                      x2={next[0]} y2={next[1]}
+                      stroke="white"
+                      strokeWidth={2}
+                      strokeDasharray="6 4"
+                      strokeOpacity={0.9}
+                    />
+                  );
+                })}
+                {/* Group badge at midpoint */}
+                {(() => {
+                  const mx = centers.reduce((s, c) => s + c[0], 0) / centers.length;
+                  const my = centers.reduce((s, c) => s + c[1], 0) / centers.length;
+                  return (
+                    <g>
+                      <circle cx={mx} cy={my} r={9} fill="#059669" fillOpacity={0.9} />
+                      <text
+                        x={mx} y={my}
+                        textAnchor="middle"
+                        dominantBaseline="central"
+                        fontSize="8"
+                        fontWeight="800"
+                        fill="white"
+                      >
+                        G
+                      </text>
+                    </g>
+                  );
+                })()}
+              </g>
+            );
+          })}
 
           {/* Lasso selection rectangle */}
           {lassoRect && (

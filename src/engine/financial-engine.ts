@@ -2,6 +2,7 @@ import {
   Lot,
   DevelopmentType,
   LotFinancials,
+  LotGroup,
   PhaseFinancials,
   Phase,
   SimulationSummary,
@@ -97,14 +98,87 @@ export function calculateLotFinancials(
   };
 }
 
+/** Calculates financials for a lot group by merging all member lots' geometry */
+export function calculateGroupFinancials(
+  lots: Lot[],
+  group: LotGroup,
+  assumptionsMap?: Partial<Record<DevelopmentType, TypeAssumption>>,
+): LotFinancials {
+  if (lots.length === 0) {
+    return {
+      lotId: group.id,
+      isGroup: true,
+      groupLotIds: group.lotIds,
+      landCost: 0,
+      sellableArea: 0,
+      totalBUA: 0,
+      numUnits: 0,
+      constructionCost: 0,
+      revenue: 0,
+      grossProfit: 0,
+      netProfit: 0,
+      grossMargin: 0,
+    };
+  }
+
+  const assumption = assumptionsMap?.[group.devType];
+
+  // Merge lot geometry into a synthetic lot
+  const mergedArea = lots.reduce((s, l) => s + l.area_sqm, 0);
+  const mergedBUA = lots.reduce((s, l) => s + l.total_bua_sqm, 0);
+  const avgExploitation = lots.reduce((s, l) => s + l.exploitation_ratio, 0) / lots.length;
+  const anyOUG = lots.some((l) => l.oug_allowed);
+  const minMaxFloors = Math.min(...lots.map((l) => l.max_floors));
+  const avgZoneRetail = lots.reduce((s, l) => s + l.zone_price_retail, 0) / lots.length;
+  const avgZoneDisc = lots.reduce((s, l) => s + l.zone_price_discounted, 0) / lots.length;
+
+  const syntheticLot: Lot = {
+    ...lots[0],
+    area_sqm: mergedArea,
+    total_bua_sqm: mergedBUA,
+    exploitation_ratio: avgExploitation,
+    max_floors: minMaxFloors,
+    oug_allowed: anyOUG,
+    zone_price_retail: avgZoneRetail,
+    zone_price_discounted: avgZoneDisc,
+  };
+
+  // If custom units specified, build a fully-typed TypeAssumption with units overridden
+  const staticConfig = DEVELOPMENT_TYPES[group.devType];
+  const assumptionWithUnits: TypeAssumption | undefined =
+    group.customUnits !== undefined
+      ? {
+          constructionCostPerM: assumption?.constructionCostPerM ?? staticConfig.constructionCostPerM,
+          sellingPricePerM: assumption?.sellingPricePerM ?? staticConfig.sellingPricePerM,
+          avgUnitSize: assumption?.avgUnitSize ?? staticConfig.avgUnitSize,
+          commonAreaPct: assumption?.commonAreaPct ?? staticConfig.commonAreaPct,
+          maxFloors: assumption?.maxFloors ?? syntheticLot.max_floors,
+          gardenAreaM: assumption?.gardenAreaM ?? 0,
+          unitsPerLot: group.customUnits,
+        }
+      : assumption;
+
+  const result = calculateLotFinancials(syntheticLot, group.devType, assumptionWithUnits);
+  return {
+    ...result,
+    lotId: group.id,
+    isGroup: true,
+    groupLotIds: group.lotIds,
+  };
+}
+
 export function calculatePhaseFinancials(
   lots: Lot[],
   assignments: LotAssignment[],
   phase: Phase,
-  assumptionsMap?: Partial<Record<DevelopmentType, TypeAssumption>>
+  assumptionsMap?: Partial<Record<DevelopmentType, TypeAssumption>>,
+  lotGroups: LotGroup[] = []
 ): PhaseFinancials {
   const phaseLots = assignments.filter((a) => a.phase === phase);
   const lotMap = new Map(lots.map((l) => [l.id, l]));
+
+  // Lots that belong to a group are handled separately
+  const groupedLotIds = new Set(lotGroups.flatMap((g) => g.lotIds));
 
   let totalArea = 0;
   let totalUnits = 0;
@@ -115,8 +189,11 @@ export function calculatePhaseFinancials(
   let totalNetProfit = 0;
   let marginSum = 0;
   let marginCount = 0;
+  let lotCount = 0;
 
+  // Individual (non-grouped) lots
   for (const assignment of phaseLots) {
+    if (groupedLotIds.has(assignment.lotId)) continue; // handled by group
     const lot = lotMap.get(assignment.lotId);
     if (!lot || assignment.developmentType === "unassigned") continue;
 
@@ -129,8 +206,29 @@ export function calculatePhaseFinancials(
     totalRevenue += financials.revenue;
     totalGrossProfit += financials.grossProfit;
     totalNetProfit += financials.netProfit;
+    lotCount++;
     if (financials.grossMargin > 0) {
       marginSum += financials.grossMargin;
+      marginCount++;
+    }
+  }
+
+  // Groups in this phase
+  for (const group of lotGroups) {
+    if (group.phase !== phase || group.devType === "unassigned") continue;
+    const groupLots = group.lotIds.map((id) => lotMap.get(id)).filter(Boolean) as Lot[];
+    if (groupLots.length === 0) continue;
+    const gf = calculateGroupFinancials(groupLots, group, assumptionsMap);
+    totalArea += groupLots.reduce((s, l) => s + l.area_sqm, 0);
+    totalUnits += gf.numUnits;
+    totalLandCost += gf.landCost;
+    totalConstructionCost += gf.constructionCost;
+    totalRevenue += gf.revenue;
+    totalGrossProfit += gf.grossProfit;
+    totalNetProfit += gf.netProfit;
+    lotCount++;
+    if (gf.grossMargin > 0) {
+      marginSum += gf.grossMargin;
       marginCount++;
     }
   }
@@ -139,7 +237,7 @@ export function calculatePhaseFinancials(
 
   return {
     phase,
-    lotCount: phaseLots.filter((a) => a.developmentType !== "unassigned").length,
+    lotCount,
     totalArea: Math.round(totalArea),
     totalUnits,
     totalLandCost: Math.round(totalLandCost),
@@ -157,12 +255,13 @@ export function calculateSimulationSummary(
   lots: Lot[],
   assignments: LotAssignment[],
   investorSharePct: number,
-  assumptionsMap?: Partial<Record<DevelopmentType, TypeAssumption>>
+  assumptionsMap?: Partial<Record<DevelopmentType, TypeAssumption>>,
+  lotGroups: LotGroup[] = []
 ): SimulationSummary {
-  const phase0 = calculatePhaseFinancials(lots, assignments, 0, assumptionsMap);
-  const phase1 = calculatePhaseFinancials(lots, assignments, 1, assumptionsMap);
-  const phase2 = calculatePhaseFinancials(lots, assignments, 2, assumptionsMap);
-  const phase3 = calculatePhaseFinancials(lots, assignments, 3, assumptionsMap);
+  const phase0 = calculatePhaseFinancials(lots, assignments, 0, assumptionsMap, lotGroups);
+  const phase1 = calculatePhaseFinancials(lots, assignments, 1, assumptionsMap, lotGroups);
+  const phase2 = calculatePhaseFinancials(lots, assignments, 2, assumptionsMap, lotGroups);
+  const phase3 = calculatePhaseFinancials(lots, assignments, 3, assumptionsMap, lotGroups);
 
   const assigned = assignments.filter(
     (a) => a.developmentType !== "unassigned"

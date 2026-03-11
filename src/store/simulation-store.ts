@@ -3,6 +3,7 @@ import {
   DevelopmentType,
   Phase,
   LotAssignment,
+  LotGroup,
   ViewMode,
   MapColorMode,
   Scenario,
@@ -52,9 +53,21 @@ interface SimulationState {
   calibrationMode: boolean;
   lotCenterOverrides: Map<number, [number, number]>;
 
+  // Lot groups
+  lotGroups: LotGroup[];
+
   // Actions — Assignment
   setDevelopmentType: (lotIds: number[], type: DevelopmentType) => void;
   setPhase: (lotIds: number[], phase: Phase) => void;
+
+  // Actions — Lot Groups
+  addLotGroup: (lotIds: number[]) => string;
+  removeLotGroup: (groupId: string) => void;
+  setGroupDevType: (groupId: string, type: DevelopmentType) => void;
+  setGroupPhase: (groupId: string, phase: Phase) => void;
+  setGroupCustomUnits: (groupId: string, units: number | undefined) => void;
+  setGroupLabel: (groupId: string, label: string) => void;
+  getGroupForLot: (lotId: number) => LotGroup | undefined;
 
   // Actions — Selection
   selectLot: (lotId: number, multi?: boolean) => void;
@@ -127,10 +140,10 @@ const DEFAULT_MAX_FLOORS: Record<DevelopmentType, number> = {
 const DEFAULT_UNITS_PER_LOT: Record<DevelopmentType, number> = {
   unassigned: 0,
   lot_sale: 0,
-  twin_villa: 2,
-  villa_2f: 2,
-  villa_3f: 3,
-  apartments: 0, // auto-derive from area for apartments
+  twin_villa: 0, // auto-derive from avg lot BUA ÷ avgUnitSize
+  villa_2f: 0,
+  villa_3f: 0,
+  apartments: 0,
 };
 
 const DEFAULT_GARDEN_AREA: Record<DevelopmentType, number> = {
@@ -167,6 +180,7 @@ const LS_ASSUMPTIONS_KEY = "dh-type-assumptions";
 const LS_INVESTOR_MODEL_KEY = "dh-investor-model";
 const LS_PROJECT_SPECS_KEY = "dh-project-specs";
 const LS_PHASE_TARGETS_KEY = "dh-phase-targets";
+const LS_LOT_GROUPS_KEY = "dh-lot-groups";
 
 const DEFAULT_PHASE_TARGETS: { 1: number; 2: number; 3: number } = { 1: 0, 2: 0, 3: 0 };
 
@@ -315,6 +329,24 @@ function saveProjectSpecs(specs: ProjectSpecs) {
   } catch { /* ignore */ }
 }
 
+function loadLotGroups(): LotGroup[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const str = localStorage.getItem(LS_LOT_GROUPS_KEY);
+    if (!str) return [];
+    return JSON.parse(str) as LotGroup[];
+  } catch {
+    return [];
+  }
+}
+
+function saveLotGroups(groups: LotGroup[]) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(LS_LOT_GROUPS_KEY, JSON.stringify(groups));
+  } catch { /* ignore */ }
+}
+
 function createDefaultAssignments(): Map<number, LotAssignment> {
   const map = new Map<number, LotAssignment>();
   for (const lot of LOTS) {
@@ -348,6 +380,7 @@ interface PersistedServerState {
   investorModel: typeof DEFAULT_INVESTOR_MODEL_STATE;
   projectSpecs?: ProjectSpecs;
   phaseRevenueTargets?: { 1: number; 2: number; 3: number };
+  lotGroups?: LotGroup[];
 }
 
 function buildServerState(s: SimulationState): PersistedServerState {
@@ -367,6 +400,7 @@ function buildServerState(s: SimulationState): PersistedServerState {
     },
     projectSpecs: s.projectSpecs,
     phaseRevenueTargets: s.phaseRevenueTargets,
+    lotGroups: s.lotGroups,
   };
 }
 
@@ -434,6 +468,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   phaseRevenueTargets: loadPhaseTargets(),
   calibrationMode: false,
   lotCenterOverrides: new Map(),
+  lotGroups: loadLotGroups(),
 
   setDevelopmentType: (lotIds, type) => {
     set((state) => {
@@ -465,13 +500,16 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
 
   selectLot: (lotId, multi = false) => {
     set((state) => {
-      const newSelected = multi
-        ? new Set(state.selectedLotIds)
-        : new Set<number>();
-      if (newSelected.has(lotId)) {
-        newSelected.delete(lotId);
+      // If the lot belongs to a group, expand selection to the whole group
+      const group = state.lotGroups.find((g) => g.lotIds.includes(lotId));
+      const idsToToggle = group ? group.lotIds : [lotId];
+
+      const newSelected = multi ? new Set(state.selectedLotIds) : new Set<number>();
+      const alreadyAllSelected = idsToToggle.every((id) => newSelected.has(id));
+      if (alreadyAllSelected) {
+        idsToToggle.forEach((id) => newSelected.delete(id));
       } else {
-        newSelected.add(lotId);
+        idsToToggle.forEach((id) => newSelected.add(id));
       }
       return { selectedLotIds: newSelected };
     });
@@ -623,6 +661,8 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
         ? { ...DEFAULT_PHASE_TARGETS, ...data.phaseRevenueTargets }
         : undefined;
       if (phaseRevenueTargets) savePhaseTargets(phaseRevenueTargets);
+      const lotGroups = data.lotGroups ?? [];
+      saveLotGroups(lotGroups);
 
       set({
         assignments,
@@ -636,6 +676,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
         holdPeriodYears: im.holdPeriodYears,
         ticketSize: im.ticketSize,
         investorTickets: im.investorTickets,
+        lotGroups,
         ...(data.projectSpecs ? { projectSpecs: data.projectSpecs } : {}),
         ...(phaseRevenueTargets ? { phaseRevenueTargets } : {}),
       });
@@ -713,12 +754,107 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
     const lotStatuses = new Map<number, LotStatus>();
     saveAssignments(assignments);
     saveLotStatuses(lotStatuses);
+    saveLotGroups([]);
     set({
       assignments,
       selectedLotIds: new Set(),
       lotStatuses,
       activeScenarioId: null,
+      lotGroups: [],
     });
+  },
+
+  // ── Lot Group Actions ─────────────────────────────────────────────────────
+
+  addLotGroup: (lotIds) => {
+    const id = `grp_${Date.now()}`;
+    set((state) => {
+      // Derive devType + phase from the first lot's assignment
+      const firstAssignment = state.assignments.get(lotIds[0]);
+      const devType = firstAssignment?.developmentType ?? "unassigned";
+      const phase = firstAssignment?.phase ?? 0;
+      const label = `Lots ${lotIds.join("+")}`;
+      const newGroup: LotGroup = { id, lotIds, devType, phase, label };
+      const newGroups = [...state.lotGroups, newGroup];
+      saveLotGroups(newGroups);
+      return { lotGroups: newGroups, selectedLotIds: new Set<number>() };
+    });
+    return id;
+  },
+
+  removeLotGroup: (groupId) => {
+    set((state) => {
+      const newGroups = state.lotGroups.filter((g) => g.id !== groupId);
+      saveLotGroups(newGroups);
+      return { lotGroups: newGroups };
+    });
+  },
+
+  setGroupDevType: (groupId, type) => {
+    set((state) => {
+      const newGroups = state.lotGroups.map((g) =>
+        g.id === groupId ? { ...g, devType: type } : g
+      );
+      // Keep individual lot assignments in sync
+      const group = state.lotGroups.find((g) => g.id === groupId);
+      if (group) {
+        const newAssignments = new Map(state.assignments);
+        for (const lotId of group.lotIds) {
+          const cur = newAssignments.get(lotId);
+          if (cur) newAssignments.set(lotId, { ...cur, developmentType: type });
+        }
+        saveAssignments(newAssignments);
+        saveLotGroups(newGroups);
+        return { lotGroups: newGroups, assignments: newAssignments };
+      }
+      saveLotGroups(newGroups);
+      return { lotGroups: newGroups };
+    });
+  },
+
+  setGroupPhase: (groupId, phase) => {
+    set((state) => {
+      const newGroups = state.lotGroups.map((g) =>
+        g.id === groupId ? { ...g, phase } : g
+      );
+      const group = state.lotGroups.find((g) => g.id === groupId);
+      if (group) {
+        const newAssignments = new Map(state.assignments);
+        for (const lotId of group.lotIds) {
+          const cur = newAssignments.get(lotId);
+          if (cur) newAssignments.set(lotId, { ...cur, phase });
+        }
+        saveAssignments(newAssignments);
+        saveLotGroups(newGroups);
+        return { lotGroups: newGroups, assignments: newAssignments };
+      }
+      saveLotGroups(newGroups);
+      return { lotGroups: newGroups };
+    });
+  },
+
+  setGroupCustomUnits: (groupId, units) => {
+    set((state) => {
+      const newGroups = state.lotGroups.map((g) =>
+        g.id === groupId ? { ...g, customUnits: units } : g
+      );
+      saveLotGroups(newGroups);
+      return { lotGroups: newGroups };
+    });
+  },
+
+  setGroupLabel: (groupId, label) => {
+    set((state) => {
+      const newGroups = state.lotGroups.map((g) =>
+        g.id === groupId ? { ...g, label } : g
+      );
+      saveLotGroups(newGroups);
+      return { lotGroups: newGroups };
+    });
+  },
+
+  getGroupForLot: (lotId) => {
+    return get().lotGroups.find((g) => g.lotIds.includes(lotId));
   },
 
   setInvestorModel: (model) => {
@@ -827,7 +963,8 @@ if (typeof window !== "undefined") {
       state.holdPeriodYears !== prevState.holdPeriodYears ||
       state.ticketSize !== prevState.ticketSize ||
       state.projectSpecs !== prevState.projectSpecs ||
-      state.phaseRevenueTargets !== prevState.phaseRevenueTargets
+      state.phaseRevenueTargets !== prevState.phaseRevenueTargets ||
+      state.lotGroups !== prevState.lotGroups
     ) {
       queueServerSave(buildServerState(state));
     }

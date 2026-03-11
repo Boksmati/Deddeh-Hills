@@ -3,7 +3,7 @@
 import { useRef, useState, useCallback, useEffect } from "react";
 import { LOT_POLYGONS, SVG_VIEWBOX } from "@/data/lot-polygons";
 import { DEVELOPMENT_TYPES } from "@/data/development-types";
-import { LotAssignment, LotStatus } from "@/types";
+import { LotAssignment, LotStatus, LotGroup } from "@/types";
 
 const STATUS_FILL: Record<LotStatus, string> = {
   available: "#22c55e",
@@ -27,7 +27,11 @@ interface Props {
   selectedLotId: number | null;
   lang: string;
   compact?: boolean;
+  lotGroups?: LotGroup[];
 }
+
+// Pre-build a centroid lookup for fast access
+const CENTROID_MAP = new Map(LOT_POLYGONS.map((p) => [p.id, p.center]));
 
 export default function CustomerMap({
   filteredLotIds,
@@ -37,6 +41,7 @@ export default function CustomerMap({
   selectedLotId,
   lang,
   compact = false,
+  lotGroups = [],
 }: Props) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -109,6 +114,53 @@ export default function CustomerMap({
           width={SVG_VIEWBOX.width}
           height={SVG_VIEWBOX.height}
         />
+
+        {/* Group connectors — dashed lines between grouped lot centroids */}
+        {mounted && lotGroups.map((group) => {
+          const centers = group.lotIds
+            .map((id) => CENTROID_MAP.get(id))
+            .filter((c): c is [number, number] => c !== undefined);
+          if (centers.length < 2) return null;
+          return (
+            <g key={group.id} pointerEvents="none">
+              {centers.slice(0, -1).map((c, i) => {
+                const next = centers[i + 1];
+                return (
+                  <line
+                    key={i}
+                    x1={c[0]} y1={c[1]}
+                    x2={next[0]} y2={next[1]}
+                    stroke="#ffffff"
+                    strokeWidth={1.5}
+                    strokeDasharray="5 4"
+                    strokeOpacity={0.85}
+                  />
+                );
+              })}
+              {/* Group badge at midpoint of first pair */}
+              {(() => {
+                const mx = (centers[0][0] + centers[centers.length - 1][0]) / 2;
+                const my = (centers[0][1] + centers[centers.length - 1][1]) / 2;
+                return (
+                  <g>
+                    <circle cx={mx} cy={my} r={7} fill="white" fillOpacity={0.9} />
+                    <text
+                      x={mx} y={my}
+                      textAnchor="middle"
+                      dominantBaseline="central"
+                      fontSize="7"
+                      fontWeight="700"
+                      fill="#059669"
+                      pointerEvents="none"
+                    >
+                      G
+                    </text>
+                  </g>
+                );
+              })()}
+            </g>
+          );
+        })}
 
         {/* Lot dots — client-only to avoid hydration mismatch */}
         {mounted && LOT_POLYGONS.map((polygon) => {

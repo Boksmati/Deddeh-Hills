@@ -51,7 +51,9 @@ export interface LotAssignment {
 }
 
 export interface LotFinancials {
-  lotId: number;
+  lotId: number | string; // number for individual lots, string group.id for groups
+  isGroup?: boolean;
+  groupLotIds?: number[]; // populated when isGroup=true
   landCost: number;
   sellableArea: number;
   totalBUA: number;
@@ -61,6 +63,16 @@ export interface LotFinancials {
   grossProfit: number;
   netProfit: number;
   grossMargin: number;
+}
+
+/** A cluster of 2+ lots treated as one development unit */
+export interface LotGroup {
+  id: string;               // "grp_<timestamp>"
+  lotIds: number[];         // 2+ lot IDs merged into this group
+  devType: DevelopmentType; // shared development type for the group
+  phase: Phase;             // shared phase
+  customUnits?: number;     // optional override; undefined = auto-derive
+  label?: string;           // display label, e.g. "Lots 5+6"
 }
 
 export interface PhaseFinancials {

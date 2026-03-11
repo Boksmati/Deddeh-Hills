@@ -476,6 +476,14 @@ const en = {
   term_sheet_download_en: "Download Term Sheet (English)",
   term_sheet_download_ar: "Download Term Sheet (Arabic)",
   term_sheet_nav: "Term Sheet",
+
+  // ── Lot Grouping
+  lot_group: "Lot Group",
+  group_lots: "Group Lots",
+  ungroup: "Ungroup",
+  group_area: "Combined Area",
+  group_bua: "Combined BUA",
+  custom_units: "Custom Units",
 } as const;
 
 export type TranslationKey = keyof typeof en;
@@ -953,6 +961,14 @@ const ar: Record<TranslationKey, string> = {
   term_sheet_download_en: "تنزيل نشرة الشروط (بالإنجليزية)",
   term_sheet_download_ar: "تنزيل نشرة الشروط (بالعربية)",
   term_sheet_nav: "نشرة الشروط",
+
+  // ── Lot Grouping
+  lot_group: "مجموعة قطع",
+  group_lots: "تجميع القطع",
+  ungroup: "فك التجميع",
+  group_area: "المساحة المجمعة",
+  group_bua: "مساحة بناء مجمعة",
+  custom_units: "وحدات مخصصة",
 } as const;
 
 export const translations: Record<Lang, Record<TranslationKey, string>> = { en, ar };

@@ -20,7 +20,27 @@ export default function Toolbar() {
   const calibrationMode = useSimulationStore((s) => s.calibrationMode);
   const toggleCalibrationMode = useSimulationStore((s) => s.toggleCalibrationMode);
   const resetCenterOverrides = useSimulationStore((s) => s.resetCenterOverrides);
+  const selectedLotIds = useSimulationStore((s) => s.selectedLotIds);
+  const assignments = useSimulationStore((s) => s.assignments);
+  const lotGroups = useSimulationStore((s) => s.lotGroups);
+  const addLotGroup = useSimulationStore((s) => s.addLotGroup);
+  const removeLotGroup = useSimulationStore((s) => s.removeLotGroup);
   const { t } = useTranslations();
+
+  // Derive selection state for grouping
+  const selectedIds = Array.from(selectedLotIds);
+  const canGroup =
+    selectedIds.length >= 2 &&
+    selectedIds.every((id) => {
+      const a = assignments.get(id);
+      return a && a.developmentType !== "unassigned";
+    });
+
+  // Check if ALL selected lots are already in the same group → show Ungroup
+  const selectedGroup =
+    selectedIds.length >= 1
+      ? lotGroups.find((g) => selectedIds.every((id) => g.lotIds.includes(id)))
+      : undefined;
 
   const viewModes: { id: ViewMode; label: string }[] = [
     { id: "development", label: t("view_development") },
@@ -153,6 +173,25 @@ export default function Toolbar() {
             {t("calibrate")}
           </button>
         )}
+
+        {/* Group / Ungroup lots */}
+        {selectedGroup ? (
+          <button
+            onClick={() => removeLotGroup(selectedGroup.id)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-lg transition-all"
+          >
+            <span>⊗</span>
+            <span>{t("ungroup")}</span>
+          </button>
+        ) : canGroup ? (
+          <button
+            onClick={() => addLotGroup(selectedIds)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-all"
+          >
+            <span>⊕</span>
+            <span>{t("group_lots")}</span>
+          </button>
+        ) : null}
 
         {/* Scenarios */}
         <button
