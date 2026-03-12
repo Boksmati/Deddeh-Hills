@@ -200,7 +200,7 @@ export default function AssumptionsPage() {
 
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-dh-bg">
         <AppHeader currentPage="assumptions" />
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="h-64 bg-white rounded-xl shadow-sm border border-gray-100 animate-pulse" />
@@ -210,7 +210,7 @@ export default function AssumptionsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-dh-bg">
       <AppHeader currentPage="assumptions" />
 
       <div className="max-w-7xl mx-auto px-6 py-6 space-y-8">

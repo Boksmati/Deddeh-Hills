@@ -20,7 +20,7 @@ function fmtPct(n: number): string {
 }
 
 const STATUS_COLORS: Record<LotStatus, string> = {
-  available: "#10B981",
+  available: "#22c55e",
   reserved: "#F59E0B",
   under_contract: "#F97316",
   sold: "#EF4444",
@@ -162,7 +162,7 @@ export default function StatusPage() {
   const assignPct = data.totalLots > 0 ? data.assignedCount / data.totalLots : 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-dh-bg">
       <AppHeader currentPage="status" />
 
       <main className="max-w-6xl mx-auto px-6 py-8 space-y-8">
@@ -183,7 +183,7 @@ export default function StatusPage() {
             const rev = data.statusRevenue[s];
             const pct = data.totalLots > 0 ? count / data.totalLots : 0;
             return (
-              <div key={s} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+              <div key={s} className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
                 <div className="flex items-center justify-between mb-3">
                   <span className={`text-xs font-semibold uppercase tracking-wide ${meta.text}`}>
                     {meta.label}
@@ -215,7 +215,7 @@ export default function StatusPage() {
 
         {/* ── Revenue Pipeline Bar ─────────────────────────────────────────── */}
         {data.projectedRevenue > 0 && (
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
             <h2 className="text-sm font-semibold text-gray-900 mb-4">{t("revenue_pipeline")}</h2>
             <div className="flex items-end gap-8 mb-4">
               <div>
@@ -258,7 +258,7 @@ export default function StatusPage() {
         )}
 
         {/* ── Phase Progress ───────────────────────────────────────────────── */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
           <h2 className="text-sm font-semibold text-gray-900 mb-5">{t("phase_progress")}</h2>
           <div className="space-y-5">
             {data.phases.map((p) => {
@@ -375,7 +375,7 @@ export default function StatusPage() {
 
         {/* ── Typology Mix ─────────────────────────────────────────────────── */}
         {data.typeBreakdown.length > 0 && (
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
             <h2 className="text-sm font-semibold text-gray-900 mb-4">{t("typology_mix")}</h2>
             <table className="w-full text-xs">
               <thead>
@@ -434,7 +434,7 @@ export default function StatusPage() {
 
         {/* Empty state */}
         {data.assignedCount === 0 && (
-          <div className="bg-white rounded-2xl p-12 shadow-sm border border-gray-100 text-center">
+          <div className="bg-white rounded-xl p-12 shadow-sm border border-gray-100 text-center">
             <div className="text-5xl mb-4 opacity-20">&#9634;</div>
             <p className="text-sm text-gray-500 font-medium">{t("no_lots_yet")}</p>
             <p className="text-xs text-gray-400 mt-1">

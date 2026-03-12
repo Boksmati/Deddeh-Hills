@@ -15,7 +15,7 @@ import { DEFAULT_LAYER_PARAMS, type LayerParams, computeWaterfall, DEFAULT_INVES
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 const C = {
-  bg: "#F7F8F6",
+  bg: "#F4F9EF",
   white: "#FFFFFF",
   ink: "#1A1F16",
   muted: "#6B7280",

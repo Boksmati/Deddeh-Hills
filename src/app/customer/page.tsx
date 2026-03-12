@@ -921,7 +921,7 @@ export default function CustomerPage() {
     <div className="min-h-screen" style={{ background: C.bg }}>
 
       {/* ── Hero ── */}
-      <div style={{ background: C.ink }}>
+      <div style={{ background: "#1A3810" }}>
         <div className="max-w-7xl mx-auto px-5 pt-8 pb-7">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
@@ -980,7 +980,7 @@ export default function CustomerPage() {
                   </div>
                 </div>
               </div>
-              <LanguageToggle className="border-stone-600 bg-transparent text-stone-300 hover:bg-stone-800" />
+              <LanguageToggle className="border-white/30 bg-white/10 text-white/90 hover:bg-white/20" />
             </div>
           </div>
         </div>
@@ -1664,12 +1664,6 @@ export default function CustomerPage() {
             Deddeh Hills · Koura, Lebanon · All prices in USD
           </div>
           <div className="flex items-center gap-4">
-            <a href="/simulator" className="text-xs transition-colors" style={{ color: C.muted }}>
-              {lang === "ar" ? "عرض الإدارة" : "Admin View"}
-            </a>
-            <a href="/investor" className="text-xs transition-colors" style={{ color: C.muted }}>
-              {t("nav_investor")}
-            </a>
             <LanguageToggle />
           </div>
         </div>
