@@ -1,0 +1,181 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 560">
+  <defs>
+    <linearGradient id="skyApt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7DAFC8"/>
+      <stop offset="60%" stop-color="#B8D4E2"/>
+      <stop offset="100%" stop-color="#D6E8C8"/>
+    </linearGradient>
+    <linearGradient id="facadeApt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F8F6F2"/>
+      <stop offset="100%" stop-color="#E8E4DC"/>
+    </linearGradient>
+    <linearGradient id="sideApt" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#D8D4CC"/>
+      <stop offset="100%" stop-color="#C8C4BC"/>
+    </linearGradient>
+    <linearGradient id="groundApt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#9DC870"/>
+      <stop offset="100%" stop-color="#78A850"/>
+    </linearGradient>
+    <linearGradient id="roofApt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3A6830"/>
+      <stop offset="100%" stop-color="#2D5225"/>
+    </linearGradient>
+    <filter id="shadowApt">
+      <feDropShadow dx="4" dy="8" stdDeviation="8" flood-color="#1A3810" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="800" height="560" fill="url(#skyApt)"/>
+
+  <!-- Rolling hills background -->
+  <ellipse cx="200" cy="260" rx="280" ry="80" fill="#8BBD5A" opacity="0.35"/>
+  <ellipse cx="600" cy="270" rx="260" ry="70" fill="#7DB050" opacity="0.30"/>
+
+  <!-- Ground plane -->
+  <polygon points="0,380 800,380 800,560 0,560" fill="url(#groundApt)"/>
+  <!-- Grass texture lines -->
+  <line x1="50" y1="400" x2="80" y2="398" stroke="#6A9840" stroke-width="1" opacity="0.5"/>
+  <line x1="150" y1="410" x2="190" y2="408" stroke="#6A9840" stroke-width="1" opacity="0.5"/>
+  <line x1="600" y1="400" x2="640" y2="398" stroke="#6A9840" stroke-width="1" opacity="0.5"/>
+  <line x1="700" y1="412" x2="740" y2="410" stroke="#6A9840" stroke-width="1" opacity="0.5"/>
+
+  <!-- ── APARTMENT BUILDING (isometric-ish perspective) ─── -->
+  <!-- Building base shadow -->
+  <ellipse cx="400" cy="386" rx="220" ry="18" fill="#1A3810" opacity="0.18"/>
+
+  <!-- Right side face -->
+  <polygon points="560,110 620,130 620,380 560,360" fill="url(#sideApt)" filter="url(#shadowApt)"/>
+
+  <!-- Main facade (front) -->
+  <rect x="180" y="100" width="380" height="280" rx="2" fill="url(#facadeApt)" filter="url(#shadowApt)"/>
+
+  <!-- ── FACADE DETAILS ──────────────────────────────────── -->
+
+  <!-- Ground floor - Unit A left half -->
+  <!-- G-floor left windows -->
+  <rect x="200" y="280" width="70" height="85" rx="3" fill="#8BBFD8" opacity="0.7"/>
+  <line x1="235" y1="280" x2="235" y2="365" stroke="white" stroke-width="1" opacity="0.6"/>
+  <rect x="200" y="280" width="70" height="8" rx="1" fill="#E8E4DC" opacity="0.9"/>
+
+  <!-- G-floor center window -->
+  <rect x="295" y="280" width="80" height="85" rx="3" fill="#8BBFD8" opacity="0.7"/>
+  <line x1="335" y1="280" x2="335" y2="365" stroke="white" stroke-width="1" opacity="0.6"/>
+  <rect x="295" y="280" width="80" height="8" rx="1" fill="#E8E4DC" opacity="0.9"/>
+
+  <!-- G-floor right windows -->
+  <rect x="400" y="280" width="70" height="85" rx="3" fill="#8BBFD8" opacity="0.7"/>
+  <line x1="435" y1="280" x2="435" y2="365" stroke="white" stroke-width="1" opacity="0.6"/>
+  <rect x="400" y="280" width="70" height="8" rx="1" fill="#E8E4DC" opacity="0.9"/>
+
+  <!-- Garden doors (ground floor) -->
+  <rect x="490" y="290" width="52" height="75" rx="2" fill="#7DAFC8" opacity="0.8"/>
+  <rect x="490" y="285" width="52" height="8" rx="1" fill="#E8E4DC" opacity="0.9"/>
+
+  <!-- Floor 1 (duplex lower) windows -->
+  <rect x="200" y="190" width="65" height="75" rx="3" fill="#9BC8DC" opacity="0.65"/>
+  <line x1="232" y1="190" x2="232" y2="265" stroke="white" stroke-width="1" opacity="0.5"/>
+  <rect x="200" y="190" width="65" height="7" rx="1" fill="#E8E4DC" opacity="0.9"/>
+
+  <rect x="290" y="190" width="65" height="75" rx="3" fill="#9BC8DC" opacity="0.65"/>
+  <line x1="322" y1="190" x2="322" y2="265" stroke="white" stroke-width="1" opacity="0.5"/>
+  <rect x="290" y="190" width="65" height="7" rx="1" fill="#E8E4DC" opacity="0.9"/>
+
+  <!-- F1 Balconies -->
+  <rect x="180" y="265" width="380" height="18" rx="2" fill="#E0DDD6"/>
+  <line x1="200" y1="265" x2="200" y2="283" stroke="#C8C4BC" stroke-width="1.5"/>
+  <line x1="230" y1="265" x2="230" y2="283" stroke="#C8C4BC" stroke-width="1.5"/>
+  <line x1="260" y1="265" x2="260" y2="283" stroke="#C8C4BC" stroke-width="1.5"/>
+  <line x1="290" y1="265" x2="290" y2="283" stroke="#C8C4BC" stroke-width="1.5"/>
+  <line x1="320" y1="265" x2="320" y2="283" stroke="#C8C4BC" stroke-width="1.5"/>
+  <line x1="350" y1="265" x2="350" y2="283" stroke="#C8C4BC" stroke-width="1.5"/>
+  <line x1="380" y1="265" x2="380" y2="283" stroke="#C8C4BC" stroke-width="1.5"/>
+  <line x1="410" y1="265" x2="410" y2="283" stroke="#C8C4BC" stroke-width="1.5"/>
+  <line x1="440" y1="265" x2="440" y2="283" stroke="#C8C4BC" stroke-width="1.5"/>
+  <line x1="470" y1="265" x2="470" y2="283" stroke="#C8C4BC" stroke-width="1.5"/>
+  <line x1="500" y1="265" x2="500" y2="283" stroke="#C8C4BC" stroke-width="1.5"/>
+  <line x1="530" y1="265" x2="530" y2="283" stroke="#C8C4BC" stroke-width="1.5"/>
+
+  <!-- Floor 2 (duplex upper) windows -->
+  <rect x="200" y="118" width="65" height="60" rx="3" fill="#9BC8DC" opacity="0.6"/>
+  <line x1="232" y1="118" x2="232" y2="178" stroke="white" stroke-width="1" opacity="0.5"/>
+  <rect x="200" y="118" width="65" height="7" rx="1" fill="#E8E4DC" opacity="0.9"/>
+
+  <rect x="290" y="118" width="65" height="60" rx="3" fill="#9BC8DC" opacity="0.6"/>
+  <line x1="322" y1="118" x2="322" y2="178" stroke="white" stroke-width="1" opacity="0.5"/>
+  <rect x="290" y="118" width="65" height="7" rx="1" fill="#E8E4DC" opacity="0.9"/>
+
+  <rect x="380" y="118" width="65" height="60" rx="3" fill="#9BC8DC" opacity="0.6"/>
+  <line x1="412" y1="118" x2="412" y2="178" stroke="white" stroke-width="1" opacity="0.5"/>
+  <rect x="380" y="118" width="65" height="7" rx="1" fill="#E8E4DC" opacity="0.9"/>
+
+  <rect x="470" y="118" width="65" height="60" rx="3" fill="#9BC8DC" opacity="0.6"/>
+  <line x1="502" y1="118" x2="502" y2="178" stroke="white" stroke-width="1" opacity="0.5"/>
+  <rect x="470" y="118" width="65" height="7" rx="1" fill="#E8E4DC" opacity="0.9"/>
+
+  <!-- F1-F2 dividing band -->
+  <rect x="180" y="183" width="380" height="10" rx="0" fill="#E8E4DC"/>
+
+  <!-- Floor indicator bands -->
+  <rect x="180" y="370" width="380" height="12" rx="0" fill="#DDDBD4" opacity="0.9"/>
+
+  <!-- ── ROOFTOP TERRACE PARAPET ─────────────────────────── -->
+  <rect x="180" y="95" width="380" height="12" rx="2" fill="url(#roofApt)"/>
+  <!-- Parapet notches -->
+  <rect x="195" y="87" width="25" height="15" rx="1" fill="#2D5225"/>
+  <rect x="235" y="87" width="25" height="15" rx="1" fill="#2D5225"/>
+  <rect x="275" y="87" width="25" height="15" rx="1" fill="#2D5225"/>
+  <rect x="315" y="87" width="25" height="15" rx="1" fill="#2D5225"/>
+  <rect x="355" y="87" width="25" height="15" rx="1" fill="#2D5225"/>
+  <rect x="395" y="87" width="25" height="15" rx="1" fill="#2D5225"/>
+  <rect x="435" y="87" width="25" height="15" rx="1" fill="#2D5225"/>
+  <rect x="475" y="87" width="25" height="15" rx="1" fill="#2D5225"/>
+  <rect x="515" y="87" width="25" height="15" rx="1" fill="#2D5225"/>
+
+  <!-- Rooftop planters / vegetation hint -->
+  <ellipse cx="260" cy="90" rx="18" ry="10" fill="#78BF42" opacity="0.75"/>
+  <ellipse cx="340" cy="90" rx="14" ry="8" fill="#95CC58" opacity="0.70"/>
+  <ellipse cx="460" cy="90" rx="20" ry="11" fill="#78BF42" opacity="0.75"/>
+
+  <!-- ── ENTRY / LOBBY ───────────────────────────────────── -->
+  <rect x="340" y="320" width="80" height="62" rx="3" fill="#7DAFC8" opacity="0.9"/>
+  <rect x="340" y="315" width="80" height="10" rx="2" fill="#A8C4B8"/>
+  <!-- entry canopy -->
+  <polygon points="328,322 412,322 400,308 340,308" fill="#2D5A27" opacity="0.85"/>
+  <text x="380" y="360" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="700" fill="white">LOBBY</text>
+
+  <!-- ── GARDEN FOREGROUND ───────────────────────────────── -->
+  <!-- Hedge / shrubs -->
+  <ellipse cx="150" cy="378" rx="40" ry="20" fill="#5A9040" opacity="0.8"/>
+  <ellipse cx="130" cy="372" rx="28" ry="15" fill="#6EAA4C" opacity="0.85"/>
+  <ellipse cx="660" cy="378" rx="38" ry="19" fill="#5A9040" opacity="0.8"/>
+  <ellipse cx="680" cy="373" rx="25" ry="13" fill="#6EAA4C" opacity="0.85"/>
+
+  <!-- Trees (foreground) -->
+  <!-- Tree L -->
+  <rect x="95" y="300" width="8" height="80" fill="#6B4226"/>
+  <ellipse cx="99" cy="290" rx="32" ry="38" fill="#4A8830" opacity="0.9"/>
+  <ellipse cx="99" cy="278" rx="22" ry="28" fill="#5A9840" opacity="0.85"/>
+  <!-- Tree R -->
+  <rect x="685" y="295" width="8" height="85" fill="#6B4226"/>
+  <ellipse cx="689" cy="285" rx="30" ry="36" fill="#4A8830" opacity="0.9"/>
+  <ellipse cx="689" cy="273" rx="20" ry="26" fill="#5A9840" opacity="0.85"/>
+
+  <!-- Pathway -->
+  <polygon points="330,382 450,382 420,480 360,480" fill="#D8D0B8" opacity="0.7"/>
+  <line x1="390" y1="382" x2="390" y2="480" stroke="#C8C0A8" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
+
+  <!-- ── HEADER / LOGO OVERLAY ───────────────────────────── -->
+  <rect x="0" y="0" width="800" height="52" fill="rgba(26,56,16,0.82)"/>
+  <text x="24" y="20" font-family="'DM Sans',sans-serif" font-size="8" font-weight="600" fill="#78BF42" letter-spacing="3">DEDDEH HILLS</text>
+  <text x="24" y="40" font-family="'DM Sans',sans-serif" font-size="16" font-weight="700" fill="white">Apartments &amp; Duplexes</text>
+  <text x="776" y="20" text-anchor="end" font-family="'DM Sans',sans-serif" font-size="8" fill="rgba(255,255,255,0.5)">3-floor · 4 units · 140–200 m²</text>
+  <text x="776" y="38" text-anchor="end" font-family="'DM Sans',sans-serif" font-size="10" fill="rgba(255,255,255,0.7)">Koura, Lebanon</text>
+
+  <!-- ── CAPTION BAR ─────────────────────────────────────── -->
+  <rect x="0" y="508" width="800" height="52" fill="rgba(26,56,16,0.78)"/>
+  <text x="24" y="528" font-family="'DM Sans',sans-serif" font-size="10" font-weight="600" fill="#78BF42">Ground Apts: 145 m² · 2BR + Garden</text>
+  <text x="24" y="548" font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(255,255,255,0.7)">Upper Duplexes: 200 m² · 3BR + Balcony + Shared Rooftop</text>
+  <text x="776" y="540" text-anchor="end" font-family="'DM Sans',sans-serif" font-size="8" fill="rgba(255,255,255,0.4)">Illustrative rendering only</text>
+</svg>

@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800">
+  <defs>
+    <pattern id="grassLot" patternUnits="userSpaceOnUse" width="12" height="12">
+      <path d="M0,6 Q3,0 6,6 Q9,12 12,6" fill="none" stroke="#95CC58" stroke-width="0.7" opacity="0.4"/>
+    </pattern>
+    <pattern id="hatchLot" patternUnits="userSpaceOnUse" width="8" height="8">
+      <line x1="0" y1="8" x2="8" y2="0" stroke="#78BF42" stroke-width="0.7" opacity="0.3"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="800" fill="#FAFAF9"/>
+
+  <!-- Header bar -->
+  <rect x="0" y="0" width="600" height="72" fill="#1A3810"/>
+  <text x="30" y="28" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="#78BF42" letter-spacing="3">DEDDEH HILLS</text>
+  <text x="30" y="50" font-family="'DM Sans',sans-serif" font-size="18" font-weight="700" fill="white">Land Plot — Site Plan</text>
+  <text x="30" y="64" font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(255,255,255,0.5)">indicative · not to scale · serviced plot ready to build</text>
+
+  <!-- ── STREET / ROAD ───────────────────────────────────── -->
+  <!-- Road top -->
+  <rect x="0" y="82" width="600" height="40" fill="#E8E4DC"/>
+  <line x1="0" y1="102" x2="600" y2="102" stroke="white" stroke-width="2" stroke-dasharray="20,12" opacity="0.6"/>
+  <text x="300" y="97" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="#9CA3AF" letter-spacing="3">MAIN ROAD</text>
+
+  <!-- Road left -->
+  <rect x="0" y="82" width="50" height="626" fill="#E8E4DC"/>
+  <line x1="25" y1="82" x2="25" y2="708" stroke="white" stroke-width="1.5" stroke-dasharray="18,10" opacity="0.5"/>
+  <text x="13" y="400" text-anchor="middle" transform="rotate(-90,13,400)" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF" letter-spacing="2">SIDE ROAD</text>
+
+  <!-- ── LOT BOUNDARY ────────────────────────────────────── -->
+  <!-- Land fill -->
+  <rect x="56" y="128" width="496" height="576" fill="url(#grassLot)"/>
+  <rect x="56" y="128" width="496" height="576" fill="#D8F0C0" opacity="0.45"/>
+
+  <!-- Lot boundary (bold line) -->
+  <rect x="56" y="128" width="496" height="576" fill="none" stroke="#1A3810" stroke-width="3"/>
+
+  <!-- Setback lines (dashed) -->
+  <rect x="86" y="158" width="436" height="516" fill="none" stroke="#78BF42" stroke-width="1.5" stroke-dasharray="8,5"/>
+
+  <!-- ── BUILDABLE ZONE ──────────────────────────────────── -->
+  <!-- Buildable area hatch + label -->
+  <rect x="96" y="168" width="416" height="496" fill="url(#hatchLot)"/>
+  <rect x="96" y="168" width="416" height="496" fill="rgba(120,191,66,0.06)"/>
+
+  <!-- Buildable zone corner markers -->
+  <line x1="96" y1="168" x2="116" y2="168" stroke="#78BF42" stroke-width="1.5"/>
+  <line x1="96" y1="168" x2="96" y2="188" stroke="#78BF42" stroke-width="1.5"/>
+  <line x1="512" y1="168" x2="492" y2="168" stroke="#78BF42" stroke-width="1.5"/>
+  <line x1="512" y1="168" x2="512" y2="188" stroke="#78BF42" stroke-width="1.5"/>
+  <line x1="96" y1="664" x2="116" y2="664" stroke="#78BF42" stroke-width="1.5"/>
+  <line x1="96" y1="664" x2="96" y2="644" stroke="#78BF42" stroke-width="1.5"/>
+  <line x1="512" y1="664" x2="492" y2="664" stroke="#78BF42" stroke-width="1.5"/>
+  <line x1="512" y1="664" x2="512" y2="644" stroke="#78BF42" stroke-width="1.5"/>
+
+  <!-- Buildable area label (center) -->
+  <text x="304" y="390" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="16" font-weight="700" fill="#2D5A27" opacity="0.7">BUILDABLE ZONE</text>
+  <text x="304" y="412" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" fill="#6AAB50" opacity="0.8">Exploitation ratio: 40%</text>
+  <text x="304" y="428" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="10" fill="#78BF42" opacity="0.7">Max floors: 2–3</text>
+
+  <!-- ── SERVICES INDICATORS ─────────────────────────────── -->
+  <!-- Utility connection (top-left) -->
+  <circle cx="92" cy="152" r="8" fill="#1A3810" opacity="0.7"/>
+  <text x="92" y="155" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" font-weight="700" fill="white">E</text>
+  <text x="106" y="155" font-family="'DM Sans',sans-serif" font-size="8" fill="#4B5563">Electricity</text>
+
+  <!-- Water connection -->
+  <circle cx="92" cy="180" r="8" fill="#4A90C4" opacity="0.7"/>
+  <text x="92" y="183" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" font-weight="700" fill="white">W</text>
+  <text x="106" y="183" font-family="'DM Sans',sans-serif" font-size="8" fill="#4B5563">Water</text>
+
+  <!-- Telecom -->
+  <circle cx="92" cy="208" r="8" fill="#7B6AAB" opacity="0.7"/>
+  <text x="92" y="211" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" font-weight="700" fill="white">T</text>
+  <text x="106" y="211" font-family="'DM Sans',sans-serif" font-size="8" fill="#4B5563">Telecom</text>
+
+  <!-- Sewage -->
+  <circle cx="92" cy="236" r="8" fill="#8B6B3A" opacity="0.7"/>
+  <text x="92" y="239" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" font-weight="700" fill="white">S</text>
+  <text x="106" y="239" font-family="'DM Sans',sans-serif" font-size="8" fill="#4B5563">Sewage</text>
+
+  <!-- ── ACCESS POINT ────────────────────────────────────── -->
+  <!-- Driveway from main road -->
+  <rect x="236" y="122" width="90" height="40" fill="#D0CABC" opacity="0.9"/>
+  <line x1="236" y1="128" x2="236" y2="162" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="326" y1="128" x2="326" y2="162" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="281" y="147" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="#4B5563">ENTRY</text>
+  <!-- Arrow down into plot -->
+  <polygon points="281,162 271,148 291,148" fill="#1A3810" opacity="0.6"/>
+
+  <!-- Side access -->
+  <rect x="50" y="370" width="40" height="70" fill="#D0CABC" opacity="0.9"/>
+  <text x="30" y="410" text-anchor="middle" transform="rotate(-90,30,410)" font-family="'DM Sans',sans-serif" font-size="8" fill="#4B5563">SIDE ACCESS</text>
+  <polygon points="90,405 76,398 76,412" fill="#1A3810" opacity="0.6"/>
+
+  <!-- ── DIMENSIONS ──────────────────────────────────────── -->
+  <!-- Width (top) -->
+  <line x1="56" y1="112" x2="552" y2="112" stroke="#374151" stroke-width="0.8"/>
+  <line x1="56" y1="108" x2="56" y2="116" stroke="#374151" stroke-width="0.8"/>
+  <line x1="552" y1="108" x2="552" y2="116" stroke="#374151" stroke-width="0.8"/>
+  <rect x="234" y="104" width="136" height="16" rx="3" fill="#1A3810"/>
+  <text x="302" y="115" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="white">≈ 28–32 m frontage</text>
+
+  <!-- Height (right) -->
+  <line x1="568" y1="128" x2="568" y2="704" stroke="#374151" stroke-width="0.8"/>
+  <line x1="564" y1="128" x2="572" y2="128" stroke="#374151" stroke-width="0.8"/>
+  <line x1="564" y1="704" x2="572" y2="704" stroke="#374151" stroke-width="0.8"/>
+  <text x="590" y="420" text-anchor="middle" transform="rotate(90,590,420)" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="#374151">≈ 22–28 m depth</text>
+
+  <!-- Area badge -->
+  <rect x="204" y="450" width="200" height="80" rx="8" fill="rgba(26,56,16,0.85)"/>
+  <text x="304" y="480" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="10" fill="#78BF42" letter-spacing="1">PLOT AREA</text>
+  <text x="304" y="506" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="22" font-weight="700" fill="white">~600–800 m²</text>
+  <text x="304" y="524" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(255,255,255,0.6)">varies by lot</text>
+
+  <!-- ── SETBACK LABELS ──────────────────────────────────── -->
+  <!-- Front setback -->
+  <line x1="56" y1="128" x2="56" y2="158" stroke="#78BF42" stroke-width="1" stroke-dasharray="3,2" opacity="0.7"/>
+  <line x1="86" y1="128" x2="86" y2="158" stroke="#78BF42" stroke-width="1" stroke-dasharray="3,2" opacity="0.7"/>
+  <line x1="56" y1="143" x2="86" y2="143" stroke="#78BF42" stroke-width="0.8" opacity="0.7"/>
+  <text x="71" y="140" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#78BF42" opacity="0.8">3m</text>
+  <text x="71" y="150" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="6" fill="#78BF42" opacity="0.6">setback</text>
+
+  <!-- ── NORTH ARROW ─────────────────────────────────────── -->
+  <g transform="translate(556,656)">
+    <circle cx="0" cy="0" r="18" fill="white" stroke="#D1D5DB" stroke-width="1.5"/>
+    <polygon points="0,-13 -4,5 0,0 4,5" fill="#1A3810"/>
+    <polygon points="0,0 -4,5 0,13 4,5" fill="#9CA3AF"/>
+    <text x="0" y="27" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" font-weight="700" fill="#374151">N</text>
+  </g>
+
+  <!-- ── FOOTER ──────────────────────────────────────────── -->
+  <rect x="0" y="720" width="600" height="80" fill="#F4F9EF"/>
+  <line x1="0" y1="720" x2="600" y2="720" stroke="#E5E7EB" stroke-width="1"/>
+
+  <!-- Spec badges -->
+  <rect x="30" y="732" width="100" height="36" rx="5" fill="#1A3810"/>
+  <text x="80" y="747" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#78BF42">SERVICES</text>
+  <text x="80" y="761" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="white">All connected</text>
+
+  <rect x="140" y="732" width="100" height="36" rx="5" fill="#2D5A27"/>
+  <text x="190" y="747" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#95CC58">ZONING</text>
+  <text x="190" y="761" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="white">Residential R2</text>
+
+  <rect x="250" y="732" width="100" height="36" rx="5" fill="#374151"/>
+  <text x="300" y="747" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">EXPLOIT</text>
+  <text x="300" y="761" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="white">40% max BUA</text>
+
+  <rect x="360" y="732" width="100" height="36" rx="5" fill="#374151"/>
+  <text x="410" y="747" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">MAX FLOORS</text>
+  <text x="410" y="761" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="white">2–3 floors</text>
+
+  <text x="300" y="792" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">Deddeh Hills Gated Community · Koura, Lebanon · For illustration purposes only</text>
+</svg>

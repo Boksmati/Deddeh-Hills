@@ -36,6 +36,16 @@ function fmtUSD(n: number) {
 }
 function fmt(n: number) { return n.toLocaleString("en-US", { maximumFractionDigits: 0 }); }
 
+// twin_villa has real PNG/JPG assets; all other types use SVG floor plans
+function floorPlanSrc(devType: string, floor: number): string {
+  const ext = devType === "twin_villa" ? "png" : "svg";
+  return `/typologies/${devType}-floor${floor}.${ext}`;
+}
+function perspectiveSrc(devType: string): string {
+  const ext = devType === "twin_villa" ? "jpg" : "svg";
+  return `/typologies/${devType}-perspective.${ext}`;
+}
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 const PAYMENT_MILESTONES = [
   { label_en: "Signing",    label_ar: "التوقيع",  pct: 0.30 },
@@ -306,7 +316,7 @@ function UnitDetail({ sel, lang, t, projectSpecs, onClose, onEnquire, wide = fal
     <div className="flex flex-col flex-1 min-h-0">
       {/* Perspective header */}
       <div className="relative h-40 flex-shrink-0" style={{ backgroundColor: devCfg.color + "20" }}>
-        <img src={`/typologies/${devType}-perspective.jpg`} alt=""
+        <img src={perspectiveSrc(devType)} alt=""
           className="absolute inset-0 w-full h-full object-cover"
           onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
         <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(28,32,16,0.75) 0%, rgba(28,32,16,0.15) 55%, transparent 100%)" }} />
@@ -492,7 +502,7 @@ function UnitDetail({ sel, lang, t, projectSpecs, onClose, onEnquire, wide = fal
                       <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: "3/4", background: C.bg, border: `1px solid ${C.sand}` }}>
                         <img
                           key={`fp-${devType}-${unit.floors[floorIdx]}`}
-                          src={`/typologies/${devType}-floor${unit.floors[floorIdx]}.png`}
+                          src={floorPlanSrc(devType, unit.floors[floorIdx])}
                           alt=""
                           className="absolute inset-0 w-full h-full object-contain p-3"
                           onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
@@ -510,7 +520,7 @@ function UnitDetail({ sel, lang, t, projectSpecs, onClose, onEnquire, wide = fal
                         {lang === "ar" ? "المنظور الخارجي" : "Exterior Perspective"}
                       </div>
                       <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: "3/4", background: C.bg, border: `1px solid ${C.sand}` }}>
-                        <img src={`/typologies/${devType}-perspective.jpg`} alt=""
+                        <img src={perspectiveSrc(devType)} alt=""
                           className="absolute inset-0 w-full h-full object-cover"
                           onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
                         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 pointer-events-none">
@@ -531,7 +541,7 @@ function UnitDetail({ sel, lang, t, projectSpecs, onClose, onEnquire, wide = fal
                     <div className="relative rounded-xl overflow-hidden mb-3" style={{ aspectRatio: "3/4", background: C.bg, border: `1px solid ${C.sand}` }}>
                       <img
                         key={`fp-${devType}-${unit.floors[floorIdx]}`}
-                        src={`/typologies/${devType}-floor${unit.floors[floorIdx]}.png`}
+                        src={floorPlanSrc(devType, unit.floors[floorIdx])}
                         alt=""
                         className="absolute inset-0 w-full h-full object-contain p-3"
                         onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
@@ -547,7 +557,7 @@ function UnitDetail({ sel, lang, t, projectSpecs, onClose, onEnquire, wide = fal
                       </div>
                     </div>
                     <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: "16/9", background: C.bg, border: `1px solid ${C.sand}` }}>
-                      <img src={`/typologies/${devType}-perspective.jpg`} alt=""
+                      <img src={perspectiveSrc(devType)} alt=""
                         className="absolute inset-0 w-full h-full object-cover"
                         onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
                       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 pointer-events-none">
@@ -686,7 +696,7 @@ function MapUnitList({
 
       {/* Perspective */}
       <div className="relative flex-shrink-0" style={{ height: "120px", backgroundColor: devCfg.color + "18" }}>
-        <img src={`/typologies/${devType}-perspective.jpg`} alt=""
+        <img src={perspectiveSrc(devType)} alt=""
           className="absolute inset-0 w-full h-full object-cover"
           onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
       </div>

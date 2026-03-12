@@ -1,0 +1,167 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800">
+  <defs>
+    <pattern id="garden0" patternUnits="userSpaceOnUse" width="10" height="10">
+      <path d="M0,5 Q2.5,0 5,5 Q7.5,10 10,5" fill="none" stroke="#95CC58" stroke-width="0.8" opacity="0.5"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="800" fill="#FAFAF9"/>
+
+  <!-- Header bar -->
+  <rect x="0" y="0" width="600" height="72" fill="#1A3810"/>
+  <text x="30" y="28" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="#78BF42" letter-spacing="3">DEDDEH HILLS</text>
+  <text x="30" y="50" font-family="'DM Sans',sans-serif" font-size="18" font-weight="700" fill="white">Apartments — Ground Floor</text>
+  <text x="30" y="64" font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(255,255,255,0.5)">indicative · not to scale · 2 garden apartments · ~145 m² each</text>
+
+  <!-- Building shadow -->
+  <rect x="54" y="92" width="496" height="540" rx="3" fill="#D1D5DB" opacity="0.4"/>
+
+  <!-- Building outer wall -->
+  <rect x="50" y="88" width="496" height="540" rx="2" fill="#374151"/>
+
+  <!-- ── UNIT A (LEFT APARTMENT) ─────────────────────────── -->
+  <!-- Unit A label -->
+  <rect x="56" y="94" width="238" height="16" fill="#1A3810" opacity="0.8"/>
+  <text x="175" y="106" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="700" fill="#78BF42" letter-spacing="2">UNIT A</text>
+
+  <!-- Unit A: Entry -->
+  <rect x="56" y="110" width="80" height="80" fill="#F3F2EF"/>
+  <text x="96" y="148" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="#374151">ENTRY</text>
+  <text x="96" y="162" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#9CA3AF">6 m²</text>
+  <path d="M56 110 A40 40 0 0 1 96 150" fill="none" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="3,2"/>
+
+  <!-- Unit A: Living Room -->
+  <rect x="56" y="190" width="238" height="130" fill="#F5F9F1"/>
+  <rect x="72" y="240" width="120" height="50" rx="6" fill="none" stroke="#A8C99A" stroke-width="1.5"/>
+  <rect x="72" y="240" width="120" height="18" rx="4" fill="#C8E0B8" opacity="0.6"/>
+  <text x="175" y="280" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="13" font-weight="700" fill="#2D5A27">LIVING ROOM</text>
+  <text x="175" y="296" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">38 m²</text>
+
+  <!-- Unit A: Kitchen -->
+  <rect x="136" y="110" width="158" height="80" fill="#FFF4ED"/>
+  <rect x="140" y="114" width="150" height="20" rx="3" fill="#E8C9A8" stroke="#C9996A" stroke-width="1"/>
+  <text x="215" y="170" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="12" font-weight="700" fill="#374151">KITCHEN</text>
+  <text x="215" y="184" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#9CA3AF">16 m²</text>
+
+  <!-- Unit A: Bathroom -->
+  <rect x="56" y="320" width="80" height="76" fill="#E8F4FB"/>
+  <ellipse cx="76" cy="348" rx="12" ry="15" fill="none" stroke="#7DB9D4" stroke-width="1.5"/>
+  <rect x="96" y="336" width="20" height="26" rx="10" fill="none" stroke="#7DB9D4" stroke-width="1.5"/>
+  <text x="96" y="376" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" font-weight="600" fill="#374151">BATH</text>
+  <text x="96" y="388" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#9CA3AF">5 m²</text>
+
+  <!-- Unit A: Bedroom 1 -->
+  <rect x="136" y="320" width="158" height="130" fill="#EBF3FA"/>
+  <rect x="148" y="334" width="110" height="60" rx="5" fill="none" stroke="#93C5D8" stroke-width="1.5"/>
+  <rect x="148" y="334" width="110" height="20" rx="5" fill="#B8D9E8" opacity="0.6"/>
+  <text x="215" y="418" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" font-weight="700" fill="#374151">BEDROOM 1</text>
+  <text x="215" y="432" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#9CA3AF">18 m²</text>
+
+  <!-- Unit A: Bedroom 2 -->
+  <rect x="56" y="396" width="80" height="130" fill="#EBF3FA"/>
+  <rect x="62" y="410" width="68" height="55" rx="5" fill="none" stroke="#93C5D8" stroke-width="1.5"/>
+  <rect x="62" y="410" width="68" height="18" rx="5" fill="#B8D9E8" opacity="0.6"/>
+  <text x="96" y="476" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="700" fill="#374151">BED 2</text>
+  <text x="96" y="490" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#9CA3AF">14 m²</text>
+
+  <!-- Vertical divider between A and B -->
+  <rect x="294" y="94" width="6" height="534" fill="#374151"/>
+
+  <!-- ── UNIT B (RIGHT APARTMENT) ─────────────────────────── -->
+  <rect x="300" y="94" width="238" height="16" fill="#1A3810" opacity="0.8"/>
+  <text x="419" y="106" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="700" fill="#78BF42" letter-spacing="2">UNIT B</text>
+
+  <!-- Unit B: Entry -->
+  <rect x="462" y="110" width="78" height="80" fill="#F3F2EF"/>
+  <text x="501" y="148" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="#374151">ENTRY</text>
+  <text x="501" y="162" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#9CA3AF">6 m²</text>
+  <path d="M540 110 A40 40 0 0 0 500 150" fill="none" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="3,2"/>
+
+  <!-- Unit B: Living Room -->
+  <rect x="300" y="190" width="238" height="130" fill="#F5F9F1"/>
+  <rect x="400" y="240" width="120" height="50" rx="6" fill="none" stroke="#A8C99A" stroke-width="1.5"/>
+  <rect x="400" y="240" width="120" height="18" rx="4" fill="#C8E0B8" opacity="0.6"/>
+  <text x="419" y="280" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="13" font-weight="700" fill="#2D5A27">LIVING ROOM</text>
+  <text x="419" y="296" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">38 m²</text>
+
+  <!-- Unit B: Kitchen -->
+  <rect x="300" y="110" width="162" height="80" fill="#FFF4ED"/>
+  <rect x="304" y="114" width="154" height="20" rx="3" fill="#E8C9A8" stroke="#C9996A" stroke-width="1"/>
+  <text x="381" y="170" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="12" font-weight="700" fill="#374151">KITCHEN</text>
+  <text x="381" y="184" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#9CA3AF">16 m²</text>
+
+  <!-- Unit B: Bathroom -->
+  <rect x="462" y="320" width="78" height="76" fill="#E8F4FB"/>
+  <ellipse cx="480" cy="348" rx="12" ry="15" fill="none" stroke="#7DB9D4" stroke-width="1.5"/>
+  <rect x="498" y="336" width="20" height="26" rx="10" fill="none" stroke="#7DB9D4" stroke-width="1.5"/>
+  <text x="501" y="376" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" font-weight="600" fill="#374151">BATH</text>
+  <text x="501" y="388" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#9CA3AF">5 m²</text>
+
+  <!-- Unit B: Bedroom 1 -->
+  <rect x="300" y="320" width="162" height="130" fill="#EBF3FA"/>
+  <rect x="310" y="334" width="110" height="60" rx="5" fill="none" stroke="#93C5D8" stroke-width="1.5"/>
+  <rect x="310" y="334" width="110" height="20" rx="5" fill="#B8D9E8" opacity="0.6"/>
+  <text x="381" y="418" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" font-weight="700" fill="#374151">BEDROOM 1</text>
+  <text x="381" y="432" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#9CA3AF">18 m²</text>
+
+  <!-- Unit B: Bedroom 2 -->
+  <rect x="462" y="396" width="78" height="130" fill="#EBF3FA"/>
+  <rect x="466" y="410" width="68" height="55" rx="5" fill="none" stroke="#93C5D8" stroke-width="1.5"/>
+  <rect x="466" y="410" width="68" height="18" rx="5" fill="#B8D9E8" opacity="0.6"/>
+  <text x="501" y="476" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="700" fill="#374151">BED 2</text>
+  <text x="501" y="490" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#9CA3AF">14 m²</text>
+
+  <!-- ── SHARED GARDENS ──────────────────────────────────── -->
+  <!-- Horizontal wall above gardens -->
+  <rect x="56" y="526" width="480" height="5" fill="#374151"/>
+
+  <!-- Garden A -->
+  <rect x="56" y="531" width="238" height="91" fill="url(#garden0)"/>
+  <rect x="56" y="531" width="238" height="91" fill="#C8E8A8" opacity="0.4"/>
+  <text x="175" y="570" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" font-weight="700" fill="#2D5A27">PRIVATE GARDEN A</text>
+  <text x="175" y="585" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#6AAB50">~40 m²</text>
+
+  <!-- Garden B -->
+  <rect x="300" y="531" width="238" height="91" fill="url(#garden0)"/>
+  <rect x="300" y="531" width="238" height="91" fill="#C8E8A8" opacity="0.4"/>
+  <text x="419" y="570" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" font-weight="700" fill="#2D5A27">PRIVATE GARDEN B</text>
+  <text x="419" y="585" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#6AAB50">~40 m²</text>
+
+  <!-- ── DIMENSIONS ──────────────────────────────────────── -->
+  <line x1="50" y1="636" x2="546" y2="636" stroke="#9CA3AF" stroke-width="0.8"/>
+  <line x1="50" y1="632" x2="50" y2="640" stroke="#9CA3AF" stroke-width="0.8"/>
+  <line x1="546" y1="632" x2="546" y2="640" stroke="#9CA3AF" stroke-width="0.8"/>
+  <text x="298" y="648" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">≈ 18 m</text>
+
+  <!-- ── NORTH ARROW ─────────────────────────────────────── -->
+  <g transform="translate(556,100)">
+    <circle cx="0" cy="0" r="17" fill="white" stroke="#D1D5DB" stroke-width="1.5"/>
+    <polygon points="0,-12 -4,4 0,0 4,4" fill="#1A3810"/>
+    <polygon points="0,0 -4,4 0,12 4,4" fill="#9CA3AF"/>
+    <text x="0" y="26" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" font-weight="700" fill="#374151">N</text>
+  </g>
+
+  <!-- ── FOOTER ──────────────────────────────────────────── -->
+  <rect x="0" y="660" width="600" height="140" fill="#F4F9EF"/>
+  <line x1="0" y1="660" x2="600" y2="660" stroke="#E5E7EB" stroke-width="1"/>
+
+  <!-- Building badge -->
+  <rect x="30" y="674" width="160" height="38" rx="6" fill="#1A3810"/>
+  <text x="110" y="690" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" font-weight="600" fill="#78BF42" letter-spacing="1">GROUND FLOOR</text>
+  <text x="110" y="705" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">2 × 145 m² Garden Apartments</text>
+
+  <!-- Legend -->
+  <rect x="30" y="724" width="10" height="10" rx="2" fill="#EBF3FA"/>
+  <text x="44" y="733" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">Bedroom</text>
+  <rect x="100" y="724" width="10" height="10" rx="2" fill="#E8F4FB"/>
+  <text x="114" y="733" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">Bathroom</text>
+  <rect x="178" y="724" width="10" height="10" rx="2" fill="#F5F9F1"/>
+  <text x="192" y="733" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">Living</text>
+  <rect x="228" y="724" width="10" height="10" rx="2" fill="#DFF1D5"/>
+  <text x="242" y="733" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">Garden</text>
+  <rect x="295" y="724" width="10" height="10" rx="2" fill="#FFF4ED"/>
+  <text x="309" y="733" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">Kitchen</text>
+
+  <text x="300" y="758" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">Deddeh Hills Gated Community · Koura, Lebanon · For illustration purposes only</text>
+</svg>

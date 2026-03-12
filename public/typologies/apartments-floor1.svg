@@ -1,0 +1,160 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800">
+  <!-- Background -->
+  <rect width="600" height="800" fill="#FAFAF9"/>
+
+  <!-- Header bar -->
+  <rect x="0" y="0" width="600" height="72" fill="#1A3810"/>
+  <text x="30" y="28" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="#78BF42" letter-spacing="3">DEDDEH HILLS</text>
+  <text x="30" y="50" font-family="'DM Sans',sans-serif" font-size="18" font-weight="700" fill="white">Apartments — First Floor (Duplex Lower)</text>
+  <text x="30" y="64" font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(255,255,255,0.5)">indicative · not to scale · 2 duplex units · entry + main living level</text>
+
+  <!-- Building shadow -->
+  <rect x="54" y="92" width="496" height="530" rx="3" fill="#D1D5DB" opacity="0.4"/>
+
+  <!-- Building outer wall -->
+  <rect x="50" y="88" width="496" height="530" rx="2" fill="#374151"/>
+
+  <!-- ── UNIT C (LEFT DUPLEX) ─────────────────────────────── -->
+  <rect x="56" y="94" width="238" height="16" fill="#2D5A27" opacity="0.9"/>
+  <text x="175" y="106" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="700" fill="#95CC58" letter-spacing="2">UNIT C — DUPLEX LOWER</text>
+
+  <!-- Unit C: Entry / Stair Landing -->
+  <rect x="56" y="110" width="98" height="90" fill="#F3F2EF"/>
+  <text x="105" y="148" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="#374151">ENTRY</text>
+  <!-- stair symbol -->
+  <line x1="66" y1="170" x2="144" y2="170" stroke="#9CA3AF" stroke-width="0.8"/>
+  <line x1="66" y1="163" x2="144" y2="163" stroke="#9CA3AF" stroke-width="0.8"/>
+  <line x1="66" y1="156" x2="144" y2="156" stroke="#9CA3AF" stroke-width="0.8"/>
+  <text x="105" y="190" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#9CA3AF">STAIR ▲ F2</text>
+
+  <!-- Unit C: Kitchen / Dining -->
+  <rect x="154" y="110" width="140" height="90" fill="#FFF4ED"/>
+  <rect x="158" y="114" width="132" height="20" rx="3" fill="#E8C9A8" stroke="#C9996A" stroke-width="1"/>
+  <ellipse cx="224" cy="168" rx="38" ry="22" fill="none" stroke="#A8C99A" stroke-width="1.5"/>
+  <text x="224" y="173" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="700" fill="#374151">KIT / DINING</text>
+  <text x="224" y="190" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#9CA3AF">24 m²</text>
+
+  <!-- Unit C: Living -->
+  <rect x="56" y="200" width="238" height="148" fill="#F5F9F1"/>
+  <rect x="72" y="254" width="130" height="55" rx="6" fill="none" stroke="#A8C99A" stroke-width="1.5"/>
+  <rect x="72" y="254" width="130" height="18" rx="4" fill="#C8E0B8" opacity="0.6"/>
+  <text x="175" y="304" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="13" font-weight="700" fill="#2D5A27">LIVING ROOM</text>
+  <text x="175" y="320" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">42 m²</text>
+
+  <!-- Unit C: WC -->
+  <rect x="56" y="348" width="80" height="70" fill="#E8F4FB"/>
+  <ellipse cx="74" cy="370" rx="11" ry="14" fill="none" stroke="#7DB9D4" stroke-width="1.5"/>
+  <rect x="92" y="360" width="18" height="24" rx="9" fill="none" stroke="#7DB9D4" stroke-width="1.5"/>
+  <text x="96" y="400" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" font-weight="600" fill="#374151">WC</text>
+  <text x="96" y="412" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#9CA3AF">4 m²</text>
+
+  <!-- Unit C: Storage -->
+  <rect x="136" y="348" width="158" height="70" fill="#EDECEA"/>
+  <text x="215" y="382" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" font-weight="600" fill="#4B5563">STORAGE</text>
+  <text x="215" y="396" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#9CA3AF">8 m²</text>
+
+  <!-- Unit C: Balcony -->
+  <rect x="56" y="418" width="238" height="68" fill="#DFF1D5" opacity="0.85"/>
+  <!-- balcony railing lines -->
+  <line x1="56" y1="420" x2="294" y2="420" stroke="#A8D890" stroke-width="2"/>
+  <line x1="70" y1="418" x2="70" y2="486" stroke="#A8D890" stroke-width="0.8"/>
+  <line x1="100" y1="418" x2="100" y2="486" stroke="#A8D890" stroke-width="0.8"/>
+  <line x1="130" y1="418" x2="130" y2="486" stroke="#A8D890" stroke-width="0.8"/>
+  <line x1="160" y1="418" x2="160" y2="486" stroke="#A8D890" stroke-width="0.8"/>
+  <line x1="190" y1="418" x2="190" y2="486" stroke="#A8D890" stroke-width="0.8"/>
+  <line x1="220" y1="418" x2="220" y2="486" stroke="#A8D890" stroke-width="0.8"/>
+  <line x1="250" y1="418" x2="250" y2="486" stroke="#A8D890" stroke-width="0.8"/>
+  <line x1="280" y1="418" x2="280" y2="486" stroke="#A8D890" stroke-width="0.8"/>
+  <text x="175" y="456" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" font-weight="700" fill="#2D5A27">BALCONY</text>
+  <text x="175" y="472" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#6AAB50">~22 m²</text>
+
+  <!-- Vertical divider -->
+  <rect x="294" y="94" width="6" height="530" fill="#374151"/>
+
+  <!-- ── UNIT D (RIGHT DUPLEX) ─────────────────────────────── -->
+  <rect x="300" y="94" width="238" height="16" fill="#2D5A27" opacity="0.9"/>
+  <text x="419" y="106" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="700" fill="#95CC58" letter-spacing="2">UNIT D — DUPLEX LOWER</text>
+
+  <!-- Unit D: Entry / Stair Landing -->
+  <rect x="446" y="110" width="94" height="90" fill="#F3F2EF"/>
+  <text x="493" y="148" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="#374151">ENTRY</text>
+  <line x1="456" y1="170" x2="530" y2="170" stroke="#9CA3AF" stroke-width="0.8"/>
+  <line x1="456" y1="163" x2="530" y2="163" stroke="#9CA3AF" stroke-width="0.8"/>
+  <line x1="456" y1="156" x2="530" y2="156" stroke="#9CA3AF" stroke-width="0.8"/>
+  <text x="493" y="190" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#9CA3AF">STAIR ▲ F2</text>
+
+  <!-- Unit D: Kitchen / Dining -->
+  <rect x="300" y="110" width="146" height="90" fill="#FFF4ED"/>
+  <rect x="304" y="114" width="138" height="20" rx="3" fill="#E8C9A8" stroke="#C9996A" stroke-width="1"/>
+  <ellipse cx="373" cy="168" rx="38" ry="22" fill="none" stroke="#A8C99A" stroke-width="1.5"/>
+  <text x="373" y="173" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="700" fill="#374151">KIT / DINING</text>
+  <text x="373" y="190" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#9CA3AF">24 m²</text>
+
+  <!-- Unit D: Living -->
+  <rect x="300" y="200" width="238" height="148" fill="#F5F9F1"/>
+  <rect x="390" y="254" width="130" height="55" rx="6" fill="none" stroke="#A8C99A" stroke-width="1.5"/>
+  <rect x="390" y="254" width="130" height="18" rx="4" fill="#C8E0B8" opacity="0.6"/>
+  <text x="419" y="304" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="13" font-weight="700" fill="#2D5A27">LIVING ROOM</text>
+  <text x="419" y="320" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">42 m²</text>
+
+  <!-- Unit D: WC -->
+  <rect x="458" y="348" width="78" height="70" fill="#E8F4FB"/>
+  <ellipse cx="474" cy="370" rx="11" ry="14" fill="none" stroke="#7DB9D4" stroke-width="1.5"/>
+  <rect x="492" y="360" width="18" height="24" rx="9" fill="none" stroke="#7DB9D4" stroke-width="1.5"/>
+  <text x="501" y="400" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" font-weight="600" fill="#374151">WC</text>
+  <text x="501" y="412" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#9CA3AF">4 m²</text>
+
+  <!-- Unit D: Storage -->
+  <rect x="300" y="348" width="158" height="70" fill="#EDECEA"/>
+  <text x="379" y="382" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" font-weight="600" fill="#4B5563">STORAGE</text>
+  <text x="379" y="396" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#9CA3AF">8 m²</text>
+
+  <!-- Unit D: Balcony -->
+  <rect x="300" y="418" width="238" height="68" fill="#DFF1D5" opacity="0.85"/>
+  <line x1="300" y1="420" x2="538" y2="420" stroke="#A8D890" stroke-width="2"/>
+  <line x1="315" y1="418" x2="315" y2="486" stroke="#A8D890" stroke-width="0.8"/>
+  <line x1="345" y1="418" x2="345" y2="486" stroke="#A8D890" stroke-width="0.8"/>
+  <line x1="375" y1="418" x2="375" y2="486" stroke="#A8D890" stroke-width="0.8"/>
+  <line x1="405" y1="418" x2="405" y2="486" stroke="#A8D890" stroke-width="0.8"/>
+  <line x1="435" y1="418" x2="435" y2="486" stroke="#A8D890" stroke-width="0.8"/>
+  <line x1="465" y1="418" x2="465" y2="486" stroke="#A8D890" stroke-width="0.8"/>
+  <line x1="495" y1="418" x2="495" y2="486" stroke="#A8D890" stroke-width="0.8"/>
+  <line x1="525" y1="418" x2="525" y2="486" stroke="#A8D890" stroke-width="0.8"/>
+  <text x="419" y="456" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" font-weight="700" fill="#2D5A27">BALCONY</text>
+  <text x="419" y="472" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#6AAB50">~22 m²</text>
+
+  <!-- ── DIMENSIONS ──────────────────────────────────────── -->
+  <line x1="50" y1="596" x2="546" y2="596" stroke="#9CA3AF" stroke-width="0.8"/>
+  <line x1="50" y1="592" x2="50" y2="600" stroke="#9CA3AF" stroke-width="0.8"/>
+  <line x1="546" y1="592" x2="546" y2="600" stroke="#9CA3AF" stroke-width="0.8"/>
+  <text x="298" y="608" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">≈ 18 m</text>
+
+  <!-- ── NORTH ARROW ─────────────────────────────────────── -->
+  <g transform="translate(556,100)">
+    <circle cx="0" cy="0" r="17" fill="white" stroke="#D1D5DB" stroke-width="1.5"/>
+    <polygon points="0,-12 -4,4 0,0 4,4" fill="#1A3810"/>
+    <polygon points="0,0 -4,4 0,12 4,4" fill="#9CA3AF"/>
+    <text x="0" y="26" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" font-weight="700" fill="#374151">N</text>
+  </g>
+
+  <!-- ── FOOTER ──────────────────────────────────────────── -->
+  <rect x="0" y="660" width="600" height="140" fill="#F4F9EF"/>
+  <line x1="0" y1="660" x2="600" y2="660" stroke="#E5E7EB" stroke-width="1"/>
+
+  <rect x="30" y="674" width="170" height="38" rx="6" fill="#2D5A27"/>
+  <text x="115" y="690" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" font-weight="600" fill="#95CC58" letter-spacing="1">FIRST FLOOR — DUPLEX LOWER</text>
+  <text x="115" y="705" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">2 × 170 m² Duplex Units</text>
+
+  <rect x="30" y="724" width="10" height="10" rx="2" fill="#EBF3FA"/>
+  <text x="44" y="733" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">Bedroom</text>
+  <rect x="100" y="724" width="10" height="10" rx="2" fill="#E8F4FB"/>
+  <text x="114" y="733" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">Bathroom</text>
+  <rect x="178" y="724" width="10" height="10" rx="2" fill="#F5F9F1"/>
+  <text x="192" y="733" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">Living</text>
+  <rect x="228" y="724" width="10" height="10" rx="2" fill="#DFF1D5"/>
+  <text x="242" y="733" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">Balcony</text>
+  <rect x="295" y="724" width="10" height="10" rx="2" fill="#FFF4ED"/>
+  <text x="309" y="733" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">Kitchen</text>
+
+  <text x="300" y="758" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">Deddeh Hills Gated Community · Koura, Lebanon · For illustration purposes only</text>
+</svg>

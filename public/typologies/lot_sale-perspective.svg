@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 560">
+  <defs>
+    <linearGradient id="skyLot" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6A9EC0"/>
+      <stop offset="55%" stop-color="#A8C8D8"/>
+      <stop offset="100%" stop-color="#CCE0B0"/>
+    </linearGradient>
+    <linearGradient id="groundLot" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#A8D878"/>
+      <stop offset="100%" stop-color="#80B850"/>
+    </linearGradient>
+    <linearGradient id="soilLot" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#C8B888"/>
+      <stop offset="100%" stop-color="#A89868"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="800" height="560" fill="url(#skyLot)"/>
+
+  <!-- Sun -->
+  <circle cx="680" cy="80" r="36" fill="#FFE070" opacity="0.5" filter="url(#glow)"/>
+  <circle cx="680" cy="80" r="24" fill="#FFD040" opacity="0.7"/>
+
+  <!-- Background hills -->
+  <ellipse cx="160" cy="290" rx="300" ry="90" fill="#6AAA48" opacity="0.32"/>
+  <ellipse cx="640" cy="300" rx="280" ry="75" fill="#60A040" opacity="0.28"/>
+
+  <!-- Ground -->
+  <polygon points="0,370 800,370 800,560 0,560" fill="url(#groundLot)"/>
+
+  <!-- ── LAND PLOT (main feature) ────────────────────────── -->
+
+  <!-- Plot shadow -->
+  <ellipse cx="400" cy="376" rx="200" ry="14" fill="#1A3810" opacity="0.15"/>
+
+  <!-- Bare land area (light soil texture — not yet built) -->
+  <polygon points="160,180 620,180 640,375 140,375" fill="url(#soilLot)" opacity="0.85"/>
+
+  <!-- Soil texture dots -->
+  <circle cx="240" cy="240" r="2.5" fill="#A08060" opacity="0.4"/>
+  <circle cx="320" cy="270" r="2" fill="#A08060" opacity="0.3"/>
+  <circle cx="400" cy="250" r="3" fill="#A08060" opacity="0.35"/>
+  <circle cx="480" cy="265" r="2" fill="#A08060" opacity="0.3"/>
+  <circle cx="540" cy="300" r="2.5" fill="#A08060" opacity="0.4"/>
+  <circle cx="280" cy="310" r="2" fill="#A08060" opacity="0.3"/>
+  <circle cx="360" cy="330" r="3" fill="#A08060" opacity="0.35"/>
+  <circle cx="460" cy="340" r="2" fill="#A08060" opacity="0.3"/>
+  <circle cx="220" cy="360" r="2.5" fill="#A08060" opacity="0.35"/>
+  <circle cx="560" cy="355" r="2" fill="#A08060" opacity="0.3"/>
+
+  <!-- Plot boundary pegs + string -->
+  <circle cx="165" cy="182" r="5" fill="#8B6B3A"/>
+  <circle cx="618" cy="182" r="5" fill="#8B6B3A"/>
+  <circle cx="145" cy="372" r="5" fill="#8B6B3A"/>
+  <circle cx="638" cy="372" r="5" fill="#8B6B3A"/>
+  <!-- string lines -->
+  <line x1="165" y1="182" x2="618" y2="182" stroke="#D4A020" stroke-width="1.5" opacity="0.7" stroke-dasharray="0"/>
+  <line x1="165" y1="182" x2="145" y2="372" stroke="#D4A020" stroke-width="1.5" opacity="0.7"/>
+  <line x1="618" y1="182" x2="638" y2="372" stroke="#D4A020" stroke-width="1.5" opacity="0.7"/>
+  <line x1="145" y1="372" x2="638" y2="372" stroke="#D4A020" stroke-width="1.5" opacity="0.7"/>
+
+  <!-- Infrastructure lines (underground markers) -->
+  <!-- Electricity conduit indicator -->
+  <line x1="165" y1="200" x2="195" y2="200" stroke="#FFD040" stroke-width="2" opacity="0.6" stroke-dasharray="6,3"/>
+  <circle cx="165" cy="200" r="4" fill="#FFD040" opacity="0.8"/>
+  <text x="200" y="204" font-family="'DM Sans',sans-serif" font-size="9" fill="#D4A020" font-weight="600">⚡ Electricity</text>
+
+  <!-- Water pipe indicator -->
+  <line x1="165" y1="218" x2="195" y2="218" stroke="#4A90C4" stroke-width="2" opacity="0.6" stroke-dasharray="6,3"/>
+  <circle cx="165" cy="218" r="4" fill="#4A90C4" opacity="0.8"/>
+  <text x="200" y="222" font-family="'DM Sans',sans-serif" font-size="9" fill="#4A90C4" font-weight="600">💧 Water</text>
+
+  <!-- Telecom -->
+  <line x1="165" y1="236" x2="195" y2="236" stroke="#9B6ADB" stroke-width="2" opacity="0.6" stroke-dasharray="6,3"/>
+  <circle cx="165" cy="236" r="4" fill="#9B6ADB" opacity="0.8"/>
+  <text x="200" y="240" font-family="'DM Sans',sans-serif" font-size="9" fill="#9B6ADB" font-weight="600">📡 Telecom</text>
+
+  <!-- ── CONCEPT FOOTPRINT OVERLAY ───────────────────────── -->
+  <!-- Faint house ghost / potential future building -->
+  <rect x="260" y="215" width="280" height="140" rx="4" fill="rgba(26,56,16,0.06)" stroke="#78BF42" stroke-width="1.5" stroke-dasharray="8,5"/>
+  <text x="400" y="278" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" font-weight="600" fill="#2D5A27" opacity="0.55">BUILD YOUR VISION</text>
+  <text x="400" y="296" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="#2D5A27" opacity="0.45">possible footprint</text>
+
+  <!-- ── ROAD + ENTRY ─────────────────────────────────────── -->
+  <!-- Road surface (top) -->
+  <rect x="0" y="130" width="800" height="52" fill="#D8D4C8" opacity="0.85"/>
+  <line x1="0" y1="156" x2="800" y2="156" stroke="white" stroke-width="2" stroke-dasharray="22,14" opacity="0.55"/>
+  <text x="80" y="152" font-family="'DM Sans',sans-serif" font-size="9" fill="#9CA3AF" letter-spacing="3">MAIN ROAD</text>
+
+  <!-- Entry gate post -->
+  <rect x="280" y="128" width="12" height="55" rx="3" fill="#2D5A27"/>
+  <rect x="508" y="128" width="12" height="55" rx="3" fill="#2D5A27"/>
+  <!-- gate beam -->
+  <rect x="280" y="128" width="240" height="10" rx="3" fill="#1A3810" opacity="0.7"/>
+
+  <!-- ── TREES / LANDSCAPING ─────────────────────────────── -->
+  <!-- Tree left -->
+  <rect x="78" y="265" width="7" height="110" fill="#6B4226"/>
+  <ellipse cx="81" cy="248" rx="36" ry="44" fill="#3A7828" opacity="0.88"/>
+  <ellipse cx="81" cy="234" rx="24" ry="30" fill="#4A9038" opacity="0.85"/>
+
+  <!-- Tree right -->
+  <rect x="706" y="260" width="7" height="115" fill="#6B4226"/>
+  <ellipse cx="709" cy="243" rx="34" ry="42" fill="#3A7828" opacity="0.88"/>
+  <ellipse cx="709" cy="229" rx="22" ry="28" fill="#4A9038" opacity="0.85"/>
+
+  <!-- Small shrubs near plot edge -->
+  <ellipse cx="148" cy="375" rx="28" ry="14" fill="#5A9040" opacity="0.8"/>
+  <ellipse cx="640" cy="375" rx="26" ry="13" fill="#5A9040" opacity="0.8"/>
+
+  <!-- ── HEADER ───────────────────────────────────────────── -->
+  <rect x="0" y="0" width="800" height="52" fill="rgba(26,56,16,0.84)"/>
+  <text x="24" y="20" font-family="'DM Sans',sans-serif" font-size="8" font-weight="600" fill="#78BF42" letter-spacing="3">DEDDEH HILLS</text>
+  <text x="24" y="40" font-family="'DM Sans',sans-serif" font-size="16" font-weight="700" fill="white">Land Plot — Your Canvas</text>
+  <text x="776" y="22" text-anchor="end" font-family="'DM Sans',sans-serif" font-size="8" fill="rgba(255,255,255,0.5)">Fully serviced · Infrastructure ready</text>
+  <text x="776" y="40" text-anchor="end" font-family="'DM Sans',sans-serif" font-size="10" fill="rgba(255,255,255,0.7)">Koura, Lebanon</text>
+
+  <!-- ── CAPTION BAR ─────────────────────────────────────── -->
+  <rect x="0" y="508" width="800" height="52" fill="rgba(26,56,16,0.80)"/>
+  <!-- Spec pills -->
+  <rect x="24" y="518" width="110" height="24" rx="12" fill="rgba(120,191,66,0.25)" stroke="#78BF42" stroke-width="1"/>
+  <text x="79" y="534" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="#78BF42">600–800 m² plot</text>
+
+  <rect x="144" y="518" width="110" height="24" rx="12" fill="rgba(120,191,66,0.25)" stroke="#78BF42" stroke-width="1"/>
+  <text x="199" y="534" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="#78BF42">40% exploit ratio</text>
+
+  <rect x="264" y="518" width="120" height="24" rx="12" fill="rgba(120,191,66,0.25)" stroke="#78BF42" stroke-width="1"/>
+  <text x="324" y="534" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="#78BF42">All services connected</text>
+
+  <rect x="394" y="518" width="100" height="24" rx="12" fill="rgba(120,191,66,0.25)" stroke="#78BF42" stroke-width="1"/>
+  <text x="444" y="534" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="#78BF42">Design freedom</text>
+
+  <text x="776" y="540" text-anchor="end" font-family="'DM Sans',sans-serif" font-size="8" fill="rgba(255,255,255,0.4)">Illustrative rendering only</text>
+</svg>
