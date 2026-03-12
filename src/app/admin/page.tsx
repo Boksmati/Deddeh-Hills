@@ -260,7 +260,7 @@ function InviteRow({ invite, origin, copied, onCopy, onRevoke, disabled }: {
 }
 
 // ── CRM Tab ───────────────────────────────────────────────────────────────────
-type CrmSubTab = "pipeline" | "contacts" | "clients";
+type CrmSubTab = "pipeline" | "contacts" | "clients" | "registry";
 
 const STAGE_CFG: Record<CrmContact["stage"], { label: string; color: string; bg: string; border: string }> = {
   lead:           { label: "Lead",           color: "#1D4ED8", bg: "#EFF6FF", border: "#BFDBFE" },
@@ -720,6 +720,228 @@ function ContactsListView({
   );
 }
 
+// ── Buyer Registry ─────────────────────────────────────────────────────────────
+const PAYMENT_MILESTONES = [
+  { key: "signing",    label: "Signing",    pct: 0.30 },
+  { key: "foundation", label: "Foundation", pct: 0.20 },
+  { key: "structure",  label: "Structure",  pct: 0.20 },
+  { key: "handover",   label: "Handover",   pct: 0.30 },
+];
+
+const DEV_TYPE_LABELS: Record<string, string> = {
+  twin_villa: "Twin Villa", villa_2f: "Villa 2F", villa_3f: "Villa 3F",
+  apartments: "Apartments", lot_sale: "Land Plot", unassigned: "—",
+};
+
+const MILESTONE_STATUS_CFG = {
+  paid:    { label: "Paid",    bg: "#D1FAE5", color: "#065F46", border: "#6EE7B7", dot: "#10B981" },
+  pending: { label: "Pending", bg: "#F3F4F6", color: "#6B7280", border: "#E5E7EB", dot: "#9CA3AF" },
+  overdue: { label: "Overdue", bg: "#FEE2E2", color: "#B91C1C", border: "#FCA5A5", dot: "#EF4444" },
+};
+
+function BuyerRegistryView({
+  contacts,
+  onPayments,
+}: {
+  contacts: CrmContact[];
+  onPayments: (c: CrmContact) => void;
+}) {
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const assignments = useSimulationStore((s) => s.assignments);
+  const buyers = contacts.filter((c) =>
+    (["reserved", "under_contract", "sold"] as CrmContact["stage"][]).includes(c.stage)
+  );
+
+  // Summary KPIs
+  const totalExpected = buyers.reduce((s, b) => {
+    const pTotal = b.payments.reduce((t, p) => t + p.amount, 0);
+    return s + (b.budget ?? pTotal);
+  }, 0);
+  const totalPaid = buyers.flatMap((b) => b.payments).filter((p) => p.status === "paid").reduce((s, p) => s + p.amount, 0);
+  const totalPending = buyers.flatMap((b) => b.payments).filter((p) => p.status === "pending").reduce((s, p) => s + p.amount, 0);
+  const totalOverdue = buyers.flatMap((b) => b.payments).filter((p) => p.status === "overdue").reduce((s, p) => s + p.amount, 0);
+  const collectionPct = totalExpected > 0 ? (totalPaid / totalExpected) * 100 : 0;
+
+  function getDevType(lotId?: number): string {
+    if (!lotId) return "—";
+    const asgn = assignments.get(lotId);
+    return asgn ? (DEV_TYPE_LABELS[asgn.developmentType] ?? asgn.developmentType) : "—";
+  }
+
+  return (
+    <div>
+      {/* KPI strip */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(150px,1fr))", gap: 10, marginBottom: 20 }}>
+        {[
+          { label: "Total Buyers",       val: String(buyers.length),        color: C.ink    },
+          { label: "Expected Revenue",   val: fmtUSD(totalExpected),        color: C.ink    },
+          { label: "Collected",          val: fmtUSD(totalPaid),            color: "#059669" },
+          { label: "Outstanding",        val: fmtUSD(totalPending + totalOverdue), color: C.amber },
+          { label: "Overdue",            val: fmtUSD(totalOverdue),         color: C.red    },
+          { label: "Collection Rate",    val: `${collectionPct.toFixed(0)}%`, color: collectionPct >= 50 ? "#059669" : C.amber },
+        ].map(({ label, val, color }) => (
+          <div key={label} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "12px 14px" }}>
+            <div style={{ fontSize: 9, fontWeight: 600, color: C.muted, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 4 }}>{label}</div>
+            <div style={{ fontSize: 18, fontWeight: 700, color }}>{val}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Collection progress bar */}
+      <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "12px 16px", marginBottom: 20 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+          <span style={{ fontSize: 11, fontWeight: 600, color: C.ink }}>Overall Collection Progress</span>
+          <span style={{ fontSize: 11, color: C.muted }}>{fmtUSD(totalPaid)} / {fmtUSD(totalExpected)}</span>
+        </div>
+        <div style={{ height: 10, background: "#F3F4F6", borderRadius: 5, overflow: "hidden" }}>
+          <div style={{ height: "100%", width: `${Math.min(100, collectionPct)}%`, background: "#059669", borderRadius: 5, transition: "width 0.5s ease" }} />
+        </div>
+      </div>
+
+      {buyers.length === 0 ? (
+        <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "40px 20px", textAlign: "center", color: C.muted, fontSize: 13 }}>
+          No buyers yet. Contacts move here when their stage reaches Reserved / Under Contract / Sold.
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {buyers.map((buyer) => {
+            const totalPrice = buyer.budget ?? buyer.payments.reduce((s, p) => s + p.amount, 0);
+            const paid = buyer.payments.filter((p) => p.status === "paid").reduce((s, p) => s + p.amount, 0);
+            const paidPct = totalPrice > 0 ? Math.round((paid / totalPrice) * 100) : 0;
+            const isExpanded = expanded === buyer.id;
+            const lotRow = buyer.assignedLotId ? LOTS.find((l) => l.id === buyer.assignedLotId) : null;
+
+            // Build milestone rows from payments or synthesize from budget
+            const milestoneRows: Array<{
+              label: string; pct: number; expected: number;
+              payment?: CrmPayment; status: "paid" | "pending" | "overdue";
+            }> = PAYMENT_MILESTONES.map((m, i) => {
+              const expected = Math.round(totalPrice * m.pct);
+              const payment = buyer.payments[i];
+              const status: "paid" | "pending" | "overdue" = payment
+                ? payment.status
+                : "pending";
+              return { label: m.label, pct: m.pct, expected, payment, status };
+            });
+
+            return (
+              <div key={buyer.id} style={{
+                background: C.white, border: `1px solid ${C.border}`, borderRadius: 12,
+                overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+              }}>
+                {/* Buyer header row */}
+                <div
+                  onClick={() => setExpanded(isExpanded ? null : buyer.id)}
+                  style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 180px 80px 36px", gap: 12, alignItems: "center", padding: "12px 16px", cursor: "pointer" }}
+                >
+                  {/* Name + contact */}
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>{buyer.name}</div>
+                    <div style={{ fontSize: 11, color: C.muted }}>{buyer.email}{buyer.phone ? ` · ${buyer.phone}` : ""}</div>
+                  </div>
+                  {/* Lot + stage */}
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 500, color: C.ink }}>
+                      {buyer.assignedLotId ? `Lot ${buyer.assignedLotId}` : "No lot"}
+                    </div>
+                    <div style={{ fontSize: 11, color: C.muted }}>
+                      {lotRow ? DEV_TYPE_LABELS[lotRow.id.toString()] || "—" : "—"}
+                    </div>
+                  </div>
+                  {/* Price + paid */}
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: C.ink }}>{fmtUSD(totalPrice)}</div>
+                    <div style={{ fontSize: 11, color: "#059669" }}>{fmtUSD(paid)} paid ({paidPct}%)</div>
+                  </div>
+                  {/* Milestone chips */}
+                  <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+                    {milestoneRows.map((m) => {
+                      const cfg = MILESTONE_STATUS_CFG[m.status];
+                      return (
+                        <div key={m.label} title={`${m.label}: ${fmtUSD(m.expected)} · ${m.status}`}
+                          style={{ flex: 1, textAlign: "center", padding: "3px 2px", borderRadius: 5, fontSize: 8, fontWeight: 700,
+                            background: cfg.bg, color: cfg.color, border: `1px solid ${cfg.border}` }}>
+                          {m.label.slice(0, 4).toUpperCase()}
+                          <div style={{ width: 5, height: 5, borderRadius: "50%", background: cfg.dot, margin: "2px auto 0" }} />
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {/* Stage badge */}
+                  <StageBadge stage={buyer.stage} />
+                  {/* Expand chevron */}
+                  <span style={{ color: C.muted, fontSize: 14, textAlign: "center", userSelect: "none" }}>
+                    {isExpanded ? "▲" : "▼"}
+                  </span>
+                </div>
+
+                {/* Expanded payment detail */}
+                {isExpanded && (
+                  <div style={{ borderTop: `1px solid ${C.border}`, padding: "14px 16px", background: "#F9FBF7" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: C.ink }}>Payment Milestones</span>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onPayments(buyer); }}
+                        style={{ padding: "5px 12px", background: C.green, color: "#fff", border: "none", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer" }}
+                      >
+                        Edit Payments
+                      </button>
+                    </div>
+                    {/* Milestone table */}
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                      {milestoneRows.map((m, idx) => {
+                        const cfg = MILESTONE_STATUS_CFG[m.status];
+                        return (
+                          <div key={idx} style={{ display: "grid", gridTemplateColumns: "110px 1fr 90px 120px 90px", gap: 10, alignItems: "center",
+                            background: C.white, border: `1px solid ${cfg.border}`, borderRadius: 8, padding: "8px 12px" }}>
+                            {/* Milestone label */}
+                            <div>
+                              <div style={{ fontSize: 11, fontWeight: 700, color: C.ink }}>{m.label}</div>
+                              <div style={{ fontSize: 9, color: C.muted }}>{(m.pct * 100).toFixed(0)}% of total</div>
+                            </div>
+                            {/* Progress bar */}
+                            <div style={{ height: 6, background: "#F3F4F6", borderRadius: 3, overflow: "hidden" }}>
+                              <div style={{ height: "100%", width: m.status === "paid" ? "100%" : "0%",
+                                background: cfg.dot, borderRadius: 3, transition: "width 0.4s ease" }} />
+                            </div>
+                            {/* Expected */}
+                            <div style={{ fontSize: 11, fontWeight: 600, color: C.ink }}>{fmtUSD(m.expected)}</div>
+                            {/* Dates */}
+                            <div>
+                              {m.payment?.dueDate && (
+                                <div style={{ fontSize: 10, color: C.muted }}>Due: {m.payment.dueDate}</div>
+                              )}
+                              {m.payment?.paidDate && (
+                                <div style={{ fontSize: 10, color: "#059669" }}>Paid: {m.payment.paidDate}</div>
+                              )}
+                              {!m.payment && <div style={{ fontSize: 10, color: C.muted }}>Not scheduled</div>}
+                            </div>
+                            {/* Status badge */}
+                            <div style={{ padding: "3px 8px", borderRadius: 5, fontSize: 10, fontWeight: 700, textAlign: "center",
+                              background: cfg.bg, color: cfg.color, border: `1px solid ${cfg.border}` }}>
+                              {cfg.label}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {/* Notes */}
+                    {buyer.notes && (
+                      <div style={{ marginTop: 10, fontSize: 11, color: C.muted, background: C.white, border: `1px solid ${C.border}`, borderRadius: 6, padding: "6px 10px" }}>
+                        📝 {buyer.notes}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── CRM Tab main ───────────────────────────────────────────────────────────────
 function CrmTab() {
   const [subTab, setSubTab] = useState<CrmSubTab>("pipeline");
@@ -766,6 +988,7 @@ function CrmTab() {
 
   const clientStages: CrmContact["stage"][] = ["reserved", "under_contract", "sold"];
   const clients = contacts.filter((c) => clientStages.includes(c.stage));
+  const buyers = clients; // alias — same set, used for registry tab label
 
   // KPIs
   const totalRevenue = clients.flatMap((c) => c.payments).reduce((s, p) => s + p.amount, 0);
@@ -775,6 +998,7 @@ function CrmTab() {
     { id: "pipeline", label: "Pipeline" },
     { id: "contacts", label: `All Contacts (${contacts.length})` },
     { id: "clients",  label: `Clients (${clients.length})` },
+    { id: "registry", label: `Registry (${buyers.length})` },
   ];
 
   return (
@@ -839,6 +1063,9 @@ function CrmTab() {
               onPayments={setPaymentsContact}
               stageFilter={clientStages}
             />
+          )}
+          {subTab === "registry" && (
+            <BuyerRegistryView contacts={contacts} onPayments={setPaymentsContact} />
           )}
         </>
       )}
