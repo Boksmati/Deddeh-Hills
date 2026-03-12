@@ -117,6 +117,9 @@ export default function InvestorPage() {
     waterfall, l1Returns, l1ExitOptions, phasedPricing, cashSufficiency,
   } = useInvestmentConfig();
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   const [activeTab, setActiveTab] = useState<"structure" | "waterfall" | "simulator" | "phases" | "tickets">("structure");
   const [waterfallModel, setWaterfallModel] = useState<"split" | "priority">("split");
 
@@ -222,9 +225,6 @@ export default function InvestorPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-8 py-8 sm:py-10">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6 sm:gap-8">
             <div className="flex-1">
-              <div className="mb-5">
-                <DhLogo variant="light" className="h-10" />
-              </div>
               <h1 className="text-xl font-serif font-semibold text-white mb-4 leading-snug">
                 {t("inv_hero_headline")}
               </h1>
@@ -253,9 +253,9 @@ export default function InvestorPage() {
             {/* Right side — quick project stats */}
             <div className="hidden md:flex flex-col gap-3 flex-shrink-0 text-right" dir="ltr">
               {[
-                { val: summary.totalLots, unit: "lots", label: lang === "ar" ? "قطعة أرض" : "in 3 phases" },
+                { val: mounted ? summary.totalLots : "—", unit: "lots", label: lang === "ar" ? "قطعة أرض" : "in 3 phases" },
                 { val: "80,000", unit: "m²", label: lang === "ar" ? "مساحة إجمالية" : "total land area" },
-                { val: formatUSD(summary.totalRevenue), unit: "", label: lang === "ar" ? "إجمالي الإيرادات" : "projected revenue" },
+                { val: mounted ? formatUSD(summary.totalRevenue) : "—", unit: "", label: lang === "ar" ? "إجمالي الإيرادات" : "projected revenue" },
               ].map((s, i) => (
                 <div key={i} className="text-right">
                   <div className="text-white font-bold text-lg tabular-nums">
