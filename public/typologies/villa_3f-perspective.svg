@@ -1,0 +1,184 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <defs>
+    <linearGradient id="sky3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#A8D0E8;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#D8EEF8;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="grass3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#A8CC88;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#88AA68;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="wall3f" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#F2EFE8;stop-opacity:1"/>
+      <stop offset="60%" style="stop-color:#EAE6DA;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#DAD5C8;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="wall3fl2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E2DFD8;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#CAC6BB;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="wall3fl3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#D8D4CC;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#C0BBB0;stop-opacity:1"/>
+    </linearGradient>
+    <filter id="shadow3">
+      <feDropShadow dx="5" dy="8" stdDeviation="8" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="800" height="600" fill="url(#sky3)"/>
+
+  <!-- Mountains (deeper/more dramatic for hillside context) -->
+  <polygon points="0,280 80,150 180,230 320,100 460,200 580,120 720,170 800,190 800,310 0,310" fill="#9AB5A8" opacity="0.5"/>
+  <polygon points="0,310 60,190 160,260 300,145 440,220 610,145 760,185 800,210 800,330 0,330" fill="#B0C8B8" opacity="0.4"/>
+  <!-- Light mist layer -->
+  <rect x="0" y="295" width="800" height="25" fill="white" opacity="0.12"/>
+
+  <!-- Ground / lawn -->
+  <rect x="0" y="420" width="800" height="180" fill="url(#grass3)"/>
+  <!-- Shadow on ground (larger for 3-floor villa) -->
+  <ellipse cx="320" cy="428" rx="230" ry="22" fill="rgba(0,0,0,0.14)"/>
+
+  <!-- ── VILLA BODY — 3 FLOORS ────────────────────────── -->
+
+  <!-- Ground floor -->
+  <rect x="60" y="295" width="510" height="130" fill="url(#wall3f)" filter="url(#shadow3)"/>
+
+  <!-- Second floor (slightly inset) -->
+  <rect x="60" y="205" width="510" height="95" fill="url(#wall3fl2)"/>
+
+  <!-- Third floor / roof floor (more inset) -->
+  <rect x="80" y="130" width="470" height="80" fill="url(#wall3fl3)"/>
+
+  <!-- Parapet / roof edge -->
+  <rect x="68" y="118" width="494" height="18" fill="#2D5A27"/>
+  <rect x="68" y="118" width="494" height="5" fill="#78BF42" opacity="0.55"/>
+
+  <!-- Roof terrace railing (top floor) -->
+  <rect x="80" y="206" width="470" height="8" fill="#D4D0C8" stroke="#BCBAB0" stroke-width="1"/>
+  <line x1="95" y1="196" x2="95" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
+  <line x1="115" y1="196" x2="115" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
+  <line x1="135" y1="196" x2="135" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
+  <line x1="155" y1="196" x2="155" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
+  <line x1="175" y1="196" x2="175" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
+  <line x1="195" y1="196" x2="195" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
+  <line x1="215" y1="196" x2="215" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
+  <line x1="235" y1="196" x2="235" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
+  <line x1="255" y1="196" x2="255" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
+  <line x1="275" y1="196" x2="275" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
+  <line x1="295" y1="196" x2="295" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
+  <line x1="315" y1="196" x2="315" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
+  <line x1="335" y1="196" x2="335" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
+  <line x1="355" y1="196" x2="355" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
+  <line x1="375" y1="196" x2="375" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
+  <line x1="395" y1="196" x2="395" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
+  <line x1="415" y1="196" x2="415" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
+  <line x1="435" y1="196" x2="435" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
+  <line x1="455" y1="196" x2="455" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
+  <line x1="475" y1="196" x2="475" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
+  <line x1="495" y1="196" x2="495" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
+  <line x1="515" y1="196" x2="515" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
+  <line x1="535" y1="196" x2="535" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
+
+  <!-- Second floor balcony railing -->
+  <rect x="60" y="291" width="510" height="8" fill="#D8D5CC" stroke="#C0BDB5" stroke-width="1"/>
+  <line x1="80" y1="280" x2="80" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
+  <line x1="100" y1="280" x2="100" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
+  <line x1="120" y1="280" x2="120" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
+  <line x1="140" y1="280" x2="140" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
+  <line x1="160" y1="280" x2="160" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
+  <line x1="180" y1="280" x2="180" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
+  <line x1="200" y1="280" x2="200" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
+  <line x1="220" y1="280" x2="220" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
+  <line x1="240" y1="280" x2="240" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
+  <line x1="260" y1="280" x2="260" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
+  <line x1="280" y1="280" x2="280" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
+  <line x1="300" y1="280" x2="300" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
+  <line x1="320" y1="280" x2="320" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
+  <line x1="340" y1="280" x2="340" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
+  <line x1="360" y1="280" x2="360" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
+  <line x1="380" y1="280" x2="380" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
+  <line x1="400" y1="280" x2="400" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
+  <line x1="420" y1="280" x2="420" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
+  <line x1="440" y1="280" x2="440" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
+  <line x1="460" y1="280" x2="460" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
+  <line x1="480" y1="280" x2="480" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
+  <line x1="500" y1="280" x2="500" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
+  <line x1="520" y1="280" x2="520" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
+  <line x1="540" y1="280" x2="540" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
+  <line x1="560" y1="280" x2="560" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
+
+  <!-- Ground floor: garage (left) -->
+  <rect x="70" y="308" width="155" height="115" fill="#D0CCBF"/>
+  <rect x="70" y="308" width="155" height="115" fill="none" stroke="#B8B4AA" stroke-width="2"/>
+  <line x1="100" y1="308" x2="100" y2="423" stroke="#B8B4AA" stroke-width="1.5"/>
+  <line x1="130" y1="308" x2="130" y2="423" stroke="#B8B4AA" stroke-width="1.5"/>
+  <line x1="160" y1="308" x2="160" y2="423" stroke="#B8B4AA" stroke-width="1.5"/>
+  <line x1="196" y1="308" x2="196" y2="423" stroke="#B8B4AA" stroke-width="1.5"/>
+  <line x1="70" y1="340" x2="225" y2="340" stroke="#B8B4AA" stroke-width="1"/>
+  <line x1="70" y1="375" x2="225" y2="375" stroke="#B8B4AA" stroke-width="1"/>
+  <line x1="70" y1="405" x2="225" y2="405" stroke="#B8B4AA" stroke-width="1"/>
+
+  <!-- Ground floor windows -->
+  <rect x="240" y="318" width="90" height="62" fill="#C8E0EC" stroke="#A0BCCC" stroke-width="2"/>
+  <line x1="285" y1="318" x2="285" y2="380" stroke="#A0BCCC" stroke-width="1"/>
+  <line x1="240" y1="349" x2="330" y2="349" stroke="#A0BCCC" stroke-width="1"/>
+  <rect x="350" y="318" width="90" height="62" fill="#C8E0EC" stroke="#A0BCCC" stroke-width="2"/>
+  <line x1="395" y1="318" x2="395" y2="380" stroke="#A0BCCC" stroke-width="1"/>
+  <line x1="350" y1="349" x2="440" y2="349" stroke="#A0BCCC" stroke-width="1"/>
+
+  <!-- Grand entrance (right of center) -->
+  <rect x="455" y="330" width="100" height="93" fill="#8A7050" stroke="#685030" stroke-width="2"/>
+  <!-- double door panels -->
+  <rect x="462" y="338" width="38" height="75" fill="#A08868" stroke="#685030" stroke-width="1"/>
+  <rect x="505" y="338" width="38" height="75" fill="#A08868" stroke="#685030" stroke-width="1"/>
+  <circle cx="501" cy="380" r="4.5" fill="#C8A860"/>
+  <circle cx="506" cy="380" r="4.5" fill="#C8A860"/>
+  <!-- transom window above door -->
+  <rect x="455" y="320" width="100" height="14" fill="#C8E0EC" stroke="#8A7050" stroke-width="1"/>
+  <line x1="505" y1="320" x2="505" y2="334" stroke="#A0BCCC" stroke-width="1"/>
+
+  <!-- Second floor windows (5) -->
+  <rect x="70" y="218" width="80" height="48" fill="#C8E0EC" stroke="#A0BCCC" stroke-width="1.5"/>
+  <line x1="110" y1="218" x2="110" y2="266" stroke="#A0BCCC" stroke-width="1"/>
+  <rect x="168" y="218" width="80" height="48" fill="#C8E0EC" stroke="#A0BCCC" stroke-width="1.5"/>
+  <line x1="208" y1="218" x2="208" y2="266" stroke="#A0BCCC" stroke-width="1"/>
+  <rect x="266" y="218" width="80" height="48" fill="#C8E0EC" stroke="#A0BCCC" stroke-width="1.5"/>
+  <line x1="306" y1="218" x2="306" y2="266" stroke="#A0BCCC" stroke-width="1"/>
+  <rect x="364" y="218" width="80" height="48" fill="#C8E0EC" stroke="#A0BCCC" stroke-width="1.5"/>
+  <line x1="404" y1="218" x2="404" y2="266" stroke="#A0BCCC" stroke-width="1"/>
+  <rect x="462" y="218" width="80" height="48" fill="#C8E0EC" stroke="#A0BCCC" stroke-width="1.5"/>
+  <line x1="502" y1="218" x2="502" y2="266" stroke="#A0BCCC" stroke-width="1"/>
+
+  <!-- Third floor windows (4) -->
+  <rect x="88" y="138" width="80" height="42" fill="#C8E0EC" stroke="#A0BCCC" stroke-width="1.5"/>
+  <line x1="128" y1="138" x2="128" y2="180" stroke="#A0BCCC" stroke-width="1"/>
+  <rect x="208" y="138" width="80" height="42" fill="#C8E0EC" stroke="#A0BCCC" stroke-width="1.5"/>
+  <line x1="248" y1="138" x2="248" y2="180" stroke="#A0BCCC" stroke-width="1"/>
+  <rect x="328" y="138" width="80" height="42" fill="#C8E0EC" stroke="#A0BCCC" stroke-width="1.5"/>
+  <line x1="368" y1="138" x2="368" y2="180" stroke="#A0BCCC" stroke-width="1"/>
+  <rect x="448" y="138" width="80" height="42" fill="#C8E0EC" stroke="#A0BCCC" stroke-width="1.5"/>
+  <line x1="488" y1="138" x2="488" y2="180" stroke="#A0BCCC" stroke-width="1"/>
+
+  <!-- Driveway -->
+  <path d="M160 423 L120 510 L240 510 L280 423 Z" fill="#C0B8A8" opacity="0.7"/>
+
+  <!-- Landscaping hedge -->
+  <rect x="60" y="420" width="680" height="15" rx="5" fill="#4A8A30" opacity="0.65"/>
+
+  <!-- Trees (taller for 3-story framing) -->
+  <ellipse cx="670" cy="360" rx="45" ry="65" fill="#3A7820" opacity="0.8"/>
+  <rect x="665" y="418" width="10" height="38" fill="#6B4A2A"/>
+  <ellipse cx="730" cy="375" rx="32" ry="50" fill="#4A8A38" opacity="0.7"/>
+  <rect x="726" y="418" width="8" height="32" fill="#6B4A2A"/>
+  <!-- Smaller tree left -->
+  <ellipse cx="30" cy="375" rx="28" ry="45" fill="#3A7820" opacity="0.6"/>
+  <rect x="26" y="418" width="8" height="30" fill="#6B4A2A"/>
+
+  <!-- Label overlay -->
+  <rect x="0" y="542" width="800" height="58" fill="rgba(26,56,16,0.90)"/>
+  <text x="30" y="565" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="#78BF42" letter-spacing="2">DEDDEH HILLS</text>
+  <text x="30" y="584" font-family="'DM Sans',sans-serif" font-size="16" font-weight="700" fill="white">Villa 3F — Luxury Three-Floor Villa</text>
+  <text x="750" y="575" text-anchor="end" font-family="'DM Sans',sans-serif" font-size="10" fill="rgba(255,255,255,0.6)">Exterior Perspective · Indicative</text>
+</svg>

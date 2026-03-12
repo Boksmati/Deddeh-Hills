@@ -1,0 +1,152 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800">
+  <!-- Background -->
+  <rect width="600" height="800" fill="#FAFAF9"/>
+
+  <!-- Header bar -->
+  <rect x="0" y="0" width="600" height="72" fill="#1A3810"/>
+  <text x="30" y="28" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="#78BF42" letter-spacing="3">DEDDEH HILLS</text>
+  <text x="30" y="50" font-family="'DM Sans',sans-serif" font-size="18" font-weight="700" fill="white">Villa 3F — Roof Floor</text>
+  <text x="30" y="64" font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(255,255,255,0.5)">indicative · not to scale · BUA ~150 m² per floor</text>
+
+  <!-- Building shadow -->
+  <rect x="54" y="92" width="496" height="590" rx="3" fill="#D1D5DB" opacity="0.4"/>
+  <!-- Building outer wall -->
+  <rect x="50" y="88" width="496" height="590" rx="2" fill="#374151"/>
+
+  <!-- BEDROOM 4 (top-left) -->
+  <rect x="56" y="94" width="220" height="190" fill="#EBF3FA"/>
+  <!-- double bed -->
+  <rect x="76" y="110" width="175" height="105" rx="6" fill="none" stroke="#7DB9D4" stroke-width="1.5"/>
+  <rect x="76" y="110" width="175" height="32" rx="6" fill="#B8D9E8" opacity="0.5"/>
+  <!-- pillows -->
+  <rect x="86" y="118" width="35" height="18" rx="4" fill="#C8E8F0" opacity="0.7"/>
+  <rect x="200" y="118" width="35" height="18" rx="4" fill="#C8E8F0" opacity="0.7"/>
+  <text x="163" y="250" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="12" font-weight="700" fill="#374151">BEDROOM 4</text>
+  <text x="163" y="266" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">18 m²</text>
+
+  <!-- Vertical wall center-top -->
+  <rect x="276" y="94" width="5" height="195" fill="#374151"/>
+
+  <!-- BEDROOM 5 (top-right) -->
+  <rect x="281" y="94" width="255" height="190" fill="#EBF3FA"/>
+  <!-- double bed -->
+  <rect x="298" y="110" width="180" height="105" rx="6" fill="none" stroke="#7DB9D4" stroke-width="1.5"/>
+  <rect x="298" y="110" width="180" height="32" rx="6" fill="#B8D9E8" opacity="0.5"/>
+  <!-- pillows -->
+  <rect x="308" y="118" width="35" height="18" rx="4" fill="#C8E8F0" opacity="0.7"/>
+  <rect x="423" y="118" width="35" height="18" rx="4" fill="#C8E8F0" opacity="0.7"/>
+  <text x="409" y="250" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="12" font-weight="700" fill="#374151">BEDROOM 5</text>
+  <text x="409" y="266" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">20 m²</text>
+
+  <!-- Horizontal wall between top rooms and bathroom zone -->
+  <rect x="56" y="284" width="480" height="5" fill="#374151"/>
+
+  <!-- SHARED BATHROOM (left, below BR4) -->
+  <rect x="56" y="289" width="130" height="120" fill="#E8F4FB"/>
+  <!-- bathtub -->
+  <rect x="64" y="296" width="112" height="56" rx="24" fill="none" stroke="#7DB9D4" stroke-width="1.5"/>
+  <!-- shower icon -->
+  <circle cx="90" cy="380" r="12" fill="none" stroke="#7DB9D4" stroke-width="1.5"/>
+  <line x1="90" y1="365" x2="90" y2="358" stroke="#7DB9D4" stroke-width="1"/>
+  <circle cx="90" cy="357" r="3" fill="#7DB9D4" opacity="0.5"/>
+  <text x="120" y="388" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="#374151">BATHROOM</text>
+  <text x="120" y="400" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">8 m²</text>
+
+  <!-- Vertical wall between bathroom and lounge -->
+  <rect x="186" y="289" width="5" height="120" fill="#374151"/>
+
+  <!-- ROOF LOUNGE / SKYROOM (center, below wall) -->
+  <rect x="191" y="289" width="170" height="120" fill="#F5F9F1"/>
+  <!-- coffee table symbol -->
+  <ellipse cx="276" cy="340" rx="36" ry="24" fill="none" stroke="#A8C99A" stroke-width="1.5"/>
+  <rect x="246" y="355" width="60" height="14" rx="4" fill="#C8E0B8" opacity="0.5"/>
+  <text x="276" y="320" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="10" font-weight="700" fill="#2D5A27">SKY LOUNGE</text>
+  <text x="276" y="395" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">18 m²</text>
+
+  <!-- Vertical wall before staircase -->
+  <rect x="361" y="289" width="5" height="120" fill="#374151"/>
+
+  <!-- STAIRCASE (right, mid) -->
+  <rect x="366" y="289" width="170" height="120" fill="#F0EEE8"/>
+  <line x1="366" y1="309" x2="536" y2="309" stroke="#9CA3AF" stroke-width="1"/>
+  <line x1="366" y1="325" x2="536" y2="325" stroke="#9CA3AF" stroke-width="1"/>
+  <line x1="366" y1="341" x2="536" y2="341" stroke="#9CA3AF" stroke-width="1"/>
+  <line x1="366" y1="357" x2="536" y2="357" stroke="#9CA3AF" stroke-width="1"/>
+  <line x1="366" y1="373" x2="536" y2="373" stroke="#9CA3AF" stroke-width="1"/>
+  <line x1="366" y1="389" x2="536" y2="389" stroke="#9CA3AF" stroke-width="1"/>
+  <text x="451" y="396" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">↓ TO FLOOR 1</text>
+
+  <!-- Horizontal wall before roof terrace -->
+  <rect x="56" y="409" width="480" height="5" fill="#374151"/>
+
+  <!-- ROOF TERRACE (main, full width) -->
+  <rect x="56" y="414" width="480" height="264" fill="#C8E8B0"/>
+
+  <!-- Terrace deck pattern (diagonal lines) -->
+  <line x1="56" y1="434" x2="90" y2="414" stroke="#A8CC90" stroke-width="0.8"/>
+  <line x1="86" y1="434" x2="120" y2="414" stroke="#A8CC90" stroke-width="0.8"/>
+  <line x1="116" y1="434" x2="150" y2="414" stroke="#A8CC90" stroke-width="0.8"/>
+  <line x1="146" y1="434" x2="180" y2="414" stroke="#A8CC90" stroke-width="0.8"/>
+  <line x1="176" y1="434" x2="210" y2="414" stroke="#A8CC90" stroke-width="0.8"/>
+  <line x1="206" y1="434" x2="240" y2="414" stroke="#A8CC90" stroke-width="0.8"/>
+  <line x1="236" y1="434" x2="270" y2="414" stroke="#A8CC90" stroke-width="0.8"/>
+  <line x1="266" y1="434" x2="300" y2="414" stroke="#A8CC90" stroke-width="0.8"/>
+  <line x1="296" y1="434" x2="330" y2="414" stroke="#A8CC90" stroke-width="0.8"/>
+  <line x1="326" y1="434" x2="360" y2="414" stroke="#A8CC90" stroke-width="0.8"/>
+  <line x1="356" y1="434" x2="390" y2="414" stroke="#A8CC90" stroke-width="0.8"/>
+  <line x1="386" y1="434" x2="420" y2="414" stroke="#A8CC90" stroke-width="0.8"/>
+  <line x1="416" y1="434" x2="450" y2="414" stroke="#A8CC90" stroke-width="0.8"/>
+  <line x1="446" y1="434" x2="480" y2="414" stroke="#A8CC90" stroke-width="0.8"/>
+  <line x1="476" y1="434" x2="510" y2="414" stroke="#A8CC90" stroke-width="0.8"/>
+  <line x1="506" y1="434" x2="536" y2="420" stroke="#A8CC90" stroke-width="0.8"/>
+
+  <!-- Plunge Pool / Jacuzzi (optional) -->
+  <rect x="380" y="430" width="130" height="70" rx="12" fill="#A8D8F0" stroke="#7DB9D4" stroke-width="1.5"/>
+  <rect x="390" y="438" width="110" height="54" rx="10" fill="#B8E4F8" opacity="0.6"/>
+  <text x="445" y="460" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="#2D5A27">PLUNGE</text>
+  <text x="445" y="473" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="#2D5A27">POOL</text>
+  <text x="445" y="487" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#5BA0C0">~18 m²</text>
+
+  <!-- Pergola area (left of pool) -->
+  <rect x="80" y="430" width="160" height="80" rx="4" fill="none" stroke="#6AAB50" stroke-width="1" stroke-dasharray="6,3"/>
+  <!-- pergola posts -->
+  <rect x="80" y="430" width="6" height="80" fill="#A8CC88" opacity="0.4"/>
+  <rect x="234" y="430" width="6" height="80" fill="#A8CC88" opacity="0.4"/>
+  <!-- pergola slats -->
+  <line x1="80" y1="440" x2="240" y2="440" stroke="#A8CC88" stroke-width="1" stroke-dasharray="8,4"/>
+  <line x1="80" y1="454" x2="240" y2="454" stroke="#A8CC88" stroke-width="1" stroke-dasharray="8,4"/>
+  <line x1="80" y1="468" x2="240" y2="468" stroke="#A8CC88" stroke-width="1" stroke-dasharray="8,4"/>
+  <line x1="80" y1="482" x2="240" y2="482" stroke="#A8CC88" stroke-width="1" stroke-dasharray="8,4"/>
+  <text x="160" y="528" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="#2D5A27">PERGOLA</text>
+
+  <!-- Terrace main label -->
+  <text x="296" y="560" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="16" font-weight="700" fill="#2D5A27">PANORAMIC</text>
+  <text x="296" y="580" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="16" font-weight="700" fill="#2D5A27">ROOF TERRACE</text>
+  <text x="296" y="600" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="#6AAB50">~90 m² · 360° mountain + valley + sea views</text>
+  <!-- Railing edge -->
+  <rect x="56" y="673" width="480" height="5" fill="#374151"/>
+  <line x1="56" y1="660" x2="536" y2="660" stroke="#78BF42" stroke-width="1" stroke-dasharray="8,4" opacity="0.6"/>
+
+  <!-- North arrow -->
+  <g transform="translate(556,110)">
+    <circle cx="0" cy="0" r="17" fill="white" stroke="#D1D5DB" stroke-width="1.5"/>
+    <polygon points="0,-12 -4,4 0,0 4,4" fill="#1A3810"/>
+    <polygon points="0,0 -4,4 0,12 4,4" fill="#9CA3AF"/>
+    <text x="0" y="26" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" font-weight="700" fill="#374151">N</text>
+  </g>
+
+  <!-- Footer -->
+  <rect x="0" y="732" width="600" height="68" fill="#F4F9EF"/>
+  <line x1="0" y1="732" x2="600" y2="732" stroke="#E5E7EB" stroke-width="1"/>
+  <rect x="30" y="750" width="10" height="10" rx="2" fill="#EBF3FA"/>
+  <text x="44" y="759" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">Bedroom</text>
+  <rect x="100" y="750" width="10" height="10" rx="2" fill="#E8F4FB"/>
+  <text x="114" y="759" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">Bathroom</text>
+  <rect x="178" y="750" width="10" height="10" rx="2" fill="#F5F9F1"/>
+  <text x="192" y="759" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">Lounge</text>
+  <rect x="245" y="750" width="10" height="10" rx="2" fill="#C8E8B0"/>
+  <text x="259" y="759" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">Roof Terrace</text>
+  <rect x="340" y="750" width="10" height="10" rx="2" fill="#A8D8F0"/>
+  <text x="354" y="759" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">Pool</text>
+  <text x="300" y="782" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">Deddeh Hills Gated Community · Koura, Lebanon · For illustration purposes only</text>
+</svg>

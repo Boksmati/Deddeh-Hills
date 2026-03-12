@@ -64,19 +64,19 @@ function KPICard({
   accent?: boolean;
 }) {
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-      <div className="text-xs text-gray-400 font-medium uppercase tracking-wider">
+    <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100">
+      <div className="text-[10px] sm:text-xs text-gray-400 font-medium uppercase tracking-wider">
         {label}
       </div>
       <div
-        className={`text-3xl font-bold mt-2 tabular-nums ${
+        className={`text-xl sm:text-3xl font-bold mt-1.5 sm:mt-2 tabular-nums ${
           accent ? "text-dh-green" : "text-gray-900"
         }`}
       >
         {value}
       </div>
-      {sub && <div className="text-xs text-gray-400 mt-1">{sub}</div>}
-      {sub2 && <div className="text-xs text-gray-400">{sub2}</div>}
+      {sub && <div className="text-[10px] sm:text-xs text-gray-400 mt-1">{sub}</div>}
+      {sub2 && <div className="text-[10px] sm:text-xs text-gray-400">{sub2}</div>}
     </div>
   );
 }
@@ -107,6 +107,7 @@ export default function InvestorPage() {
   const typeAssumptions = useSimulationStore((s) => s.typeAssumptions);
   const investorSharePct = useSimulationStore((s) => s.investorSharePct);
   const lotGroups = useSimulationStore((s) => s.lotGroups);
+  const investorFeatureFlags = useSimulationStore((s) => s.investorFeatureFlags);
   const { t, lang } = useTranslations();
   const role = useRole();
 
@@ -218,8 +219,8 @@ export default function InvestorPage() {
 
       {/* Hero — Investment Narrative */}
       <div className="bg-dh-dark text-white">
-        <div className="max-w-6xl mx-auto px-8 py-10">
-          <div className="flex items-start justify-between gap-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 py-8 sm:py-10">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6 sm:gap-8">
             <div className="flex-1">
               <div className="mb-5">
                 <DhLogo variant="light" className="h-10" />
@@ -278,11 +279,11 @@ export default function InvestorPage() {
       </div>
 
       {/* KPI Grid — 4 key investor metrics */}
-      <div className="max-w-6xl mx-auto px-8 -mt-6">
+      <div className="max-w-6xl mx-auto px-4 sm:px-8 -mt-4 sm:-mt-6">
         <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-3">
           {t("inv_kpi_intro")} — {lang === "ar" ? "لكل فيلا" : "per villa"}
         </p>
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           <KPICard
             label={t("inv_your_cash")}
             value={formatUSD(waterfall.l2InvestorCash)}
@@ -309,38 +310,40 @@ export default function InvestorPage() {
       </div>
 
       {/* ── 5-Tab Investment Walkthrough ── */}
-      <div className="max-w-6xl mx-auto px-8 mt-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-8 mt-6 sm:mt-8">
         {/* Tab Navigation — walkthrough style with step numbers + subtitles */}
-        <div className="flex gap-1 bg-white rounded-2xl shadow-sm border border-gray-100 p-1.5 mb-6">
-          {TABS.map((tab, idx) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 py-2.5 px-3 rounded-xl text-left transition-all ${
-                activeTab === tab.id
-                  ? "bg-dh-dark text-white shadow-sm"
-                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              <div className={`text-[9px] font-bold uppercase tracking-widest mb-0.5 ${
-                activeTab === tab.id ? "text-white/60" : "text-gray-300"
-              }`}>
-                {String(idx + 1).padStart(2, "0")}
-              </div>
-              <div className="text-xs font-semibold leading-tight">{tab.label}</div>
-              <div className={`text-[9px] mt-0.5 leading-tight hidden sm:block ${
-                activeTab === tab.id ? "text-white/60" : "text-gray-400"
-              }`}>
-                {tab.sub}
-              </div>
-            </button>
-          ))}
+        <div className="overflow-x-auto scrollbar-none mb-6">
+          <div className="flex gap-1 bg-white rounded-2xl shadow-sm border border-gray-100 p-1.5 min-w-max sm:min-w-0">
+            {TABS.map((tab, idx) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`py-2.5 px-3 sm:flex-1 rounded-xl text-left transition-all min-w-[72px] sm:min-w-0 ${
+                  activeTab === tab.id
+                    ? "bg-dh-dark text-white shadow-sm"
+                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                <div className={`text-[9px] font-bold uppercase tracking-widest mb-0.5 ${
+                  activeTab === tab.id ? "text-white/60" : "text-gray-300"
+                }`}>
+                  {String(idx + 1).padStart(2, "0")}
+                </div>
+                <div className="text-xs font-semibold leading-tight">{tab.label}</div>
+                <div className={`text-[9px] mt-0.5 leading-tight hidden sm:block ${
+                  activeTab === tab.id ? "text-white/60" : "text-gray-400"
+                }`}>
+                  {tab.sub}
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* ── Tab 1: Structure ── */}
         {activeTab === "structure" && (
           <div className="space-y-5">
-            <div className="grid grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               {/* L1 Card */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="px-5 py-4 text-white" style={{ background: "linear-gradient(135deg, #1565C0 0%, #1976D2 100%)" }}>
@@ -438,10 +441,12 @@ export default function InvestorPage() {
                 className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${waterfallModel === "split" ? "bg-dh-dark text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
                 {t("inv_waterfall_model_a")}
               </button>
-              <button onClick={() => setWaterfallModel("priority")}
-                className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${waterfallModel === "priority" ? "bg-dh-dark text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
-                {t("inv_waterfall_model_b")}
-              </button>
+              {investorFeatureFlags.showModelB && (
+                <button onClick={() => setWaterfallModel("priority")}
+                  className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${waterfallModel === "priority" ? "bg-dh-dark text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
+                  {t("inv_waterfall_model_b")}
+                </button>
+              )}
             </div>
 
             {/* Waterfall table — investor-focused, no owner $ amounts */}
@@ -485,7 +490,7 @@ export default function InvestorPage() {
 
         {/* ── Tab 3: Simulator ── */}
         {activeTab === "simulator" && (
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
             {/* Sliders */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-5">
               <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide">{t("simulate_params")}</h3>
@@ -625,7 +630,7 @@ export default function InvestorPage() {
               <h3 className="text-sm font-semibold text-gray-900 mb-4">
                 {lang === "ar" ? "أفق التدفق النقدي" : "Cash Flow Horizon"}
               </h3>
-              <div className="grid grid-cols-3 gap-4 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-xs">
                 {([
                   { label: lang === "ar" ? "بدون مبيعات" : "No Sales", data: cashSufficiency.noSales, color: "#ef4444" },
                   { label: lang === "ar" ? "بناء وبيع" : "Build & Sell", data: cashSufficiency.buildAndSell, color: "#059669" },
@@ -654,7 +659,7 @@ export default function InvestorPage() {
             {/* L1 Tickets */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <h3 className="text-sm font-semibold text-gray-900 mb-4">{t("inv_tickets_l1_title")}</h3>
-              <div className="grid grid-cols-5 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                 {l1TicketData.map((tk) => (
                   <div key={tk.amount} className="border border-blue-100 bg-blue-50 rounded-xl p-4 text-center">
                     <div className="text-xs font-bold text-[#1565C0] mb-2">{formatUSD(tk.amount)}</div>
@@ -669,7 +674,7 @@ export default function InvestorPage() {
             {/* L2 Villa Tickets */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <h3 className="text-sm font-semibold text-gray-900 mb-4">{t("inv_tickets_l2_title")}</h3>
-              <div className="grid grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                 {l2TicketData.map((vt) => (
                   <div key={vt.villas} className="border border-orange-100 bg-orange-50 rounded-xl p-5 text-center">
                     <div className="text-sm font-bold text-[#E65100] mb-2">
@@ -702,11 +707,11 @@ export default function InvestorPage() {
       <SensitivitySection config={config} setConfig={setConfig} lang={lang} />
 
       {/* Phase Breakdown Charts — project overview */}
-      <div className="max-w-6xl mx-auto px-8 mt-8">
-        <div className="flex items-center justify-between mb-4">
+      <div className="max-w-6xl mx-auto px-4 sm:px-8 mt-6 sm:mt-8">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
           <h2 className="text-sm font-semibold text-gray-900">{t("phase_breakdown")}</h2>
           {phaseChartData.length > 0 && (
-            <div className="flex items-center gap-3 text-[10px] text-gray-400">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] text-gray-400">
               {[["#64748b", t("land_cost")], ["#94a3b8", t("construction")], ["#2D6A4F", t("revenue")], ["#059669", t("net_profit")]].map(([color, label]) => (
                 <span key={label as string} className="flex items-center gap-1"><div className="w-2 h-2 rounded-sm" style={{ backgroundColor: color as string }} /> {label}</span>
               ))}
@@ -746,7 +751,7 @@ export default function InvestorPage() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-4 pb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pb-12">
             {[1, 2, 3].map((phaseNum) => {
               const phase = summary.phaseBreakdown.find((p) => p.phase === phaseNum);
               if (!phase || phase.lotCount === 0) {
@@ -892,7 +897,7 @@ function SensitivitySection({
     n >= 1_000_000 ? `$${(n / 1_000_000).toFixed(2)}M` : n >= 1_000 ? `$${(n / 1_000).toFixed(0)}K` : `$${n.toFixed(0)}`;
 
   return (
-    <div className="max-w-6xl mx-auto px-8 mt-8">
+    <div className="max-w-6xl mx-auto px-4 sm:px-8 mt-6 sm:mt-8">
       <div className="flex items-center justify-between mb-5">
         <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
           {isAr ? "تحليل الحساسية" : "Sensitivity Analysis"}
@@ -1005,7 +1010,7 @@ function SensitivitySection({
           </div>
 
           {/* Live stats */}
-          <div className="grid grid-cols-3 gap-4 mb-5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-5">
             <div className="bg-gray-50 rounded-xl p-4">
               <div className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">
                 {isAr ? "نقدك لكل فيلا" : "Your Cash / Villa"}

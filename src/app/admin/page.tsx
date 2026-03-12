@@ -1286,6 +1286,8 @@ function OverviewTab() {
 // ── Settings Tab ──────────────────────────────────────────────────────────────
 function SettingsTab() {
   const router = useRouter();
+  const investorFeatureFlags = useSimulationStore((s) => s.investorFeatureFlags);
+  const setInvestorFeatureFlag = useSimulationStore((s) => s.setInvestorFeatureFlag);
 
   async function logout() {
     await fetch("/api/gate/logout", { method: "POST" }).catch(() => {});
@@ -1301,8 +1303,69 @@ function SettingsTab() {
     { key: "KV_REST_API_TOKEN", desc: "Vercel KV auth token (required with KV_REST_API_URL)", required: false },
   ];
 
+  const investorFlags: {
+    key: keyof typeof investorFeatureFlags;
+    label: string;
+    desc: string;
+  }[] = [
+    { key: "showModelB",       label: "Model B — Priority + Split",     desc: "Shows alternative waterfall model toggle on investor returns tab" },
+    { key: "showSensitivity",  label: "Sensitivity Analysis section",    desc: "Shows the ROI matrix & cash sensitivity panels on investor page" },
+    { key: "showTermSheet",    label: "Term Sheet link",                 desc: "Shows 'View Term Sheet' link in hero and navigation" },
+    { key: "showPhasedPricing",label: "Phased Pricing Simulator",        desc: "Shows Phase C pricing simulator inside the Sensitivity section" },
+  ];
+
   return (
     <div style={{ maxWidth: 600, margin: "0 auto" }}>
+
+      {/* ── Investor View Controls ── */}
+      <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: 20, marginBottom: 20 }}>
+        <h2 style={{ fontSize: 14, fontWeight: 600, color: C.ink, marginBottom: 4 }}>Investor View Controls</h2>
+        <p style={{ fontSize: 12, color: C.muted, marginBottom: 14 }}>
+          Toggle which sections are visible to investors on the <code style={{ background: C.bg, padding: "1px 5px", borderRadius: 4, fontSize: 11 }}>/investor</code> page.
+          Changes take effect immediately and are saved to local state.
+        </p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {investorFlags.map((flag) => {
+            const enabled = investorFeatureFlags[flag.key] as boolean;
+            return (
+              <div key={flag.key} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", background: enabled ? C.greenBg : C.bg, borderRadius: 8, border: `1px solid ${enabled ? C.border : C.border}` }}>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: C.ink, marginBottom: 2 }}>{flag.label}</p>
+                  <p style={{ fontSize: 11, color: C.muted }}>{flag.desc}</p>
+                </div>
+                <button
+                  onClick={() => setInvestorFeatureFlag(flag.key, !enabled)}
+                  style={{
+                    position: "relative",
+                    width: 42,
+                    height: 24,
+                    borderRadius: 12,
+                    border: "none",
+                    background: enabled ? C.green : "#D1D5DB",
+                    cursor: "pointer",
+                    transition: "background 0.2s",
+                    flexShrink: 0,
+                  }}
+                  title={enabled ? "Click to disable" : "Click to enable"}
+                >
+                  <span style={{
+                    position: "absolute",
+                    top: 3,
+                    left: enabled ? 21 : 3,
+                    width: 18,
+                    height: 18,
+                    borderRadius: "50%",
+                    background: "#fff",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+                    transition: "left 0.2s",
+                  }} />
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: 20, marginBottom: 20 }}>
         <h2 style={{ fontSize: 14, fontWeight: 600, color: C.ink, marginBottom: 14 }}>Environment Variables</h2>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

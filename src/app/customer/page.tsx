@@ -742,7 +742,7 @@ export default function CustomerPage() {
   const [filterType,   setFilterType]   = useState<DevelopmentType | "all">("all");
   const [filterAvail,  setFilterAvail]  = useState<"all" | LotStatus>("all");
   const [filterBudget, setFilterBudget] = useState<BudgetFilter>("all");
-  const [viewMode,     setViewMode]     = useState<"map" | "grid" | "typologies">("map");
+  const [viewMode,     setViewMode]     = useState<"map" | "grid" | "typologies">("typologies");
 
   // Selection state
   const [selectedMapLotId, setSelectedMapLotId] = useState<number | null>(null);
@@ -922,24 +922,30 @@ export default function CustomerPage() {
 
       {/* ── Hero ── */}
       <div style={{ background: "#1A3810" }}>
-        <div className="max-w-7xl mx-auto px-5 pt-8 pb-7">
-          <div className="flex items-start justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-5 pt-6 pb-6 sm:pt-8 sm:pb-7">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-4">
             <div className="flex-1 min-w-0">
-              {/* Eyebrow — click to return to landing page */}
-              <a href="/" className="flex items-center gap-3 mb-5 w-fit group" style={{ textDecoration: "none" }}>
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-opacity group-hover:opacity-80" style={{ background: C.forest }}>
-                  <span className="font-bold text-xs" style={{ color: C.white, fontFamily: "'DM Sans', system-ui, sans-serif" }}>DH</span>
+              {/* Eyebrow + lang toggle on mobile (inline) */}
+              <div className="flex items-center justify-between mb-5">
+                <a href="/" className="flex items-center gap-3 w-fit group" style={{ textDecoration: "none" }}>
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-opacity group-hover:opacity-80" style={{ background: C.forest }}>
+                    <span className="font-bold text-xs" style={{ color: C.white, fontFamily: "'DM Sans', system-ui, sans-serif" }}>DH</span>
+                  </div>
+                  <div className="text-[10px] uppercase tracking-[0.2em] transition-opacity group-hover:opacity-70" style={{ color: C.gold, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                    Koura, North Lebanon
+                  </div>
+                </a>
+                {/* Lang toggle visible on mobile only (hidden on sm+ since it shows in stats column) */}
+                <div className="sm:hidden">
+                  <LanguageToggle className="border-white/30 bg-white/10 text-white/90 hover:bg-white/20" />
                 </div>
-                <div className="text-[10px] uppercase tracking-[0.2em] transition-opacity group-hover:opacity-70" style={{ color: C.gold, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
-                  Koura, North Lebanon
-                </div>
-              </a>
+              </div>
               {/* Title */}
-              <h1 className="dh-serif font-bold leading-none mb-3" style={{ fontSize: "clamp(2rem,6vw,3.75rem)", color: C.white }}>
+              <h1 className="dh-serif font-bold leading-none mb-3" style={{ fontSize: "clamp(1.8rem,6vw,3.75rem)", color: C.white }}>
                 Deddeh Hills
               </h1>
               {/* Description */}
-              <p className="text-sm leading-relaxed mb-5 max-w-lg" style={{ color: "rgba(245,240,232,0.6)", fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+              <p className="text-sm leading-relaxed mb-4 max-w-lg" style={{ color: "rgba(245,240,232,0.6)", fontFamily: "'DM Sans', system-ui, sans-serif" }}>
                 {lang === "ar"
                   ? "مجمع سكني فاخر مسوّر على قمة تل في شمال لبنان. إطلالات بانورامية وتصاميم حصرية."
                   : "Premium hilltop gated community in North Lebanon. Panoramic mountain views, curated architecture, and full infrastructure."}
@@ -952,7 +958,7 @@ export default function CustomerPage() {
                   lang === "ar" ? "مسوّر ومخدوم"           : "Gated & serviced",
                 ].map(label => (
                   <span key={label}
-                    className="text-[10px] px-2.5 py-1 rounded-full"
+                    className="text-[10px] px-2.5 py-1 rounded-full whitespace-nowrap"
                     style={{ background: "rgba(120,191,66,0.12)", color: C.gold, border: "1px solid rgba(120,191,66,0.28)", fontFamily: "'DM Sans', system-ui, sans-serif" }}>
                     {label}
                   </span>
@@ -960,8 +966,8 @@ export default function CustomerPage() {
               </div>
             </div>
 
-            {/* Stats + lang toggle */}
-            <div className="flex-shrink-0 flex flex-col items-end gap-4">
+            {/* Stats + lang toggle (desktop) */}
+            <div className="hidden sm:flex flex-col items-end gap-4 flex-shrink-0">
               <div className="flex items-start gap-4 md:gap-7 text-end">
                 <div>
                   <div className="dh-serif font-bold tabular-nums" style={{ fontSize: "clamp(1.4rem,4vw,2.25rem)", color: C.white }}>
@@ -981,6 +987,27 @@ export default function CustomerPage() {
                 </div>
               </div>
               <LanguageToggle className="border-white/30 bg-white/10 text-white/90 hover:bg-white/20" />
+            </div>
+
+            {/* Stats — mobile only (compact row below hero text) */}
+            <div className="flex sm:hidden items-center gap-5">
+              <div>
+                <div className="dh-serif font-bold tabular-nums text-xl" style={{ color: C.white }}>
+                  {mounted ? totalUnits : "—"}
+                </div>
+                <div className="text-[9px] uppercase tracking-widest" style={{ color: "rgba(245,240,232,0.38)", fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                  {lang === "ar" ? "الوحدات" : "Total Units"}
+                </div>
+              </div>
+              <div className="w-px h-8 bg-white/10" />
+              <div>
+                <div className="dh-serif font-bold tabular-nums text-xl" style={{ color: "#4ade80" }}>
+                  {mounted ? totalAvailable : "—"}
+                </div>
+                <div className="text-[9px] uppercase tracking-widest" style={{ color: "rgba(245,240,232,0.38)", fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                  {lang === "ar" ? "متاحة" : "Available"}
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800">
+  <rect width="600" height="800" fill="#FAFAF9"/>
+  <rect x="0" y="0" width="600" height="72" fill="#1A3810"/>
+  <text x="30" y="28" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="#78BF42" letter-spacing="3">DEDDEH HILLS</text>
+  <text x="30" y="50" font-family="'DM Sans',sans-serif" font-size="18" font-weight="700" fill="white">Villa 3F — First Floor</text>
+  <text x="30" y="64" font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(255,255,255,0.5)">indicative · not to scale · BUA ~150 m² per floor</text>
+
+  <rect x="54" y="92" width="496" height="590" rx="3" fill="#D1D5DB" opacity="0.4"/>
+  <rect x="50" y="88" width="496" height="590" rx="2" fill="#374151"/>
+
+  <!-- MASTER SUITE (large, left + center-left, top) -->
+  <rect x="56" y="94" width="290" height="220" fill="#EBF3FA"/>
+  <!-- king bed -->
+  <rect x="75" y="115" width="200" height="110" rx="6" fill="none" stroke="#7DB9D4" stroke-width="1.5"/>
+  <rect x="75" y="115" width="200" height="34" rx="6" fill="#B8D9E8" opacity="0.5"/>
+  <text x="191" y="254" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="13" font-weight="700" fill="#2D5A27">MASTER SUITE</text>
+  <text x="191" y="270" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">28 m²</text>
+  <!-- walk-in label -->
+  <rect x="56" y="94" width="290" height="220" fill="none"/>
+
+  <!-- MASTER WALK-IN (top right of master) -->
+  <rect x="346" y="94" width="110" height="110" fill="#F0EEF9"/>
+  <text x="401" y="142" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="10" font-weight="600" fill="#374151">WALK-IN</text>
+  <text x="401" y="156" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="10" font-weight="600" fill="#374151">WARDROBE</text>
+  <text x="401" y="170" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">9 m²</text>
+
+  <!-- MASTER BATHROOM -->
+  <rect x="456" y="94" width="80" height="220" fill="#E8F4FB"/>
+  <!-- bath tub -->
+  <rect x="464" y="108" width="64" height="80" rx="28" fill="none" stroke="#7DB9D4" stroke-width="1.5"/>
+  <!-- shower -->
+  <rect x="464" y="205" width="64" height="52" rx="4" fill="none" stroke="#7DB9D4" stroke-width="1"/>
+  <circle cx="496" cy="231" r="8" fill="none" stroke="#7DB9D4" stroke-width="1" stroke-dasharray="2,2"/>
+  <text x="496" y="276" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">MASTER WC</text>
+  <text x="496" y="288" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">8 m²</text>
+
+  <!-- DRESSING AREA (below walk-in) -->
+  <rect x="346" y="204" width="110" height="110" fill="#F0EEF9"/>
+  <text x="401" y="252" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="10" font-weight="600" fill="#374151">DRESSING</text>
+  <text x="401" y="266" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="10" font-weight="600" fill="#374151">AREA</text>
+  <text x="401" y="290" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">8 m²</text>
+
+  <!-- Horizontal wall row 1 / row 2 -->
+  <rect x="56" y="314" width="480" height="5" fill="#374151"/>
+
+  <!-- BEDROOM 2 (left, middle) -->
+  <rect x="56" y="319" width="200" height="170" fill="#EBF3FA"/>
+  <rect x="72" y="335" width="160" height="90" rx="5" fill="none" stroke="#93C5D8" stroke-width="1.5"/>
+  <rect x="72" y="335" width="160" height="26" rx="5" fill="#B8D9E8" opacity="0.5"/>
+  <text x="156" y="433" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" font-weight="700" fill="#374151">BEDROOM 2</text>
+  <text x="156" y="448" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">16 m²</text>
+
+  <!-- Vertical wall center -->
+  <rect x="256" y="319" width="5" height="175" fill="#374151"/>
+
+  <!-- BEDROOM 3 (center, middle) -->
+  <rect x="261" y="319" width="195" height="170" fill="#EBF3FA"/>
+  <rect x="277" y="335" width="160" height="88" rx="5" fill="none" stroke="#93C5D8" stroke-width="1.5"/>
+  <rect x="277" y="335" width="160" height="26" rx="5" fill="#B8D9E8" opacity="0.5"/>
+  <text x="359" y="433" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" font-weight="700" fill="#374151">BEDROOM 3</text>
+  <text x="359" y="448" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">15 m²</text>
+
+  <!-- Vertical wall right -->
+  <rect x="456" y="319" width="5" height="175" fill="#374151"/>
+
+  <!-- SHARED BATHROOM (right, middle) -->
+  <rect x="461" y="319" width="75" height="170" fill="#E8F4FB"/>
+  <rect x="471" y="333" width="55" height="40" rx="20" fill="none" stroke="#7DB9D4" stroke-width="1.5"/>
+  <ellipse cx="493" cy="408" rx="12" ry="16" fill="none" stroke="#7DB9D4" stroke-width="1.5"/>
+  <text x="499" y="462" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">BATHROOM</text>
+  <text x="499" y="473" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">7 m²</text>
+
+  <!-- Horizontal wall row 2 / row 3 -->
+  <rect x="56" y="494" width="480" height="5" fill="#374151"/>
+
+  <!-- FAMILY LOUNGE (left-center, lower) -->
+  <rect x="56" y="499" width="350" height="125" fill="#F5F9F1"/>
+  <rect x="72" y="528" width="200" height="50" rx="5" fill="none" stroke="#A8C99A" stroke-width="1.5"/>
+  <rect x="72" y="528" width="200" height="16" rx="4" fill="#C8E0B8" opacity="0.5"/>
+  <text x="231" y="520" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="12" font-weight="700" fill="#374151">FAMILY LOUNGE</text>
+  <text x="231" y="598" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">32 m²</text>
+
+  <!-- Vertical wall -->
+  <rect x="406" y="499" width="5" height="130" fill="#374151"/>
+
+  <!-- STAIRCASE (right, lower) -->
+  <rect x="411" y="499" width="125" height="125" fill="#F0EEE8"/>
+  <line x1="411" y1="519" x2="536" y2="519" stroke="#9CA3AF" stroke-width="1"/>
+  <line x1="411" y1="535" x2="536" y2="535" stroke="#9CA3AF" stroke-width="1"/>
+  <line x1="411" y1="551" x2="536" y2="551" stroke="#9CA3AF" stroke-width="1"/>
+  <line x1="411" y1="567" x2="536" y2="567" stroke="#9CA3AF" stroke-width="1"/>
+  <line x1="411" y1="583" x2="536" y2="583" stroke="#9CA3AF" stroke-width="1"/>
+  <line x1="411" y1="599" x2="536" y2="599" stroke="#9CA3AF" stroke-width="1"/>
+  <text x="474" y="612" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="#9CA3AF">TO ROOF FLOOR ↑</text>
+
+  <!-- Horizontal wall / balcony -->
+  <rect x="56" y="624" width="480" height="5" fill="#374151"/>
+
+  <!-- BALCONY -->
+  <rect x="56" y="629" width="480" height="55" fill="#D5EFCA"/>
+  <line x1="56" y1="650" x2="536" y2="650" stroke="#A8CC98" stroke-width="0.8" stroke-dasharray="8,4"/>
+  <text x="296" y="646" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="12" font-weight="700" fill="#2D5A27">PANORAMIC BALCONY</text>
+  <text x="296" y="672" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#6AAB50">full width · 22 m² · mountain + valley views</text>
+
+  <!-- North arrow -->
+  <g transform="translate(556,110)">
+    <circle cx="0" cy="0" r="17" fill="white" stroke="#D1D5DB" stroke-width="1.5"/>
+    <polygon points="0,-12 -4,4 0,0 4,4" fill="#1A3810"/>
+    <polygon points="0,0 -4,4 0,12 4,4" fill="#9CA3AF"/>
+    <text x="0" y="26" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" font-weight="700" fill="#374151">N</text>
+  </g>
+
+  <!-- Footer -->
+  <rect x="0" y="732" width="600" height="68" fill="#F4F9EF"/>
+  <line x1="0" y1="732" x2="600" y2="732" stroke="#E5E7EB" stroke-width="1"/>
+  <rect x="30" y="750" width="10" height="10" rx="2" fill="#EBF3FA"/>
+  <text x="44" y="759" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">Bedroom / Suite</text>
+  <rect x="140" y="750" width="10" height="10" rx="2" fill="#E8F4FB"/>
+  <text x="154" y="759" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">Bathroom</text>
+  <rect x="210" y="750" width="10" height="10" rx="2" fill="#F5F9F1"/>
+  <text x="224" y="759" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">Living</text>
+  <rect x="260" y="750" width="10" height="10" rx="2" fill="#D5EFCA"/>
+  <text x="274" y="759" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">Balcony</text>
+  <rect x="320" y="750" width="10" height="10" rx="2" fill="#F0EEF9"/>
+  <text x="334" y="759" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">Walk-in</text>
+  <text x="300" y="782" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">Deddeh Hills Gated Community · Koura, Lebanon · For illustration purposes only</text>
+</svg>

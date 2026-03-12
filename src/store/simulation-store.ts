@@ -126,6 +126,15 @@ interface SimulationState {
   toggleCalibrationMode: () => void;
   setLotCenterOverride: (lotId: number, center: [number, number]) => void;
   resetCenterOverrides: () => void;
+
+  // Investor view feature flags (admin-controlled)
+  investorFeatureFlags: {
+    showModelB: boolean;
+    showSensitivity: boolean;
+    showTermSheet: boolean;
+    showPhasedPricing: boolean;
+  };
+  setInvestorFeatureFlag: (key: keyof SimulationState["investorFeatureFlags"], val: boolean) => void;
 }
 
 const DEFAULT_MAX_FLOORS: Record<DevelopmentType, number> = {
@@ -181,6 +190,34 @@ const LS_INVESTOR_MODEL_KEY = "dh-investor-model";
 const LS_PROJECT_SPECS_KEY = "dh-project-specs";
 const LS_PHASE_TARGETS_KEY = "dh-phase-targets";
 const LS_LOT_GROUPS_KEY = "dh-lot-groups";
+const LS_INVESTOR_FLAGS_KEY = "dh-investor-flags";
+
+type InvestorFeatureFlags = SimulationState["investorFeatureFlags"];
+
+const DEFAULT_INVESTOR_FLAGS: InvestorFeatureFlags = {
+  showModelB: false,
+  showSensitivity: true,
+  showTermSheet: true,
+  showPhasedPricing: true,
+};
+
+function loadInvestorFlags(): InvestorFeatureFlags {
+  if (typeof window === "undefined") return DEFAULT_INVESTOR_FLAGS;
+  try {
+    const str = localStorage.getItem(LS_INVESTOR_FLAGS_KEY);
+    if (!str) return DEFAULT_INVESTOR_FLAGS;
+    return { ...DEFAULT_INVESTOR_FLAGS, ...JSON.parse(str) };
+  } catch {
+    return DEFAULT_INVESTOR_FLAGS;
+  }
+}
+
+function saveInvestorFlags(flags: InvestorFeatureFlags) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(LS_INVESTOR_FLAGS_KEY, JSON.stringify(flags));
+  } catch { /* ignore */ }
+}
 
 const DEFAULT_PHASE_TARGETS: { 1: number; 2: number; 3: number } = { 1: 0, 2: 0, 3: 0 };
 
@@ -381,6 +418,7 @@ interface PersistedServerState {
   projectSpecs?: ProjectSpecs;
   phaseRevenueTargets?: { 1: number; 2: number; 3: number };
   lotGroups?: LotGroup[];
+  investorFeatureFlags?: SimulationState["investorFeatureFlags"];
 }
 
 function buildServerState(s: SimulationState): PersistedServerState {
@@ -401,6 +439,7 @@ function buildServerState(s: SimulationState): PersistedServerState {
     projectSpecs: s.projectSpecs,
     phaseRevenueTargets: s.phaseRevenueTargets,
     lotGroups: s.lotGroups,
+    investorFeatureFlags: s.investorFeatureFlags,
   };
 }
 
@@ -469,6 +508,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   calibrationMode: false,
   lotCenterOverrides: new Map(),
   lotGroups: loadLotGroups(),
+  investorFeatureFlags: loadInvestorFlags(),
 
   setDevelopmentType: (lotIds, type) => {
     set((state) => {
@@ -663,6 +703,10 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
       if (phaseRevenueTargets) savePhaseTargets(phaseRevenueTargets);
       const lotGroups = data.lotGroups ?? [];
       saveLotGroups(lotGroups);
+      const investorFeatureFlags = data.investorFeatureFlags
+        ? { ...DEFAULT_INVESTOR_FLAGS, ...data.investorFeatureFlags }
+        : undefined;
+      if (investorFeatureFlags) saveInvestorFlags(investorFeatureFlags);
 
       set({
         assignments,
@@ -679,6 +723,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
         lotGroups,
         ...(data.projectSpecs ? { projectSpecs: data.projectSpecs } : {}),
         ...(phaseRevenueTargets ? { phaseRevenueTargets } : {}),
+        ...(investorFeatureFlags ? { investorFeatureFlags } : {}),
       });
     } catch { /* server unavailable, localStorage already loaded */ }
   },
@@ -945,6 +990,14 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
     const empty = new Map<number, [number, number]>();
     persistCenterOverrides(empty);
     set({ lotCenterOverrides: empty });
+  },
+
+  setInvestorFeatureFlag: (key, val) => {
+    set((state) => {
+      const next = { ...state.investorFeatureFlags, [key]: val };
+      saveInvestorFlags(next);
+      return { investorFeatureFlags: next };
+    });
   },
 }));
 
