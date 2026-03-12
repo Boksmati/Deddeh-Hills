@@ -38,8 +38,9 @@ const C = {
 function EnquiryForm() {
   const { t, isRTL } = useTranslations();
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
-  const [sent, setSent]     = useState(false);
+  const [sent, setSent]       = useState(false);
   const [sending, setSending] = useState(false);
+  const [submitError, setSubmitError] = useState(false);
 
   const bFont = isRTL
     ? "'Noto Sans Arabic', system-ui, sans-serif"
@@ -49,9 +50,25 @@ function EnquiryForm() {
     e.preventDefault();
     if (!form.name || !form.email) return;
     setSending(true);
-    await new Promise((r) => setTimeout(r, 800));
-    setSending(false);
-    setSent(true);
+    setSubmitError(false);
+    try {
+      const res = await fetch("/api/enquire", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name.trim(),
+          email: form.email.trim(),
+          phone: form.phone.trim() || undefined,
+          message: form.message.trim() || undefined,
+        }),
+      });
+      if (!res.ok) throw new Error("server error");
+      setSent(true);
+    } catch {
+      setSubmitError(true);
+    } finally {
+      setSending(false);
+    }
   }
 
   if (sent) {
@@ -102,6 +119,13 @@ function EnquiryForm() {
       </div>
       {field("phone",   t("landing_form_phone"), "tel")}
       {field("message", t("landing_form_message"), "text", 3)}
+      {submitError && (
+        <p style={{ color: "#DC2626", fontSize: 13, fontFamily: bFont, margin: "4px 0 -4px" }}>
+          {isRTL
+            ? "تعذّر إرسال طلبك. يرجى المحاولة مرة أخرى."
+            : "Something went wrong. Please try again."}
+        </p>
+      )}
       <button
         type="submit"
         disabled={!canSubmit}

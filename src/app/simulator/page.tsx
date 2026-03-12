@@ -9,8 +9,7 @@ import DevelopmentMix from "@/components/financials/DevelopmentMix";
 import Toolbar from "@/components/ui/Toolbar";
 import SelectionToolbar from "@/components/ui/SelectionToolbar";
 import PhaseManager from "@/components/phases/PhaseManager";
-import DhLogo from "@/components/ui/DhLogo";
-import LanguageToggle from "@/components/ui/LanguageToggle";
+import AppHeader from "@/components/ui/AppHeader";
 import { useSimulationStore } from "@/store/simulation-store";
 import { useTranslations } from "@/i18n/useTranslations";
 import ProjectSpecsEditor from "@/components/admin/ProjectSpecsEditor";
@@ -43,68 +42,8 @@ export default function Home() {
 
   return (
     <div className="h-screen flex flex-col" style={{ background: "#F4F9EF" }}>
-      {/* Header */}
-      <header
-        className="px-6 py-3 flex items-center justify-between flex-shrink-0"
-        style={{ background: "#1A3810" }}
-      >
-        <DhLogo className="h-10" variant="light" />
-        <div className="flex items-center gap-2">
-          {isInvestor && (
-            <span className="px-3 py-1.5 bg-white/10 text-white/80 text-xs font-medium rounded-lg border border-white/20">
-              Read-only view
-            </span>
-          )}
-          {isAdmin && (
-            <>
-              <a
-                href="/status"
-                className="px-3 py-1.5 text-white/70 text-xs font-medium rounded-lg hover:bg-white/10 hover:text-white transition-colors"
-              >
-                {t("nav_status")}
-              </a>
-              <a
-                href="/assumptions"
-                className="px-3 py-1.5 text-white/70 text-xs font-medium rounded-lg hover:bg-white/10 hover:text-white transition-colors"
-              >
-                {t("nav_assumptions")}
-              </a>
-            </>
-          )}
-          <a
-            href="/investor"
-            className="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
-            style={{ background: "#78BF42", color: "#fff" }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "#67AA34")}
-            onMouseLeave={(e) => (e.currentTarget.style.background = "#78BF42")}
-          >
-            {t("nav_investor")}
-          </a>
-          {isAdmin && (
-            <a
-              href="/customer"
-              className="px-3 py-1.5 bg-white/10 text-white text-xs font-medium rounded-lg hover:bg-white/20 transition-colors"
-            >
-              {t("nav_customer")}
-            </a>
-          )}
-          {isAdmin && (
-            <>
-              <div className="w-px h-4 bg-white/20 mx-1" />
-              <a
-                href="/admin"
-                className="px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors"
-                style={{ background: "rgba(255,255,255,0.08)", color: "#95CC58", borderColor: "rgba(255,255,255,0.2)" }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.15)")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.08)")}
-              >
-                Admin ⚙️
-              </a>
-            </>
-          )}
-          <LanguageToggle />
-        </div>
-      </header>
+      {/* Shared navigation header */}
+      <AppHeader currentPage="simulator" />
 
       {/* Toolbar — admin only */}
       {isAdmin && (

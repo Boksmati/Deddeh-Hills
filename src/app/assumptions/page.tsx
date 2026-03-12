@@ -6,7 +6,7 @@ import { LOTS } from "@/data/lots";
 import { DEVELOPMENT_TYPES, PHASE_COLORS } from "@/data/development-types";
 import { DevelopmentType, TypeAssumption } from "@/types";
 import { calculateSimulationSummary, calculateLotFinancials } from "@/engine/financial-engine";
-import LanguageToggle from "@/components/ui/LanguageToggle";
+import AppHeader from "@/components/ui/AppHeader";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useInvestmentConfig } from "@/hooks/useInvestmentConfig";
 import { computeContinuationCost, computeWaterfall, computePhaseMetrics, type LotPricing } from "@/lib/investment-layers";
@@ -198,36 +198,10 @@ export default function AssumptionsPage() {
     return { grossPerM, marginPct, unitPrice, totalLotM };
   }
 
-  const header = (
-    <header className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 bg-dh-green rounded-lg flex items-center justify-center">
-          <span className="text-white font-bold text-sm">DH</span>
-        </div>
-        <div>
-          <h1 className="text-sm font-bold text-gray-900">Development Assumptions</h1>
-          <p className="text-[10px] text-gray-400">Edit financial parameters per typology</p>
-        </div>
-      </div>
-      <div className="flex items-center gap-2">
-        <a href="/simulator" className="px-3 py-1.5 text-xs text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
-          ← {t("nav_simulator")}
-        </a>
-        <a href="/investor" className="px-3 py-1.5 text-xs text-white bg-dh-green hover:bg-dh-green/90 rounded-lg transition-colors">
-          {t("nav_investor")}
-        </a>
-        <a href="/customer" className="px-3 py-1.5 text-xs text-white bg-slate-700 hover:bg-slate-800 rounded-lg transition-colors">
-          {t("nav_customer")}
-        </a>
-        <LanguageToggle />
-      </div>
-    </header>
-  );
-
   if (!mounted) {
     return (
       <div className="min-h-screen bg-gray-50">
-        {header}
+        <AppHeader currentPage="assumptions" />
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="h-64 bg-white rounded-xl shadow-sm border border-gray-100 animate-pulse" />
         </div>
@@ -237,7 +211,7 @@ export default function AssumptionsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {header}
+      <AppHeader currentPage="assumptions" />
 
       <div className="max-w-7xl mx-auto px-6 py-6 space-y-8">
 

@@ -7,8 +7,7 @@ import { LOTS } from "@/data/lots";
 import { calculateLotFinancials } from "@/engine/financial-engine";
 import { DevelopmentType, LotStatus } from "@/types";
 import ProjectSpecsEditor from "@/components/admin/ProjectSpecsEditor";
-import DhLogo from "@/components/ui/DhLogo";
-import LanguageToggle from "@/components/ui/LanguageToggle";
+import AppHeader from "@/components/ui/AppHeader";
 import type { InviteToken } from "@/app/api/admin/invites/route";
 import type { CrmContact, CrmPayment } from "@/app/api/admin/contacts/route";
 import type { TicketPurchase } from "@/lib/tickets";
@@ -1350,29 +1349,8 @@ export default function AdminPage() {
 
   return (
     <div style={{ minHeight: "100dvh", background: C.bg, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
-      {/* Header */}
-      <header style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "0 20px", position: "sticky", top: 0, zIndex: 50 }}>
-        <div style={{ maxWidth: 960, margin: "0 auto", height: 56, display: "flex", alignItems: "center", gap: 16 }}>
-          <DhLogo className="h-8" style={{ width: "auto" }} />
-          <div style={{ width: 1, height: 20, background: C.border }} />
-          <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: C.muted }}>Admin</span>
-          <div style={{ marginLeft: "auto", display: "flex", gap: 8, alignItems: "center" }}>
-            <LanguageToggle />
-            <a
-              href="/simulator"
-              style={{
-                fontSize: 12, fontWeight: 600, color: C.green,
-                textDecoration: "none", background: C.greenBg,
-                padding: "5px 12px", borderRadius: 6,
-                border: `1px solid rgba(61,122,36,0.2)`,
-              }}
-            >
-              Simulator →
-            </a>
-            <a href="/" style={{ fontSize: 12, color: C.muted, textDecoration: "none" }}>← Back to site</a>
-          </div>
-        </div>
-      </header>
+      {/* Shared Navigation Header */}
+      <AppHeader currentPage="admin" />
 
       {/* Tabs */}
       <div style={{ background: C.white, borderBottom: `1px solid ${C.border}` }}>

@@ -14,7 +14,7 @@ import LOT_PRICES_RAW from "@/data/lot-prices.json";
 
 const LOT_PRICES = LOT_PRICES_RAW as LotPricing[];
 import DhLogo from "@/components/ui/DhLogo";
-import LanguageToggle from "@/components/ui/LanguageToggle";
+import AppHeader from "@/components/ui/AppHeader";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useRole } from "@/hooks/useRole";
 import {
@@ -204,45 +204,84 @@ export default function InvestorPage() {
   });
 
   const TABS = [
-    { id: "structure" as const, label: t("inv_tab_structure"), labelAr: "الهيكل" },
-    { id: "waterfall" as const, label: t("inv_tab_waterfall"), labelAr: "شلال التوزيع" },
-    { id: "simulator" as const, label: t("inv_tab_simulator"), labelAr: "المحاكاة" },
-    { id: "phases" as const, label: t("inv_tab_phases"), labelAr: "المراحل والخروج" },
-    { id: "tickets" as const, label: t("inv_tab_tickets"), labelAr: "الاستثمار" },
+    { id: "structure" as const, label: t("inv_tab_structure"), sub: t("inv_tab_sub_structure") },
+    { id: "waterfall" as const, label: t("inv_tab_waterfall"), sub: t("inv_tab_sub_waterfall") },
+    { id: "simulator" as const, label: t("inv_tab_simulator"), sub: t("inv_tab_sub_simulator") },
+    { id: "phases" as const, label: t("inv_tab_phases"), sub: t("inv_tab_sub_phases") },
+    { id: "tickets" as const, label: t("inv_tab_tickets"), sub: t("inv_tab_sub_tickets") },
   ];
 
   return (
     <div className="min-h-screen" style={{ background: "#F4F9EF" }}>
-      {/* Hero Header */}
+      {/* Shared Navigation Header */}
+      <AppHeader currentPage="investor" />
+
+      {/* Hero — Investment Narrative */}
       <div className="bg-dh-dark text-white">
-        <div className="max-w-6xl mx-auto px-8 py-12">
-          <div className="mb-6">
-            <DhLogo variant="light" className="h-14" />
-          </div>
-          <p className="text-gray-300 max-w-2xl text-sm leading-relaxed">
-            {lang === "ar"
-              ? "مجتمع سكني مسوّر راقٍ بمساحة ٨٠٠٠٠ م² يضم ١٠١ قطعة عبر ثلاث مراحل تطوير في شمال لبنان."
-              : "A premium 80,000 m² gated residential community comprising " + summary.totalLots + " lots across three development phases in North Lebanon."}
-          </p>
-          <div className="flex items-center gap-4 mt-4">
-            {role === "admin" && (
-              <a href="/simulator" className="text-xs underline transition-colors" style={{ color: "#95CC58" }}
+        <div className="max-w-6xl mx-auto px-8 py-10">
+          <div className="flex items-start justify-between gap-8">
+            <div className="flex-1">
+              <div className="mb-5">
+                <DhLogo variant="light" className="h-10" />
+              </div>
+              <h1 className="text-xl font-serif font-semibold text-white mb-4 leading-snug">
+                {t("inv_hero_headline")}
+              </h1>
+              <ul className="space-y-2 mb-6">
+                {[
+                  { icon: "🏗️", text: t("inv_bullet_1") },
+                  { icon: "🏠", text: t("inv_bullet_2") },
+                  { icon: "📈", text: t("inv_bullet_3") },
+                ].map((b, i) => (
+                  <li key={i} className="flex items-start gap-2.5 text-sm text-gray-300">
+                    <span className="text-base leading-5 flex-shrink-0">{b.icon}</span>
+                    <span>{b.text}</span>
+                  </li>
+                ))}
+              </ul>
+              <a
+                href="/customer"
+                className="inline-flex items-center gap-2 text-xs font-semibold px-4 py-2.5 rounded-xl transition-colors"
+                style={{ background: "#78BF42", color: "#fff" }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "#67AA34")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "#78BF42")}
+              >
+                {t("inv_browse_units")} →
+              </a>
+            </div>
+            {/* Right side — quick project stats */}
+            <div className="hidden md:flex flex-col gap-3 flex-shrink-0 text-right" dir="ltr">
+              {[
+                { val: summary.totalLots, unit: "lots", label: lang === "ar" ? "قطعة أرض" : "in 3 phases" },
+                { val: "80,000", unit: "m²", label: lang === "ar" ? "مساحة إجمالية" : "total land area" },
+                { val: formatUSD(summary.totalRevenue), unit: "", label: lang === "ar" ? "إجمالي الإيرادات" : "projected revenue" },
+              ].map((s, i) => (
+                <div key={i} className="text-right">
+                  <div className="text-white font-bold text-lg tabular-nums">
+                    {s.val}{s.unit && <span className="text-sm font-normal text-gray-400 ml-1">{s.unit}</span>}
+                  </div>
+                  <div className="text-gray-400 text-xs">{s.label}</div>
+                </div>
+              ))}
+              <a
+                href="/investor/term-sheet"
+                className="text-xs underline mt-2 transition-colors"
+                style={{ color: "#95CC58" }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = "#78BF42")}
                 onMouseLeave={(e) => (e.currentTarget.style.color = "#95CC58")}
               >
-                &larr; {t("nav_simulator")}
+                {t("term_sheet_nav")} →
               </a>
-            )}
-            <a href="/investor/term-sheet" className="text-xs underline transition-colors" style={{ color: "#95CC58" }}>
-              {t("term_sheet_nav")} →
-            </a>
-            <LanguageToggle className="border-gray-600 bg-transparent text-gray-300 hover:bg-gray-800" />
+            </div>
           </div>
         </div>
       </div>
 
       {/* KPI Grid — 4 key investor metrics */}
       <div className="max-w-6xl mx-auto px-8 -mt-6">
+        <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-3">
+          {t("inv_kpi_intro")} — {lang === "ar" ? "لكل فيلا" : "per villa"}
+        </p>
         <div className="grid grid-cols-4 gap-4">
           <KPICard
             label={t("inv_your_cash")}
@@ -269,21 +308,31 @@ export default function InvestorPage() {
         </div>
       </div>
 
-      {/* ── 5-Tab Investment Structure ── */}
+      {/* ── 5-Tab Investment Walkthrough ── */}
       <div className="max-w-6xl mx-auto px-8 mt-8">
-        {/* Tab Navigation */}
+        {/* Tab Navigation — walkthrough style with step numbers + subtitles */}
         <div className="flex gap-1 bg-white rounded-2xl shadow-sm border border-gray-100 p-1.5 mb-6">
-          {TABS.map((tab) => (
+          {TABS.map((tab, idx) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold transition-all ${
+              className={`flex-1 py-2.5 px-3 rounded-xl text-left transition-all ${
                 activeTab === tab.id
                   ? "bg-dh-dark text-white shadow-sm"
                   : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
               }`}
             >
-              {tab.label}
+              <div className={`text-[9px] font-bold uppercase tracking-widest mb-0.5 ${
+                activeTab === tab.id ? "text-white/60" : "text-gray-300"
+              }`}>
+                {String(idx + 1).padStart(2, "0")}
+              </div>
+              <div className="text-xs font-semibold leading-tight">{tab.label}</div>
+              <div className={`text-[9px] mt-0.5 leading-tight hidden sm:block ${
+                activeTab === tab.id ? "text-white/60" : "text-gray-400"
+              }`}>
+                {tab.sub}
+              </div>
             </button>
           ))}
         </div>

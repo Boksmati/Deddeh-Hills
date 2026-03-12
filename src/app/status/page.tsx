@@ -6,8 +6,7 @@ import { LOTS } from "@/data/lots";
 import { DEVELOPMENT_TYPES, PHASE_COLORS, PHASE_LABELS } from "@/data/development-types";
 import { calculateLotFinancials } from "@/engine/financial-engine";
 import { DevelopmentType, LotStatus, Phase } from "@/types";
-import DhLogo from "@/components/ui/DhLogo";
-import LanguageToggle from "@/components/ui/LanguageToggle";
+import AppHeader from "@/components/ui/AppHeader";
 import { useTranslations } from "@/i18n/useTranslations";
 
 function fmtUSD(n: number): string {
@@ -164,17 +163,7 @@ export default function StatusPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
-        <DhLogo className="h-10" />
-        <div className="flex items-center gap-2">
-          <a href="/simulator"          className="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors">{t("nav_simulator")}</a>
-          <a href="/assumptions" className="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors">{t("nav_assumptions")}</a>
-          <a href="/investor"  className="px-3 py-1.5 bg-dh-green text-white text-xs font-medium rounded-lg hover:bg-dh-green/90 transition-colors">{t("nav_investor")}</a>
-          <a href="/customer"  className="px-3 py-1.5 bg-slate-700 text-white text-xs font-medium rounded-lg hover:bg-slate-800 transition-colors">{t("nav_customer")}</a>
-          <LanguageToggle />
-        </div>
-      </header>
+      <AppHeader currentPage="status" />
 
       <main className="max-w-6xl mx-auto px-6 py-8 space-y-8">
 

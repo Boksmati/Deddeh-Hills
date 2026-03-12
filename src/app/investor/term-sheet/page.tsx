@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import DhLogo from "@/components/ui/DhLogo";
-import LanguageToggle from "@/components/ui/LanguageToggle";
+import AppHeader from "@/components/ui/AppHeader";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useInvestmentConfig } from "@/hooks/useInvestmentConfig";
 import { useRole } from "@/hooks/useRole";
@@ -134,11 +134,14 @@ export default function TermSheetPage() {
   return (
     <div dir={isRTL ? "rtl" : "ltr"} className="min-h-screen" style={{ background: "#F4F9EF" }}>
 
+      {/* Shared Navigation Header */}
+      <AppHeader currentPage="term-sheet" />
+
       {/* ── Hero Header ────────────────────────────────────────────────── */}
       <div className="bg-dh-dark text-white">
-        <div className="max-w-4xl mx-auto px-8 py-12">
-          <div className="mb-6">
-            <DhLogo variant="light" className="h-14" />
+        <div className="max-w-4xl mx-auto px-8 py-10">
+          <div className="mb-4">
+            <DhLogo variant="light" className="h-12" />
           </div>
           <div className="flex items-start justify-between gap-8">
             <div>
@@ -151,9 +154,8 @@ export default function TermSheetPage() {
                   : "The legal and financial framework for investing in Deddeh Hills — a complete guide to your rights, protections, and exit mechanisms."}
               </p>
             </div>
-            <div className="flex flex-col items-end gap-3 flex-shrink-0">
-              <LanguageToggle className="border-gray-600 bg-transparent text-gray-300 hover:bg-gray-800" />
-              {docExists && (
+            {docExists && (
+              <div className="flex-shrink-0">
                 <a
                   href="/docs/deddeh_hills_term_sheet.docx"
                   download
@@ -162,21 +164,7 @@ export default function TermSheetPage() {
                 >
                   ↓ {isAr ? t("term_sheet_download_ar") : t("term_sheet_download_en")}
                 </a>
-              )}
-            </div>
-          </div>
-          <div className="mt-4 flex items-center gap-4">
-            <a
-              href="/investor"
-              className="text-xs underline transition-colors"
-              style={{ color: "#95CC58" }}
-            >
-              {isAr ? "← العودة إلى البوابة" : "← Back to Portal"}
-            </a>
-            {role === "admin" && (
-              <a href="/assumptions" className="text-xs underline" style={{ color: "#95CC58" }}>
-                {isAr ? "تعديل الإعدادات" : "Edit Config"} →
-              </a>
+              </div>
             )}
           </div>
         </div>

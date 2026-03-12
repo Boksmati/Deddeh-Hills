@@ -88,8 +88,14 @@ function GateForm() {
         body: JSON.stringify({ code: code.trim() }),
       });
       if (res.ok) {
-        const from = searchParams.get("from") || "/";
-        router.replace(from);
+        const data = await res.json() as { success: boolean; role?: string };
+        const from = searchParams.get("from");
+        // Route each role to their natural home when no explicit ?from= is set
+        const roleHome =
+          data.role === "admin" ? "/simulator" :
+          data.role === "investor" ? "/investor" :
+          "/customer";
+        router.replace(from || roleHome);
         router.refresh();
       } else {
         setError("Incorrect access code. Please try again.");
