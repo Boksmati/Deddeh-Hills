@@ -1,8 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "@/i18n/useTranslations";
 import LanguageToggle from "@/components/ui/LanguageToggle";
+import { useSimulationStore } from "@/store/simulation-store";
+import { LOTS } from "@/data/lots";
+import { generateUnitsForLot } from "@/data/units";
+import type { LotStatus } from "@/types";
 
 /* ─── Design tokens — extracted from Deddeh Hills logo ──────── */
 const C = {
@@ -148,10 +152,46 @@ function EnquiryForm() {
   );
 }
 
+/* ─── Price formatter ───────────────────────────────────────── */
+function fmtPrice(v: number): string {
+  if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(v % 1_000_000 === 0 ? 0 : 1)}M`;
+  if (v >= 1_000)     return `$${Math.round(v / 1_000)}K`;
+  return `$${v}`;
+}
+
 /* ─── Main landing page ─────────────────────────────────────── */
 export default function LandingPage() {
   const { t, lang, isRTL } = useTranslations();
   const [scrolled, setScrolled] = useState(false);
+
+  /* ── Store state ──────────────────────────────────────────── */
+  const assignments        = useSimulationStore((s) => s.assignments);
+  const lotStatuses        = useSimulationStore((s) => s.lotStatuses);
+  const typeAssumptions    = useSimulationStore((s) => s.typeAssumptions);
+  const initStateFromServer = useSimulationStore((s) => s.initStateFromServer);
+
+  useEffect(() => { initStateFromServer(); }, [initStateFromServer]);
+
+  /* ── Dynamic typology stats ───────────────────────────────── */
+  const typologyData = useMemo(() => {
+    const result: Record<string, { unitCount: number; availableCount: number; fromPrice: number }> = {};
+    LOTS.forEach((lot) => {
+      const assignment = assignments.get(lot.id);
+      if (!assignment || assignment.developmentType === "unassigned") return;
+      const tp = assignment.developmentType;
+      const status: LotStatus = lotStatuses.get(lot.id) ?? "available";
+      if (!result[tp]) result[tp] = { unitCount: 0, availableCount: 0, fromPrice: Infinity };
+      const units = generateUnitsForLot(lot, tp);
+      result[tp].unitCount += units.length;
+      if (status === "available") result[tp].availableCount += units.length;
+      const asmp = typeAssumptions[tp];
+      if (asmp) {
+        const price = asmp.sellingPricePerM * asmp.avgUnitSize;
+        if (price > 0 && price < result[tp].fromPrice) result[tp].fromPrice = price;
+      }
+    });
+    return result;
+  }, [assignments, lotStatuses, typeAssumptions]);
 
   /* ── Font helpers ─────────────────────────────────────────── */
   const bFont = isRTL
@@ -171,8 +211,6 @@ export default function LandingPage() {
       colorBg: "rgba(98,174,53,0.10)",
       beds: "4–5 br",
       size: "250–350 m²",
-      from: "$750K",
-      count: 28,
       desc: lang === "ar"
         ? "فيلا مستقلة بطابقين مع حديقة خاصة وموقف سيارات تحت الأرض."
         : "Standalone two-floor villa with private garden and underground parking.",
@@ -185,8 +223,6 @@ export default function LandingPage() {
       colorBg: "rgba(61,122,36,0.10)",
       beds: "5–6 br",
       size: "400–600 m²",
-      from: "$1.1M",
-      count: 12,
       desc: lang === "ar"
         ? "فيلا فسيحة بثلاثة طوابق — مثالية للعائلات الممتدة مع إطلالات بانورامية."
         : "Spacious three-floor villa — ideal for extended families with panoramic views.",
@@ -199,8 +235,6 @@ export default function LandingPage() {
       colorBg: "rgba(120,191,66,0.10)",
       beds: "3–4 br",
       size: "200–280 m²",
-      from: "$550K",
-      count: 35,
       desc: lang === "ar"
         ? "فيلا مزدوجة شبه منفصلة تجمع بين الحياة المجتمعية والمساحة الخارجية الخاصة."
         : "Semi-detached paired villa offering community living with private outdoor space.",
@@ -213,8 +247,6 @@ export default function LandingPage() {
       colorBg: "rgba(90,174,40,0.10)",
       beds: "2–3 br",
       size: "120–220 m²",
-      from: "$280K",
-      count: 26,
       desc: lang === "ar"
         ? "شقق وديبلكس عصرية مع مرافق مشتركة."
         : "Contemporary apartments and duplex units with shared amenities.",
@@ -233,9 +265,9 @@ export default function LandingPage() {
   ];
 
   const DISTANCES = [
-    { place: lang === "ar" ? "وسط طرابلس"      : "Tripoli city centre",  time: "25 min" },
+    { place: lang === "ar" ? "وسط طرابلس"      : "Tripoli city centre",  time: "7 min"  },
     { place: lang === "ar" ? "بيروت"            : "Beirut",               time: "75 min" },
-    { place: lang === "ar" ? "تقاطع الشيخا"    : "Chekka interchange",   time: "12 min" },
+    { place: lang === "ar" ? "تقاطع الشيخا"    : "Chekka interchange",   time: "15 min" },
     { place: lang === "ar" ? "البترون"          : "Batroun",              time: "20 min" },
   ];
 
@@ -610,7 +642,7 @@ export default function LandingPage() {
           gap: 20,
         }}>
           {TYPOLOGIES.map((ty) => (
-            <a key={ty.id} href="/customer" style={{
+            <a key={ty.id} href={`/customer?tab=typologies&type=${ty.id}`} style={{
               display: "block",
               background: C.white,
               border: `1.5px solid ${C.border}`,
@@ -647,8 +679,8 @@ export default function LandingPage() {
                 {[
                   { k: t("landing_typo_size"), v: ty.size,                           accent: false },
                   { k: t("landing_typo_beds"), v: ty.beds,                           accent: false },
-                  { k: t("landing_typo_from"), v: ty.from,                           accent: true  },
-                  { k: t("landing_typo_available"), v: `${ty.count} ${t("landing_typo_units")}`, accent: false },
+                  { k: t("landing_typo_from"), v: typologyData[ty.id]?.fromPrice && typologyData[ty.id].fromPrice < Infinity ? fmtPrice(typologyData[ty.id].fromPrice) : "—", accent: true  },
+                  { k: t("landing_typo_available"), v: typologyData[ty.id]?.unitCount != null ? `${typologyData[ty.id].unitCount} ${t("landing_typo_units")}` : "—", accent: false },
                 ].map(row => (
                   <div key={row.k} style={{
                     display: "flex", justifyContent: "space-between",

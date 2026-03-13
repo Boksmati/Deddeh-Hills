@@ -120,7 +120,7 @@ export default function InvestorPage() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
 
-  const [activeTab, setActiveTab] = useState<"structure" | "waterfall" | "simulator" | "phases" | "tickets">("structure");
+  const [activeTab, setActiveTab] = useState<"returns" | "deal" | "simulate">("returns");
   const [waterfallModel, setWaterfallModel] = useState<"split" | "priority">("split");
 
   const summary = useMemo(() => {
@@ -208,11 +208,9 @@ export default function InvestorPage() {
   });
 
   const TABS = [
-    { id: "structure" as const, label: t("inv_tab_structure"), sub: t("inv_tab_sub_structure") },
-    { id: "waterfall" as const, label: t("inv_tab_waterfall"), sub: t("inv_tab_sub_waterfall") },
-    { id: "simulator" as const, label: t("inv_tab_simulator"), sub: t("inv_tab_sub_simulator") },
-    { id: "phases" as const, label: t("inv_tab_phases"), sub: t("inv_tab_sub_phases") },
-    { id: "tickets" as const, label: t("inv_tab_tickets"), sub: t("inv_tab_sub_tickets") },
+    { id: "returns" as const, label: t("inv_tab_returns"), sub: t("inv_tab_sub_returns") },
+    { id: "deal" as const, label: t("inv_tab_deal"), sub: t("inv_tab_sub_deal") },
+    { id: "simulate" as const, label: t("inv_tab_simulate"), sub: t("inv_tab_sub_simulate") },
   ];
 
   return (
@@ -340,8 +338,192 @@ export default function InvestorPage() {
           </div>
         </div>
 
-        {/* ── Tab 1: Structure ── */}
-        {activeTab === "structure" && (
+        {/* ── Tab 1: Your Returns ── */}
+        {activeTab === "returns" && (
+          <div className="space-y-5">
+            {/* Pitch hero */}
+            <div className="bg-dh-dark text-white rounded-2xl p-5 sm:p-6">
+              <div className="text-[10px] uppercase tracking-widest text-white/50 mb-2">Your investment opportunity</div>
+              <h2 className="text-xl sm:text-2xl font-serif font-semibold leading-snug mb-3">
+                Invest from $300K. Earn {formatPct(waterfall.l2InvestorROI)} on cash — in under 2 years.
+              </h2>
+              <p className="text-sm text-gray-300 leading-relaxed">
+                You fund villa construction. Your capital is returned first when each villa sells — then you receive 50% of the remaining profit. No subordination. No long lock-ups.
+              </p>
+            </div>
+
+            {/* Model toggle */}
+            <div className="flex items-center gap-2">
+              <button onClick={() => setWaterfallModel("split")}
+                className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${waterfallModel === "split" ? "bg-dh-dark text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
+                {t("inv_waterfall_model_a")}
+              </button>
+              {investorFeatureFlags.showModelB && (
+                <button onClick={() => setWaterfallModel("priority")}
+                  className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${waterfallModel === "priority" ? "bg-dh-dark text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
+                  {t("inv_waterfall_model_b")}
+                </button>
+              )}
+            </div>
+
+            {/* ── Layer 2: Villa Development ── */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-5">
+              <div>
+                <div className="text-[10px] uppercase tracking-widest font-semibold text-[#E65100] mb-0.5">Layer 2 — Villa Development</div>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  You fund construction. After the villa sells, your capital is returned first — then you receive <strong className="text-gray-700">50% of the remaining profit</strong>.
+                </p>
+              </div>
+
+              {/* $300K / $500K ticket cards */}
+              <div className="grid grid-cols-2 gap-4">
+                {([300_000, 500_000] as const).map((ticketSize) => {
+                  const ratio = activeWaterfall.l2InvestorCash > 0 ? ticketSize / activeWaterfall.l2InvestorCash : 0;
+                  const profit = Math.round(activeWaterfall.l2InvestorProfit * ratio);
+                  const total = ticketSize + profit;
+                  const roi = ticketSize > 0 ? profit / ticketSize : 0;
+                  return (
+                    <div key={ticketSize} className="rounded-xl border border-dh-hills/40 bg-green-50/40 p-4 space-y-3">
+                      <div className="text-sm font-bold text-gray-900">{formatUSD(ticketSize)} ticket</div>
+                      <div className="space-y-1.5 text-xs">
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">Villas funded</span>
+                          <span className="tabular-nums font-medium text-gray-800">{ratio.toFixed(1)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">Your profit (50%)</span>
+                          <span className="tabular-nums font-bold text-emerald-700">{formatUSD(profit)}</span>
+                        </div>
+                        <div className="flex justify-between border-t border-dashed border-gray-200 pt-1.5">
+                          <span className="text-gray-700 font-semibold">Total return</span>
+                          <span className="tabular-nums font-bold text-dh-green">{formatUSD(total)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">ROI on cash</span>
+                          <span className="tabular-nums font-bold text-emerald-700">{formatPct(roi)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Per-villa breakdown confirming the 50% split */}
+              <div className="border-t border-gray-100 pt-4">
+                <div className="text-[10px] uppercase tracking-widest text-gray-400 font-semibold mb-3">Per-villa profit breakdown</div>
+                <table className="w-full text-xs">
+                  <tbody>
+                    <tr>
+                      <td className="py-1.5 text-gray-600 font-medium">Villa sale price</td>
+                      <td className="py-1.5 text-right tabular-nums text-dh-green font-bold">{formatUSD(activeWaterfall.revenue)}</td>
+                    </tr>
+                    <tr>
+                      <td className="py-1.5 text-gray-400 pl-3">− Return your capital</td>
+                      <td className="py-1.5 text-right tabular-nums text-gray-400">({formatUSD(activeWaterfall.l2InvestorCash)})</td>
+                    </tr>
+                    <tr>
+                      <td className="py-1.5 text-gray-400 pl-3">− L1 land repayment</td>
+                      <td className="py-1.5 text-right tabular-nums text-gray-400">({formatUSD(activeWaterfall.l1LandPayment)})</td>
+                    </tr>
+                    <tr>
+                      <td className="py-1.5 text-gray-400 pl-3">− Landowner equity</td>
+                      <td className="py-1.5 text-right tabular-nums text-gray-400">({formatUSD(activeWaterfall.ownerLandEquity)})</td>
+                    </tr>
+                    {waterfallModel === "priority" && activeWaterfall.priorityAmount > 0 && (
+                      <tr>
+                        <td className="py-1.5 text-emerald-600 pl-3">+ Priority return (10%)</td>
+                        <td className="py-1.5 text-right tabular-nums text-emerald-600">{formatUSD(activeWaterfall.priorityAmount)}</td>
+                      </tr>
+                    )}
+                    <tr className="border-t border-gray-200">
+                      <td className="py-1.5 text-gray-700 font-medium">Remaining for 50/50 split</td>
+                      <td className="py-1.5 text-right tabular-nums font-semibold text-gray-800">{formatUSD(activeWaterfall.remainingForSplit)}</td>
+                    </tr>
+                    <tr className="bg-emerald-50/70 rounded-lg">
+                      <td className="py-2 text-emerald-700 font-bold pl-1">✓ Your 50% share</td>
+                      <td className="py-2 text-right tabular-nums font-bold text-emerald-700">{formatUSD(activeWaterfall.l2InvestorProfit)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* ── Layer 1: Land Fund ── */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-5">
+              <div>
+                <div className="text-[10px] uppercase tracking-widest font-semibold text-[#1565C0] mb-0.5">Layer 1 — Land Fund</div>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  Buy a fractional land stake at <strong className="text-gray-700">${config.l1EntryPrice}/m²</strong> today. Exit at <strong className="text-gray-700">${config.l1ExitPriceCap}/m²</strong> upon land transfer or direct sale.
+                </p>
+              </div>
+
+              {/* $300K / $500K ticket cards */}
+              <div className="grid grid-cols-2 gap-4">
+                {([300_000, 500_000] as const).map((ticketSize) => {
+                  const pct = config.l1FundSize > 0 ? ticketSize / config.l1FundSize : 0;
+                  const sqm = Math.floor(l1Returns.sqmAcquired * pct);
+                  const profit = Math.round(l1Returns.profit * pct);
+                  const total = ticketSize + profit;
+                  const roi = ticketSize > 0 ? profit / ticketSize : 0;
+                  return (
+                    <div key={ticketSize} className="rounded-xl border border-blue-200/60 bg-blue-50/30 p-4 space-y-3">
+                      <div className="text-sm font-bold text-gray-900">{formatUSD(ticketSize)} ticket</div>
+                      <div className="space-y-1.5 text-xs">
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">Land acquired</span>
+                          <span className="tabular-nums font-medium text-gray-800">{sqm.toLocaleString()} m²</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">Your profit</span>
+                          <span className="tabular-nums font-bold text-[#1565C0]">{formatUSD(profit)}</span>
+                        </div>
+                        <div className="flex justify-between border-t border-dashed border-gray-200 pt-1.5">
+                          <span className="text-gray-700 font-semibold">Total return</span>
+                          <span className="tabular-nums font-bold text-[#1565C0]">{formatUSD(total)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">ROI</span>
+                          <span className="tabular-nums font-bold text-[#1565C0]">{formatPct(roi)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* L1 mechanics strip */}
+              <div className="border-t border-gray-100 pt-4 grid grid-cols-3 gap-3 text-center">
+                <div>
+                  <div className="text-[10px] text-gray-400 mb-1">Entry price</div>
+                  <div className="text-sm font-bold text-gray-700">${config.l1EntryPrice}/m²</div>
+                </div>
+                <div>
+                  <div className="text-[10px] text-gray-400 mb-1">Exit cap</div>
+                  <div className="text-sm font-bold text-gray-700">${config.l1ExitPriceCap}/m²</div>
+                </div>
+                <div>
+                  <div className="text-[10px] text-gray-400 mb-1">Fund IRR</div>
+                  <div className="text-sm font-bold text-[#1565C0]">{formatPct(l1Returns.irr)}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Combine both layers note */}
+            <div className="bg-dh-dark text-white rounded-2xl p-5">
+              <div className="text-xs font-semibold text-dh-light uppercase tracking-wide mb-2">
+                {lang === "ar" ? "ملاحظة: يمكنك الجمع بين الطبقتين" : "Note: You can combine both layers"}
+              </div>
+              <p className="text-xs text-gray-300 leading-relaxed">
+                {lang === "ar"
+                  ? "يمكن للمستثمر المشاركة في الطبقة الأولى (صندوق الأرض) والطبقة الثانية (تطوير الفلل) في آنٍ واحد، مما يتيح تنويع العوائد."
+                  : "You can participate in Layer 1 (land fund) and Layer 2 (villa development) simultaneously, diversifying your return profile across both timelines."}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* ── Tab 2: The Deal ── */}
+        {activeTab === "deal" && (
           <div className="space-y-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               {/* L1 Card */}
@@ -429,111 +611,7 @@ export default function InvestorPage() {
                 </div>
               </div>
             </div>
-          </div>
-        )}
 
-        {/* ── Tab 2: Waterfall ── */}
-        {activeTab === "waterfall" && (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-5">
-            {/* Model toggle */}
-            <div className="flex items-center gap-2">
-              <button onClick={() => setWaterfallModel("split")}
-                className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${waterfallModel === "split" ? "bg-dh-dark text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
-                {t("inv_waterfall_model_a")}
-              </button>
-              {investorFeatureFlags.showModelB && (
-                <button onClick={() => setWaterfallModel("priority")}
-                  className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${waterfallModel === "priority" ? "bg-dh-dark text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
-                  {t("inv_waterfall_model_b")}
-                </button>
-              )}
-            </div>
-
-            {/* Waterfall table — investor-focused, no owner $ amounts */}
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs border-collapse">
-                <thead>
-                  <tr className="bg-gray-50 border-b border-gray-100">
-                    <th className="text-left px-4 py-3 font-semibold text-gray-500 w-48">Step</th>
-                    <th className="text-right px-4 py-3 font-semibold text-[#E65100]">Your Position (L2)</th>
-                    <th className="text-right px-4 py-3 font-semibold text-[#1565C0]">Layer 1 Land</th>
-                    <th className="text-right px-4 py-3 font-semibold text-gray-400">Landowner</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <WaterfallRow label={lang === "ar" ? "إجمالي الإيرادات" : "Gross Revenue"} l2={activeWaterfall.revenue} l1={null} owner={null} isRevenue />
-                  <WaterfallRow label={lang === "ar" ? "استرداد رأس المال" : "Return Capital"} l2={-activeWaterfall.l2InvestorCash} l1={null} owner={null} />
-                  <WaterfallRow label={lang === "ar" ? "خروج أرض ل1" : "L1 Land Exit"} l2={null} l1={-activeWaterfall.l1LandPayment} owner={null} />
-                  <WaterfallRow label={lang === "ar" ? "حقوق أرض المالك" : "Landowner Land Equity"} l2={null} l1={null} owner="✓ allocated" />
-                  {waterfallModel === "priority" && activeWaterfall.priorityAmount > 0 && (
-                    <WaterfallRow label={lang === "ar" ? "عائد الأولوية (10%)" : "Priority Return (10%)"} l2={activeWaterfall.priorityAmount} l1={null} owner={null} />
-                  )}
-                  <WaterfallRow label={lang === "ar" ? "تقسيم الأرباح (50/50)" : "Profit Split (50/50)"} l2={waterfall.l2InvestorProfit - (waterfallModel === "priority" ? activeWaterfall.priorityAmount : 0)} l1={null} owner="✓ 50%" />
-                  <tr className="border-t-2 border-gray-200 bg-dh-green/5">
-                    <td className="px-4 py-3 font-bold text-gray-800">{t("inv_your_total")}</td>
-                    <td className="px-4 py-3 text-right tabular-nums font-bold text-[#E65100]">{formatUSD(activeWaterfall.l2InvestorTotal)}</td>
-                    <td className="px-4 py-3 text-right tabular-nums font-bold text-[#1565C0]">{formatUSD(activeWaterfall.l1Received)}</td>
-                    <td className="px-4 py-3 text-right text-gray-400 text-[10px]">—</td>
-                  </tr>
-                  <tr className="bg-emerald-50/60">
-                    <td className="px-4 py-3 font-bold text-emerald-700">{t("inv_your_roi")}</td>
-                    <td className="px-4 py-3 text-right tabular-nums font-bold text-emerald-700 text-base">{formatPct(activeWaterfall.l2InvestorROI)}</td>
-                    <td className="px-4 py-3 text-right tabular-nums text-gray-500">{formatPct(l1Returns.roi)}</td>
-                    <td className="px-4 py-3 text-right text-gray-400 text-[10px]">—</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <p className="text-[10px] text-gray-400">Revenue per villa = {config.buaPerVilla} m² × ${config.sellingPriceSqm}/m² = {formatUSD(waterfall.revenue)}. All figures are per-villa estimates.</p>
-          </div>
-        )}
-
-        {/* ── Tab 3: Simulator ── */}
-        {activeTab === "simulator" && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
-            {/* Sliders */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-5">
-              <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide">{t("simulate_params")}</h3>
-              <div className="space-y-4">
-                <SliderField label={`${t("construction_cost")} ($/m²)`} value={config.constructionCostSqm} min={400} max={1200} step={25}
-                  onChange={(v) => setConfig({ constructionCostSqm: v })} suffix="" />
-                <SliderField label={`${t("selling_price")} ($/m²)`} value={config.sellingPriceSqm} min={800} max={2500} step={50}
-                  onChange={(v) => setConfig({ sellingPriceSqm: v })} suffix="" />
-                <SliderField label={`${t("cash_pct")} (%)`} value={+(config.cashPctOfConstruction * 100).toFixed(0)} min={20} max={100} step={5}
-                  onChange={(v) => setConfig({ cashPctOfConstruction: v / 100 })} suffix="%" />
-                <SliderField label={`${t("land_transfer_price")} — Ph1 ($/m²)`} value={config.phaseLandPrices[0]?.pricePerSqm ?? 275} min={150} max={500} step={5}
-                  onChange={(v) => setConfig({ phaseLandPrices: config.phaseLandPrices.map((p, i) => i === 0 ? { ...p, pricePerSqm: v } : p) })} suffix="" />
-                <div className="flex items-center gap-2 pt-1">
-                  <label className="text-xs text-gray-600 flex-1">{t("inv_priority_toggle")}</label>
-                  <input type="checkbox" checked={config.priorityEnabled}
-                    onChange={(e) => setConfig({ priorityEnabled: e.target.checked })}
-                    className="w-4 h-4 accent-dh-green" />
-                </div>
-              </div>
-            </div>
-
-            {/* Live Results */}
-            <div className="space-y-4">
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-4">
-                <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide">{lang === "ar" ? "النتائج الآنية — لكل فيلا" : "Live Results — per villa"}</h3>
-                <ResultBar label={t("inv_your_roi")} value={formatPct(waterfall.l2InvestorROI)} pct={Math.min(waterfall.l2InvestorROI, 1)} color="#059669" />
-                <ResultBar label={`${t("inv_l1_label")} ROI`} value={formatPct(l1Returns.roi)} pct={Math.min(l1Returns.roi, 1)} color="#1565C0" />
-              </div>
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                <div className="grid grid-cols-2 gap-3 text-xs">
-                  <MetricBox label={t("inv_your_cash")} value={formatUSD(waterfall.l2InvestorCash)} />
-                  <MetricBox label={t("inv_your_profit")} value={formatUSD(waterfall.l2InvestorProfit)} color="text-emerald-600" />
-                  <MetricBox label={t("inv_your_total")} value={formatUSD(waterfall.l2InvestorTotal)} color="text-dh-green" />
-                  <MetricBox label={t("revenue")} value={formatUSD(waterfall.revenue)} />
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ── Tab 4: Phases & Exit ── */}
-        {activeTab === "phases" && (
-          <div className="space-y-5">
             {/* Phase Pricing — Entry Advantage */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <div className="mb-4">
@@ -625,7 +703,7 @@ export default function InvestorPage() {
               </div>
             </div>
 
-            {/* Cash Sufficiency (investor view — no-admin data) */}
+            {/* Cash Flow Horizon */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <h3 className="text-sm font-semibold text-gray-900 mb-4">
                 {lang === "ar" ? "أفق التدفق النقدي" : "Cash Flow Horizon"}
@@ -653,51 +731,45 @@ export default function InvestorPage() {
           </div>
         )}
 
-        {/* ── Tab 5: Tickets ── */}
-        {activeTab === "tickets" && (
-          <div className="space-y-6">
-            {/* L1 Tickets */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h3 className="text-sm font-semibold text-gray-900 mb-4">{t("inv_tickets_l1_title")}</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-                {l1TicketData.map((tk) => (
-                  <div key={tk.amount} className="border border-blue-100 bg-blue-50 rounded-xl p-4 text-center">
-                    <div className="text-xs font-bold text-[#1565C0] mb-2">{formatUSD(tk.amount)}</div>
-                    <div className="text-[10px] text-gray-500 mb-1">{tk.sqm.toFixed(0)} m²</div>
-                    <div className="text-sm font-bold text-emerald-600 tabular-nums">+{formatUSD(tk.profit)}</div>
-                    <div className="text-[10px] text-gray-400 mt-0.5">{formatPct(tk.roi)} {t("roi")}</div>
-                  </div>
-                ))}
+        {/* ── Tab 3: Simulate ── */}
+        {activeTab === "simulate" && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
+            {/* Sliders */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-5">
+              <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide">{t("simulate_params")}</h3>
+              <div className="space-y-4">
+                <SliderField label={`${t("construction_cost")} ($/m²)`} value={config.constructionCostSqm} min={400} max={1200} step={25}
+                  onChange={(v) => setConfig({ constructionCostSqm: v })} suffix="" />
+                <SliderField label={`${t("selling_price")} ($/m²)`} value={config.sellingPriceSqm} min={800} max={2500} step={50}
+                  onChange={(v) => setConfig({ sellingPriceSqm: v })} suffix="" />
+                <SliderField label={`${t("cash_pct")} (%)`} value={+(config.cashPctOfConstruction * 100).toFixed(0)} min={20} max={100} step={5}
+                  onChange={(v) => setConfig({ cashPctOfConstruction: v / 100 })} suffix="%" />
+                <SliderField label={`${t("land_transfer_price")} — Ph1 ($/m²)`} value={config.phaseLandPrices[0]?.pricePerSqm ?? 275} min={150} max={500} step={5}
+                  onChange={(v) => setConfig({ phaseLandPrices: config.phaseLandPrices.map((p, i) => i === 0 ? { ...p, pricePerSqm: v } : p) })} suffix="" />
+                <div className="flex items-center gap-2 pt-1">
+                  <label className="text-xs text-gray-600 flex-1">{t("inv_priority_toggle")}</label>
+                  <input type="checkbox" checked={config.priorityEnabled}
+                    onChange={(e) => setConfig({ priorityEnabled: e.target.checked })}
+                    className="w-4 h-4 accent-dh-green" />
+                </div>
               </div>
             </div>
 
-            {/* L2 Villa Tickets */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h3 className="text-sm font-semibold text-gray-900 mb-4">{t("inv_tickets_l2_title")}</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-                {l2TicketData.map((vt) => (
-                  <div key={vt.villas} className="border border-orange-100 bg-orange-50 rounded-xl p-5 text-center">
-                    <div className="text-sm font-bold text-[#E65100] mb-2">
-                      {vt.villas} {vt.villas === 1 ? (lang === "ar" ? "فيلا" : "Villa") : t("villas")}
-                    </div>
-                    <div className="text-[10px] text-gray-500 mb-1">{t("inv_your_cash")}: {formatUSD(vt.totalCash)}</div>
-                    <div className="text-base font-bold text-emerald-600 tabular-nums">+{formatUSD(vt.totalProfit)}</div>
-                    <div className="text-[10px] text-gray-400 mt-0.5">{formatPct(vt.roi)} {lang === "ar" ? "على النقد" : "on cash"}</div>
-                  </div>
-                ))}
+            {/* Live Results */}
+            <div className="space-y-4">
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-4">
+                <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide">{lang === "ar" ? "النتائج الآنية — لكل فيلا" : "Live Results — per villa"}</h3>
+                <ResultBar label={t("inv_your_roi")} value={formatPct(waterfall.l2InvestorROI)} pct={Math.min(waterfall.l2InvestorROI, 1)} color="#059669" />
+                <ResultBar label={`${t("inv_l1_label")} ROI`} value={formatPct(l1Returns.roi)} pct={Math.min(l1Returns.roi, 1)} color="#1565C0" />
               </div>
-            </div>
-
-            {/* Combined exposure note */}
-            <div className="bg-dh-dark text-white rounded-2xl p-5">
-              <div className="text-xs font-semibold text-dh-light uppercase tracking-wide mb-2">
-                {lang === "ar" ? "ملاحظة: يمكنك الجمع بين الطبقتين" : "Note: You can combine both layers"}
+              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <MetricBox label={t("inv_your_cash")} value={formatUSD(waterfall.l2InvestorCash)} />
+                  <MetricBox label={t("inv_your_profit")} value={formatUSD(waterfall.l2InvestorProfit)} color="text-emerald-600" />
+                  <MetricBox label={t("inv_your_total")} value={formatUSD(waterfall.l2InvestorTotal)} color="text-dh-green" />
+                  <MetricBox label={t("revenue")} value={formatUSD(waterfall.revenue)} />
+                </div>
               </div>
-              <p className="text-xs text-gray-300 leading-relaxed">
-                {lang === "ar"
-                  ? "يمكن للمستثمر المشاركة في الطبقة الأولى (صندوق الأرض) والطبقة الثانية (تطوير الفلل) في آنٍ واحد، مما يتيح تنويع العوائد."
-                  : "An investor can participate in Layer 1 (land fund) and Layer 2 (villa development) simultaneously, diversifying return profiles across both timelines."}
-              </p>
             </div>
           </div>
         )}

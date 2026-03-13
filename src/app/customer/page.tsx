@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { useSimulationStore } from "@/store/simulation-store";
 import { LOTS } from "@/data/lots";
 import { DEVELOPMENT_TYPES, PHASE_COLORS, PHASE_LABELS } from "@/data/development-types";
@@ -36,12 +37,11 @@ function fmtUSD(n: number) {
 }
 function fmt(n: number) { return n.toLocaleString("en-US", { maximumFractionDigits: 0 }); }
 
-// All typologies now use SVG floor plans and perspectives
 function floorPlanSrc(devType: string, floor: number): string {
-  return `/typologies/${devType}-floor${floor}.svg`;
+  return `/typologies/${devType}-floor${floor}.jpg`;
 }
 function perspectiveSrc(devType: string): string {
-  return `/typologies/${devType}-perspective.svg`;
+  return `/typologies/${devType}-perspective.jpg`;
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -737,7 +737,7 @@ function MapUnitList({
 }
 
 // ─── Main Page ─────────────────────────────────────────────────────────────────
-export default function CustomerPage() {
+function CustomerPageInner() {
   const assignments         = useSimulationStore((s) => s.assignments);
   const lotStatuses         = useSimulationStore((s) => s.lotStatuses);
   const lotGroups           = useSimulationStore((s) => s.lotGroups);
@@ -745,12 +745,25 @@ export default function CustomerPage() {
   const initStateFromServer = useSimulationStore((s) => s.initStateFromServer);
   const { t, lang }         = useTranslations();
 
+  // URL params — e.g. /customer?tab=typologies&type=villa_2f
+  const searchParams = useSearchParams();
+  const urlTab  = searchParams.get("tab");   // "map" | "browse" | "typologies"
+  const urlType = searchParams.get("type");  // DevelopmentType
+
+  const initViewMode = (
+    urlTab === "map"         ? "map"         :
+    urlTab === "browse"      ? "grid"        :
+    urlTab === "typologies"  ? "typologies"  : "typologies"
+  ) as "map" | "grid" | "typologies";
+
   // Filter state
   const [filterPhase,  setFilterPhase]  = useState<Phase | 0>(0);
-  const [filterType,   setFilterType]   = useState<DevelopmentType | "all">("all");
+  const [filterType,   setFilterType]   = useState<DevelopmentType | "all">(
+    urlType && urlType !== "all" ? (urlType as DevelopmentType) : "all"
+  );
   const [filterAvail,  setFilterAvail]  = useState<"all" | LotStatus>("all");
   const [filterBudget, setFilterBudget] = useState<BudgetFilter>("all");
-  const [viewMode,     setViewMode]     = useState<"map" | "grid" | "typologies">("typologies");
+  const [viewMode,     setViewMode]     = useState<"map" | "grid" | "typologies">(initViewMode);
 
   // Selection state
   const [selectedMapLotId, setSelectedMapLotId] = useState<number | null>(null);
@@ -865,6 +878,28 @@ export default function CustomerPage() {
     });
     return stats;
   }, [lots, lotUnits]);
+
+  // Unfiltered typology stats — always shows totals across ALL lots, ignores active filters
+  const allTypologyStats = useMemo(() => {
+    const stats: Record<string, { lotCount: number; availableCount: number; fromPrice: number; unitCount: number }> = {};
+    LOTS.forEach(lot => {
+      const assignment = assignments.get(lot.id);
+      if (!assignment || assignment.developmentType === "unassigned") return;
+      const tp = assignment.developmentType;
+      const status: LotStatus = lotStatuses.get(lot.id) ?? "available";
+      if (!stats[tp]) stats[tp] = { lotCount: 0, availableCount: 0, fromPrice: Infinity, unitCount: 0 };
+      stats[tp].lotCount++;
+      const units = generateUnitsForLot(lot, tp);
+      stats[tp].unitCount += units.length;
+      if (status === "available") stats[tp].availableCount += units.length;
+      const cfg = DEVELOPMENT_TYPES[tp];
+      const price = tp === "lot_sale"
+        ? lot.zone_price_retail * lot.area_sqm
+        : cfg.sellingPricePerM * cfg.avgUnitSize;
+      if (price > 0 && price < stats[tp].fromPrice) stats[tp].fromPrice = price;
+    });
+    return stats;
+  }, [assignments, lotStatuses]);
 
   // Sorted devTypes for typology view (predefined order)
   const TYPOLOGY_ORDER = ["villa_2f", "villa_3f", "twin_villa", "apartments", "lot_sale"];
@@ -1343,7 +1378,7 @@ export default function CustomerPage() {
                               {/* Image header */}
                               <div className="relative overflow-hidden" style={{ height: "82px", backgroundColor: devCfg.color + "18" }}>
                                 <img
-                                  src={`/typologies/${assignment.developmentType}-perspective.jpg`}
+                                  src={perspectiveSrc(assignment.developmentType)}
                                   alt=""
                                   className="w-full h-full object-cover"
                                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
@@ -1487,7 +1522,7 @@ export default function CustomerPage() {
               {sortedDevTypes.map(tp => {
                 const cfg  = DEVELOPMENT_TYPES[tp];
                 const meta = TYPOLOGY_CUSTOMER_META[tp];
-                const stat = typologyStats[tp] ?? { lotCount: 0, availableCount: 0, fromPrice: 0, unitCount: 0 };
+                const stat = allTypologyStats[tp] ?? { lotCount: 0, availableCount: 0, fromPrice: 0, unitCount: 0 };
                 const fromPrice = stat.fromPrice < Infinity ? stat.fromPrice : 0;
 
                 return (
@@ -1500,26 +1535,28 @@ export default function CustomerPage() {
                       boxShadow: "0 2px 12px rgba(28,32,16,0.06)",
                     }}
                   >
-                    {/* Card accent bar + header */}
-                    <div className="px-5 pt-5 pb-4" style={{ borderBottom: `1px solid ${C.sand}` }}>
-                      <div className="flex items-start gap-3">
-                        {/* Icon badge */}
-                        <div className="w-11 h-11 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
-                          style={{ background: cfg.color + "22", border: `1.5px solid ${cfg.color}44` }}>
-                          {meta?.icon ?? "🏠"}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-0.5">
-                            <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: cfg.color }} />
-                            <h3 className="dh-serif font-bold text-base leading-tight" style={{ color: C.ink }}>
-                              {lang === "ar" ? (meta?.headline_ar ?? cfg.label) : (meta?.headline_en ?? cfg.label)}
-                            </h3>
-                          </div>
-                          <p className="text-xs leading-relaxed" style={{ color: C.muted, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
-                            {lang === "ar" ? meta?.description_ar : meta?.description_en}
-                          </p>
-                        </div>
+                    {/* Hero rendering image */}
+                    <div className="relative overflow-hidden rounded-t-2xl" style={{ aspectRatio: "16/7" }}>
+                      <img
+                        src={perspectiveSrc(tp)}
+                        alt={meta?.headline_en ?? cfg.label}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                      />
+                      <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 40%, rgba(28,32,16,0.55) 100%)" }} />
+                      <div className="absolute bottom-3 start-4 flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: cfg.color }} />
+                        <h3 className="dh-serif font-bold text-sm leading-tight" style={{ color: "#fff", textShadow: "0 1px 4px rgba(0,0,0,0.4)" }}>
+                          {lang === "ar" ? (meta?.headline_ar ?? cfg.label) : (meta?.headline_en ?? cfg.label)}
+                        </h3>
                       </div>
+                    </div>
+
+                    {/* Card header (description) */}
+                    <div className="px-5 pt-3 pb-4" style={{ borderBottom: `1px solid ${C.sand}` }}>
+                      <p className="text-xs leading-relaxed" style={{ color: C.muted, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                        {lang === "ar" ? meta?.description_ar : meta?.description_en}
+                      </p>
                     </div>
 
                     {/* Specs row */}
@@ -1704,5 +1741,13 @@ export default function CustomerPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CustomerPage() {
+  return (
+    <Suspense>
+      <CustomerPageInner />
+    </Suspense>
   );
 }

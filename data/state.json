@@ -506,145 +506,8 @@
       "phase": 2
     }
   ],
-  "lotStatuses": [
-    [
-      2,
-      "sold"
-    ],
-    [
-      3,
-      "sold"
-    ],
-    [
-      4,
-      "sold"
-    ],
-    [
-      5,
-      "sold"
-    ],
-    [
-      6,
-      "sold"
-    ],
-    [
-      14,
-      "sold"
-    ],
-    [
-      15,
-      "sold"
-    ],
-    [
-      19,
-      "sold"
-    ],
-    [
-      24,
-      "sold"
-    ],
-    [
-      26,
-      "sold"
-    ],
-    [
-      29,
-      "sold"
-    ],
-    [
-      36,
-      "sold"
-    ],
-    [
-      37,
-      "sold"
-    ],
-    [
-      38,
-      "sold"
-    ],
-    [
-      39,
-      "sold"
-    ],
-    [
-      44,
-      "sold"
-    ],
-    [
-      45,
-      "sold"
-    ],
-    [
-      53,
-      "sold"
-    ],
-    [
-      54,
-      "sold"
-    ],
-    [
-      55,
-      "under_contract"
-    ],
-    [
-      56,
-      "under_contract"
-    ],
-    [
-      57,
-      "under_contract"
-    ],
-    [
-      58,
-      "under_contract"
-    ],
-    [
-      42,
-      "sold"
-    ],
-    [
-      43,
-      "sold"
-    ],
-    [
-      49,
-      "sold"
-    ],
-    [
-      50,
-      "sold"
-    ],
-    [
-      40,
-      "sold"
-    ],
-    [
-      41,
-      "sold"
-    ],
-    [
-      51,
-      "sold"
-    ],
-    [
-      52,
-      "sold"
-    ],
-    [
-      21,
-      "sold"
-    ],
-    [
-      22,
-      "sold"
-    ],
-    [
-      23,
-      "sold"
-    ]
-  ],
-  "investorSharePct": 20,
+  "lotStatuses": [],
+  "investorSharePct": 10,
   "typeAssumptions": {
     "unassigned": {
       "constructionCostPerM": 0,
@@ -670,16 +533,16 @@
       "avgUnitSize": 300,
       "commonAreaPct": 0.1,
       "maxFloors": 2,
-      "unitsPerLot": 2,
+      "unitsPerLot": 0,
       "gardenAreaM": 150
     },
     "villa_2f": {
       "constructionCostPerM": 600,
       "sellingPricePerM": 1500,
-      "avgUnitSize": 250,
+      "avgUnitSize": 300,
       "commonAreaPct": 0.1,
       "maxFloors": 2,
-      "unitsPerLot": 1.5,
+      "unitsPerLot": 0,
       "gardenAreaM": 390
     },
     "villa_3f": {
@@ -688,7 +551,7 @@
       "avgUnitSize": 500,
       "commonAreaPct": 0.1,
       "maxFloors": 3,
-      "unitsPerLot": 1,
+      "unitsPerLot": 0,
       "gardenAreaM": 260
     },
     "apartments": {
@@ -697,7 +560,7 @@
       "avgUnitSize": 200,
       "commonAreaPct": 0.3,
       "maxFloors": 3,
-      "unitsPerLot": 1,
+      "unitsPerLot": 0,
       "gardenAreaM": 100
     }
   },
@@ -968,5 +831,49 @@
     "1": 0,
     "2": 0,
     "3": 0
+  },
+  "lotGroups": [
+    {
+      "id": "grp_1773271255371",
+      "lotIds": [
+        7,
+        8,
+        9
+      ],
+      "devType": "villa_2f",
+      "phase": 1,
+      "label": "Lots 7+8+9"
+    },
+    {
+      "id": "grp_1773271270434",
+      "lotIds": [
+        10,
+        11,
+        12,
+        13
+      ],
+      "devType": "villa_2f",
+      "phase": 1,
+      "label": "Lots 10+11+12+13"
+    },
+    {
+      "id": "grp_1773271279551",
+      "lotIds": [
+        35,
+        34,
+        33,
+        32
+      ],
+      "devType": "villa_3f",
+      "phase": 1,
+      "label": "Lots 35+34+33+32",
+      "customUnits": 1
+    }
+  ],
+  "investorFeatureFlags": {
+    "showModelB": false,
+    "showSensitivity": true,
+    "showTermSheet": true,
+    "showPhasedPricing": true
   }
 }

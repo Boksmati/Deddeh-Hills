@@ -131,12 +131,11 @@ export default function AppHeader({ currentPage }: AppHeaderProps) {
       dir={isRTL ? "rtl" : "ltr"}
     >
       {/* Logo — links to role home */}
-      <a
+      <DhLogo
+        variant="light"
         href={isAdmin ? "/simulator" : isInvestor ? "/investor" : "/"}
-        className="flex-shrink-0"
-      >
-        <DhLogo className="h-9" variant="light" />
-      </a>
+        style={{ flexShrink: 0 }}
+      />
 
       {/* ── Navigation ── */}
       <div

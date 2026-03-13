@@ -456,6 +456,13 @@ const en = {
   inv_tab_sub_simulator: "What's being built",
   inv_tab_sub_phases: "Phased development plan",
   inv_tab_sub_tickets: "Choose your entry point",
+  // ── 3-tab consolidated structure
+  inv_tab_returns: "Your Returns",
+  inv_tab_sub_returns: "Tickets, profit & ROI",
+  inv_tab_deal: "The Deal",
+  inv_tab_sub_deal: "Structure & exit options",
+  inv_tab_simulate: "Simulate",
+  inv_tab_sub_simulate: "Adjust the model",
   // hero narrative
   inv_hero_headline: "A structured investment in North Lebanon real estate",
   inv_bullet_1: "Phased development — reduce exposure, enter at Phase 1",
@@ -954,6 +961,13 @@ const ar: Record<TranslationKey, string> = {
   inv_tab_sub_simulator: "ما الذي يُبنى",
   inv_tab_sub_phases: "خطة التطوير المرحلية",
   inv_tab_sub_tickets: "اختر نقطة دخولك",
+  // ── 3-tab consolidated structure
+  inv_tab_returns: "عائداتك",
+  inv_tab_sub_returns: "التذاكر والأرباح والعائد",
+  inv_tab_deal: "الصفقة",
+  inv_tab_sub_deal: "الهيكل وخيارات الخروج",
+  inv_tab_simulate: "محاكاة",
+  inv_tab_sub_simulate: "تعديل النموذج",
   // hero narrative
   inv_hero_headline: "استثمار منظم في العقارات في شمال لبنان",
   inv_bullet_1: "تطوير مرحلي — قلّل المخاطر، ادخل في المرحلة الأولى",
