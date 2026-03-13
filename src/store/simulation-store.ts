@@ -133,6 +133,9 @@ interface SimulationState {
     showSensitivity: boolean;
     showTermSheet: boolean;
     showPhasedPricing: boolean;
+    showPhaseBreakdown: boolean;
+    showL1ExitMechanisms: boolean;
+    showCashFlowHorizon: boolean;
   };
   setInvestorFeatureFlag: (key: keyof SimulationState["investorFeatureFlags"], val: boolean) => void;
 }
@@ -199,6 +202,9 @@ const DEFAULT_INVESTOR_FLAGS: InvestorFeatureFlags = {
   showSensitivity: true,
   showTermSheet: true,
   showPhasedPricing: true,
+  showPhaseBreakdown: false,
+  showL1ExitMechanisms: false,
+  showCashFlowHorizon: false,
 };
 
 function loadInvestorFlags(): InvestorFeatureFlags {

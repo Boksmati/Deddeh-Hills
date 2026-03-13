@@ -668,7 +668,8 @@ export default function InvestorPage() {
               </table>
             </div>
 
-            {/* L1 Exit Mechanisms */}
+            {/* L1 Exit Mechanisms — hidden by default, toggle in admin */}
+            {mounted && investorFeatureFlags.showL1ExitMechanisms && (
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <h3 className="text-sm font-semibold text-gray-900 mb-4">{t("inv_exit_mechanisms")}</h3>
               <div className="overflow-x-auto">
@@ -698,8 +699,10 @@ export default function InvestorPage() {
                 </table>
               </div>
             </div>
+            )}
 
-            {/* Cash Flow Horizon */}
+            {/* Cash Flow Horizon — hidden by default, toggle in admin */}
+            {mounted && investorFeatureFlags.showCashFlowHorizon && (
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <h3 className="text-sm font-semibold text-gray-900 mb-4">
                 {lang === "ar" ? "أفق التدفق النقدي" : "Cash Flow Horizon"}
@@ -724,6 +727,7 @@ export default function InvestorPage() {
                 ))}
               </div>
             </div>
+            )}
           </div>
         )}
 
@@ -774,7 +778,8 @@ export default function InvestorPage() {
       {/* ── Sensitivity Analysis ── */}
       <SensitivitySection config={config} setConfig={setConfig} lang={lang} />
 
-      {/* Phase Breakdown Charts — project overview */}
+      {/* Phase Breakdown Charts — hidden by default, toggle in admin */}
+      {mounted && investorFeatureFlags.showPhaseBreakdown && (
       <div className="max-w-6xl mx-auto px-4 sm:px-8 mt-6 sm:mt-8">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
           <h2 className="text-sm font-semibold text-gray-900">{t("phase_breakdown")}</h2>
@@ -866,6 +871,7 @@ export default function InvestorPage() {
           </div>
         )}
       </div>
+      )}
     </div>
   );
 }

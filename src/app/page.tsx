@@ -349,7 +349,8 @@ export default function LandingPage() {
         ::placeholder { color: #9DB090; }
         /* Stats bar — absolute on desktop, flows in flex on mobile */
         .dh-stats-bar {
-          position: absolute; bottom: 52px; left: 50%; transform: translateX(-50%);
+          position: absolute; bottom: 52px; left: 0; right: 0; margin: 0 auto;
+          width: fit-content; max-width: calc(100% - 48px);
           z-index: 3; display: flex; flex-wrap: nowrap; justify-content: center;
           background: rgba(255,255,255,0.06); backdrop-filter: blur(16px);
           border: 1px solid rgba(149,204,88,0.22); border-radius: 14px; overflow: hidden;

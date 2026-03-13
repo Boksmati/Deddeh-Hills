@@ -1535,10 +1535,13 @@ function SettingsTab() {
     label: string;
     desc: string;
   }[] = [
-    { key: "showModelB",       label: "Model B — Priority + Split",     desc: "Shows alternative waterfall model toggle on investor returns tab" },
-    { key: "showSensitivity",  label: "Sensitivity Analysis section",    desc: "Shows the ROI matrix & cash sensitivity panels on investor page" },
-    { key: "showTermSheet",    label: "Term Sheet link",                 desc: "Shows 'View Term Sheet' link in hero and navigation" },
-    { key: "showPhasedPricing",label: "Phased Pricing Simulator",        desc: "Shows Phase C pricing simulator inside the Sensitivity section" },
+    { key: "showModelB",            label: "Model B — Priority + Split",     desc: "Shows alternative waterfall model toggle on investor returns tab" },
+    { key: "showSensitivity",       label: "Sensitivity Analysis section",    desc: "Shows the ROI matrix & cash sensitivity panels on investor page" },
+    { key: "showTermSheet",         label: "Term Sheet link",                 desc: "Shows 'View Term Sheet' link in hero and navigation" },
+    { key: "showPhasedPricing",     label: "Phased Pricing Simulator",        desc: "Shows Phase C pricing simulator inside the Sensitivity section" },
+    { key: "showPhaseBreakdown",    label: "Phase Breakdown charts",          desc: "Shows per-phase bar chart and phase summary cards (project overview)" },
+    { key: "showL1ExitMechanisms",  label: "L1 Exit Mechanisms table",        desc: "Shows the Land Fund exit scenarios table on the Deal tab" },
+    { key: "showCashFlowHorizon",   label: "Cash Flow Horizon scenarios",     desc: "Shows 3-scenario cash flow projection table on the Deal tab" },
   ];
 
   return (

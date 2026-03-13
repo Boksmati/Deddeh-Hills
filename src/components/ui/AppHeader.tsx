@@ -126,7 +126,7 @@ export default function AppHeader({ currentPage }: AppHeaderProps) {
 
   return (
     <header
-      className="px-6 py-3 flex items-center justify-between flex-shrink-0"
+      className="px-4 sm:px-6 py-3 flex items-center gap-3 flex-shrink-0 min-w-0"
       style={{ background: "#1A3810" }}
       dir={isRTL ? "rtl" : "ltr"}
     >
@@ -137,9 +137,10 @@ export default function AppHeader({ currentPage }: AppHeaderProps) {
         style={{ flexShrink: 0 }}
       />
 
-      {/* ── Navigation ── */}
+      {/* ── Navigation — scrollable on mobile, no scrollbar ── */}
       <div
-        className={`flex items-center gap-1.5 ${isRTL ? "flex-row-reverse" : ""}`}
+        className={`flex items-center gap-1.5 ${isRTL ? "flex-row-reverse" : ""} min-w-0 overflow-x-auto`}
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" } as React.CSSProperties}
       >
         {/* ── Admin navigation ── */}
         {isAdmin && (
