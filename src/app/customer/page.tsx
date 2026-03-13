@@ -9,6 +9,7 @@ import { Phase, DevelopmentType, LotStatus } from "@/types";
 import { Unit, generateUnitsForLot } from "@/data/units";
 import { ProjectSpecs } from "@/data/project-specs";
 import LanguageToggle from "@/components/ui/LanguageToggle";
+import AppHeader from "@/components/ui/AppHeader";
 import { useTranslations } from "@/i18n/useTranslations";
 import CustomerMap from "@/components/customer/CustomerMap";
 import type { LotPricing } from "@/lib/investment-layers";
@@ -963,26 +964,14 @@ function CustomerPageInner() {
   return (
     <div className="min-h-screen" style={{ background: C.bg }}>
 
+      {/* ── Shared nav header (role-aware — investor portal link only for investor/admin) ── */}
+      <AppHeader currentPage="customer" />
+
       {/* ── Hero ── */}
       <div style={{ background: "#1A3810" }}>
-        <div className="max-w-7xl mx-auto px-5 pt-6 pb-6 sm:pt-8 sm:pb-7">
+        <div className="max-w-7xl mx-auto px-5 pt-5 pb-6 sm:pt-7 sm:pb-7">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-4">
             <div className="flex-1 min-w-0">
-              {/* Eyebrow + lang toggle on mobile (inline) */}
-              <div className="flex items-center justify-between mb-5">
-                <a href="/" className="flex items-center gap-3 w-fit group" style={{ textDecoration: "none" }}>
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-opacity group-hover:opacity-80" style={{ background: C.forest }}>
-                    <span className="font-bold text-xs" style={{ color: C.white, fontFamily: "'DM Sans', system-ui, sans-serif" }}>DH</span>
-                  </div>
-                  <div className="text-[10px] uppercase tracking-[0.2em] transition-opacity group-hover:opacity-70" style={{ color: C.gold, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
-                    Koura, North Lebanon
-                  </div>
-                </a>
-                {/* Lang toggle visible on mobile only (hidden on sm+ since it shows in stats column) */}
-                <div className="sm:hidden">
-                  <LanguageToggle className="border-white/30 bg-white/10 text-white/90 hover:bg-white/20" />
-                </div>
-              </div>
               {/* Title */}
               <h1 className="dh-serif font-bold leading-none mb-3" style={{ fontSize: "clamp(1.8rem,6vw,3.75rem)", color: C.white }}>
                 Deddeh Hills
@@ -1029,7 +1018,6 @@ function CustomerPageInner() {
                   </div>
                 </div>
               </div>
-              <LanguageToggle className="border-white/30 bg-white/10 text-white/90 hover:bg-white/20" />
             </div>
 
             {/* Stats — mobile only (compact row below hero text) */}
