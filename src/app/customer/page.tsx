@@ -1118,8 +1118,8 @@ function CustomerPageInner() {
             </div>
           </div>
 
-          {/* Filter row 1: Status + Phase — horizontally scrollable */}
-          <div className="flex items-center gap-2 pb-2.5 scrollbar-none" style={{ overflowX: "auto" }}>
+          {/* Filter row 1: Status + Phase — wraps on narrow screens */}
+          <div className="flex flex-wrap gap-1.5 pb-2">
             {(["all", "available", "reserved", "under_contract", "sold"] as const).map((v) => (
               <Chip key={v} active={filterAvail === v} onClick={() => setFilterAvail(v)} dot={v !== "all" ? STATUS_DOTS[v] : undefined}>
                 {v === "all"
@@ -1128,7 +1128,6 @@ function CustomerPageInner() {
                 {" "}{mounted && <span style={{ opacity: 0.5 }}>({statusCount(v)})</span>}
               </Chip>
             ))}
-            <div className="w-px h-5 flex-shrink-0" style={{ background: C.border, margin: "0 2px" }} />
             {([0, 1, 2, 3] as const).map((p) => (
               <Chip key={p} active={filterPhase === p} onClick={() => setFilterPhase(p)} dot={p !== 0 ? PHASE_COLORS[p] : undefined}>
                 {p === 0 ? (lang === "ar" ? "جميع المراحل" : "All Phases") : PHASE_LABELS[p]}
@@ -1136,8 +1135,8 @@ function CustomerPageInner() {
             ))}
           </div>
 
-          {/* Filter row 2: Typology + Budget — horizontally scrollable */}
-          <div className="flex items-center gap-2 pb-2.5 scrollbar-none" style={{ overflowX: "auto" }}>
+          {/* Filter row 2: Typology + Budget — wraps on narrow screens */}
+          <div className="flex flex-wrap gap-1.5 pb-2.5">
             <Chip active={filterType === "all"} onClick={() => setFilterType("all")}>
               {lang === "ar" ? "جميع الأنواع" : "All Types"}
             </Chip>
@@ -1146,7 +1145,6 @@ function CustomerPageInner() {
                 {DEVELOPMENT_TYPES[tp].label}
               </Chip>
             ))}
-            <div className="w-px h-5 flex-shrink-0" style={{ background: C.border, margin: "0 2px" }} />
             {(["all", "lt300", "300to600", "gt600"] as const).map((b) => (
               <Chip key={b} active={filterBudget === b} onClick={() => setFilterBudget(b)}>
                 {lang === "ar" ? BUDGET_LABELS[b].ar : BUDGET_LABELS[b].en}
