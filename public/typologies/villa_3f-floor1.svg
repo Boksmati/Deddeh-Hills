@@ -1,127 +1,249 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800">
-  <rect width="600" height="800" fill="#FAFAF9"/>
-  <rect x="0" y="0" width="600" height="72" fill="#1A3810"/>
-  <text x="30" y="28" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="#78BF42" letter-spacing="3">DEDDEH HILLS</text>
-  <text x="30" y="50" font-family="'DM Sans',sans-serif" font-size="18" font-weight="700" fill="white">Villa 3F — First Floor</text>
-  <text x="30" y="64" font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(255,255,255,0.5)">indicative · not to scale · BUA ~150 m² per floor</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 900">
+  <defs>
+    <pattern id="void3f1" patternUnits="userSpaceOnUse" width="14" height="14">
+      <line x1="0" y1="14" x2="14" y2="0" stroke="#A8D4E8" stroke-width="0.8" opacity="0.5"/>
+    </pattern>
+    <pattern id="tile3f1" patternUnits="userSpaceOnUse" width="12" height="12">
+      <rect width="12" height="12" fill="none" stroke="#E0DDD6" stroke-width="0.4"/>
+    </pattern>
+    <pattern id="wood3f1" patternUnits="userSpaceOnUse" width="8" height="8">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#C8B89A" stroke-width="0.5" opacity="0.5"/>
+    </pattern>
+  </defs>
 
-  <rect x="54" y="92" width="496" height="590" rx="3" fill="#D1D5DB" opacity="0.4"/>
-  <rect x="50" y="88" width="496" height="590" rx="2" fill="#374151"/>
+  <!-- Background -->
+  <rect width="700" height="900" fill="#FAFAF9"/>
 
-  <!-- MASTER SUITE (large, left + center-left, top) -->
-  <rect x="56" y="94" width="290" height="220" fill="#EBF3FA"/>
-  <!-- king bed -->
-  <rect x="75" y="115" width="200" height="110" rx="6" fill="none" stroke="#7DB9D4" stroke-width="1.5"/>
-  <rect x="75" y="115" width="200" height="34" rx="6" fill="#B8D9E8" opacity="0.5"/>
-  <text x="191" y="254" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="13" font-weight="700" fill="#2D5A27">MASTER SUITE</text>
-  <text x="191" y="270" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">28 m²</text>
-  <!-- walk-in label -->
-  <rect x="56" y="94" width="290" height="220" fill="none"/>
+  <!-- Header bar -->
+  <rect x="0" y="0" width="700" height="72" fill="#1A3810"/>
+  <text x="30" y="26" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="#78BF42" letter-spacing="3">DEDDEH HILLS</text>
+  <text x="30" y="48" font-family="'DM Sans',sans-serif" font-size="18" font-weight="700" fill="white">Villa 3F — First Floor (F1)</text>
+  <text x="30" y="63" font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(255,255,255,0.5)">Villa Type 01 · B1 + GF + F1 + F2 · ~665 m² BUA</text>
+  <text x="670" y="48" text-anchor="end" font-family="'DM Sans',sans-serif" font-size="10" fill="rgba(255,255,255,0.6)">F1 BUA ≈ 260 m²</text>
 
-  <!-- MASTER WALK-IN (top right of master) -->
-  <rect x="346" y="94" width="110" height="110" fill="#F0EEF9"/>
-  <text x="401" y="142" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="10" font-weight="600" fill="#374151">WALK-IN</text>
-  <text x="401" y="156" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="10" font-weight="600" fill="#374151">WARDROBE</text>
-  <text x="401" y="170" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">9 m²</text>
+  <!-- ── OUTER BUILDING SHELL ──────────────────────────── -->
+  <!-- Slab outline matches GF footprint -->
+  <rect x="60" y="100" width="580" height="680" rx="2" fill="none" stroke="#2D3748" stroke-width="3"/>
+  <!-- Stair/lift core cut-out indicated on right -->
+  <rect x="540" y="100" width="100" height="120" fill="#F0EDE8" stroke="#2D3748" stroke-width="1.5"/>
 
-  <!-- MASTER BATHROOM -->
-  <rect x="456" y="94" width="80" height="220" fill="#E8F4FB"/>
-  <!-- bath tub -->
-  <rect x="464" y="108" width="64" height="80" rx="28" fill="none" stroke="#7DB9D4" stroke-width="1.5"/>
-  <!-- shower -->
-  <rect x="464" y="205" width="64" height="52" rx="4" fill="none" stroke="#7DB9D4" stroke-width="1"/>
-  <circle cx="496" cy="231" r="8" fill="none" stroke="#7DB9D4" stroke-width="1" stroke-dasharray="2,2"/>
-  <text x="496" y="276" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">MASTER WC</text>
-  <text x="496" y="288" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">8 m²</text>
+  <!-- ── TERRACE / BALCONY (over pool terrace, left side) ─── -->
+  <rect x="60" y="100" width="220" height="180" fill="#EAF4E0" stroke="#2D3748" stroke-width="1.5"/>
+  <!-- Railing lines -->
+  <rect x="60" y="100" width="220" height="180" fill="none" stroke="#78BF42" stroke-width="1" stroke-dasharray="6,3" opacity="0.5"/>
+  <line x1="65" y1="105" x2="275" y2="105" stroke="#78BF42" stroke-width="1.5" opacity="0.7"/>
+  <line x1="65" y1="275" x2="275" y2="275" stroke="#78BF42" stroke-width="1.5" opacity="0.7"/>
+  <!-- Planters on terrace -->
+  <rect x="72" y="108" width="30" height="10" rx="2" fill="#5A9040" opacity="0.7"/>
+  <rect x="110" y="108" width="30" height="10" rx="2" fill="#5A9040" opacity="0.7"/>
+  <rect x="148" y="108" width="30" height="10" rx="2" fill="#5A9040" opacity="0.7"/>
+  <rect x="186" y="108" width="30" height="10" rx="2" fill="#5A9040" opacity="0.7"/>
+  <rect x="72" y="268" width="30" height="10" rx="2" fill="#5A9040" opacity="0.7"/>
+  <rect x="148" y="268" width="60" height="10" rx="2" fill="#5A9040" opacity="0.7"/>
+  <text x="170" y="205" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" font-weight="600" fill="#2D5A27">TERRACE</text>
+  <text x="170" y="221" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="#6AAB50">~40 m²</text>
+  <text x="170" y="235" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">over pool terrace</text>
 
-  <!-- DRESSING AREA (below walk-in) -->
-  <rect x="346" y="204" width="110" height="110" fill="#F0EEF9"/>
-  <text x="401" y="252" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="10" font-weight="600" fill="#374151">DRESSING</text>
-  <text x="401" y="266" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="10" font-weight="600" fill="#374151">AREA</text>
-  <text x="401" y="290" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">8 m²</text>
+  <!-- ── VOID OVER POOL (double-height, hatched) ─────── -->
+  <rect x="60" y="280" width="220" height="200" fill="url(#void3f1)" stroke="#A8D4E8" stroke-width="1.5" stroke-dasharray="8,4"/>
+  <rect x="60" y="280" width="220" height="200" fill="#E8F4FA" opacity="0.3"/>
+  <text x="170" y="372" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" font-weight="600" fill="#4A90B8">VOID</text>
+  <text x="170" y="388" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="#7DAFC8">over pool below</text>
+  <!-- Corner brackets -->
+  <line x1="60" y1="290" x2="80" y2="290" stroke="#A8D4E8" stroke-width="1.5"/>
+  <line x1="60" y1="290" x2="60" y2="310" stroke="#A8D4E8" stroke-width="1.5"/>
+  <line x1="280" y1="290" x2="260" y2="290" stroke="#A8D4E8" stroke-width="1.5"/>
+  <line x1="280" y1="290" x2="280" y2="310" stroke="#A8D4E8" stroke-width="1.5"/>
+  <line x1="60" y1="480" x2="80" y2="480" stroke="#A8D4E8" stroke-width="1.5"/>
+  <line x1="60" y1="480" x2="60" y2="460" stroke="#A8D4E8" stroke-width="1.5"/>
+  <line x1="280" y1="480" x2="260" y2="480" stroke="#A8D4E8" stroke-width="1.5"/>
+  <line x1="280" y1="480" x2="280" y2="460" stroke="#A8D4E8" stroke-width="1.5"/>
 
-  <!-- Horizontal wall row 1 / row 2 -->
-  <rect x="56" y="314" width="480" height="5" fill="#374151"/>
+  <!-- ── LIVING ROOM ──────────────────────────────────── -->
+  <rect x="280" y="100" width="260" height="200" fill="url(#tile3f1)" stroke="#2D3748" stroke-width="1.5"/>
+  <rect x="280" y="100" width="260" height="200" fill="#FFF8F0" opacity="0.6"/>
+  <!-- Sofa group -->
+  <rect x="296" y="150" width="90" height="40" rx="4" fill="#DDD0C0" stroke="#B0A090" stroke-width="1"/>
+  <rect x="296" y="190" width="40" height="30" rx="3" fill="#DDD0C0" stroke="#B0A090" stroke-width="1"/>
+  <rect x="346" y="190" width="40" height="30" rx="3" fill="#DDD0C0" stroke="#B0A090" stroke-width="1"/>
+  <rect x="310" y="120" width="50" height="30" rx="2" fill="#E8DDD0" stroke="#C0B0A0" stroke-width="1" opacity="0.7"/>
+  <!-- TV wall -->
+  <rect x="280" y="105" width="260" height="8" fill="#E0DDD6"/>
+  <rect x="370" y="108" width="80" height="4" rx="1" fill="#6B7280"/>
+  <text x="410" y="270" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="12" font-weight="700" fill="#374151">LIVING ROOM</text>
+  <text x="410" y="286" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="10" fill="#6B7280">~48 m²</text>
 
-  <!-- BEDROOM 2 (left, middle) -->
-  <rect x="56" y="319" width="200" height="170" fill="#EBF3FA"/>
-  <rect x="72" y="335" width="160" height="90" rx="5" fill="none" stroke="#93C5D8" stroke-width="1.5"/>
-  <rect x="72" y="335" width="160" height="26" rx="5" fill="#B8D9E8" opacity="0.5"/>
-  <text x="156" y="433" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" font-weight="700" fill="#374151">BEDROOM 2</text>
-  <text x="156" y="448" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">16 m²</text>
+  <!-- ── GUEST BEDROOM ────────────────────────────────── -->
+  <rect x="280" y="300" width="160" height="200" fill="#FFF8F0" stroke="#2D3748" stroke-width="1.5"/>
+  <!-- Bed -->
+  <rect x="295" y="315" width="90" height="55" rx="3" fill="#E8DDD0" stroke="#C0B0A0" stroke-width="1"/>
+  <rect x="295" y="315" width="90" height="18" rx="2" fill="#D4C8B8"/>
+  <!-- Pillows -->
+  <ellipse cx="320" cy="328" rx="10" ry="6" fill="#F0EBE0"/>
+  <ellipse cx="362" cy="328" rx="10" ry="6" fill="#F0EBE0"/>
+  <!-- Bedside tables -->
+  <rect x="290" y="318" width="18" height="18" rx="2" fill="#DDD0C0"/>
+  <rect x="387" y="318" width="18" height="18" rx="2" fill="#DDD0C0"/>
+  <!-- Wardrobe -->
+  <rect x="295" y="430" width="130" height="25" rx="2" fill="#D8D0C4" stroke="#B8B0A4" stroke-width="1"/>
+  <line x1="360" y1="430" x2="360" y2="455" stroke="#B8B0A4" stroke-width="1"/>
+  <text x="360" y="410" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="10" font-weight="600" fill="#374151">GUEST BED</text>
+  <text x="360" y="425" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="#6B7280">~36 m²</text>
 
-  <!-- Vertical wall center -->
-  <rect x="256" y="319" width="5" height="175" fill="#374151"/>
+  <!-- ── GUEST BATHROOM ───────────────────────────────── -->
+  <rect x="440" y="300" width="100" height="100" fill="#EEF6FE" stroke="#2D3748" stroke-width="1.5"/>
+  <!-- WC symbol -->
+  <ellipse cx="490" cy="320" rx="14" ry="18" fill="#C8E0F8" stroke="#7DAFC8" stroke-width="1"/>
+  <rect cx="490" cy="320" x="483" y="300" width="14" height="8" rx="2" fill="#B8D4F0"/>
+  <!-- Basin -->
+  <rect x="456" y="344" width="26" height="22" rx="3" fill="#C8E0F8" stroke="#7DAFC8" stroke-width="1"/>
+  <circle cx="469" cy="355" r="3" fill="#A0C8E8"/>
+  <!-- Shower area -->
+  <rect x="456" y="370" width="76" height="26" rx="2" fill="#D8EEF8" stroke="#7DAFC8" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="490" y="317" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" font-weight="600" fill="#4A90B8">BATH</text>
 
-  <!-- BEDROOM 3 (center, middle) -->
-  <rect x="261" y="319" width="195" height="170" fill="#EBF3FA"/>
-  <rect x="277" y="335" width="160" height="88" rx="5" fill="none" stroke="#93C5D8" stroke-width="1.5"/>
-  <rect x="277" y="335" width="160" height="26" rx="5" fill="#B8D9E8" opacity="0.5"/>
-  <text x="359" y="433" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" font-weight="700" fill="#374151">BEDROOM 3</text>
-  <text x="359" y="448" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">15 m²</text>
+  <!-- ── OFFICE ────────────────────────────────────────── -->
+  <rect x="280" y="500" width="160" height="160" fill="#F0F4FF" stroke="#2D3748" stroke-width="1.5"/>
+  <!-- Desk -->
+  <rect x="295" y="515" width="130" height="45" rx="2" fill="#D8D4E8" stroke="#B0A8C8" stroke-width="1"/>
+  <!-- Chair -->
+  <ellipse cx="360" cy="575" rx="18" ry="15" fill="#B0A8C8" stroke="#9088B8" stroke-width="1" opacity="0.8"/>
+  <!-- Bookshelf along wall -->
+  <rect x="295" y="600" width="130" height="20" rx="2" fill="#C8C0D8" stroke="#A8A0C0" stroke-width="1"/>
+  <line x1="330" y1="600" x2="330" y2="620" stroke="#A8A0C0" stroke-width="0.8"/>
+  <line x1="360" y1="600" x2="360" y2="620" stroke="#A8A0C0" stroke-width="0.8"/>
+  <line x1="390" y1="600" x2="390" y2="620" stroke="#A8A0C0" stroke-width="0.8"/>
+  <text x="360" y="645" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" font-weight="600" fill="#374151">OFFICE</text>
+  <text x="360" y="660" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="#6B7280">~28 m²</text>
 
-  <!-- Vertical wall right -->
-  <rect x="456" y="319" width="5" height="175" fill="#374151"/>
+  <!-- ── ARCHIVE / STUDY ──────────────────────────────── -->
+  <rect x="440" y="400" width="100" height="120" fill="#F8F4EA" stroke="#2D3748" stroke-width="1.5"/>
+  <!-- Shelves -->
+  <rect x="450" y="414" width="78" height="14" rx="1" fill="#DDD4C0" stroke="#C0B8A8" stroke-width="1"/>
+  <rect x="450" y="434" width="78" height="14" rx="1" fill="#DDD4C0" stroke="#C0B8A8" stroke-width="1"/>
+  <rect x="450" y="454" width="78" height="14" rx="1" fill="#DDD4C0" stroke="#C0B8A8" stroke-width="1"/>
+  <rect x="450" y="474" width="78" height="14" rx="1" fill="#DDD4C0" stroke="#C0B8A8" stroke-width="1"/>
+  <text x="490" y="505" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="#374151">ARCHIVE</text>
+  <text x="490" y="517" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">~14 m²</text>
 
-  <!-- SHARED BATHROOM (right, middle) -->
-  <rect x="461" y="319" width="75" height="170" fill="#E8F4FB"/>
-  <rect x="471" y="333" width="55" height="40" rx="20" fill="none" stroke="#7DB9D4" stroke-width="1.5"/>
-  <ellipse cx="493" cy="408" rx="12" ry="16" fill="none" stroke="#7DB9D4" stroke-width="1.5"/>
-  <text x="499" y="462" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">BATHROOM</text>
-  <text x="499" y="473" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">7 m²</text>
+  <!-- ── WC / BATHROOM (F1) ───────────────────────────── -->
+  <rect x="440" y="500" width="100" height="120" fill="#EEF6FE" stroke="#2D3748" stroke-width="1.5"/>
+  <!-- WC symbol -->
+  <ellipse cx="490" cy="518" rx="13" ry="17" fill="#C8E0F8" stroke="#7DAFC8" stroke-width="1"/>
+  <rect x="483" y="501" width="14" height="7" rx="2" fill="#B8D4F0"/>
+  <!-- Basin -->
+  <rect x="454" y="542" width="26" height="22" rx="3" fill="#C8E0F8" stroke="#7DAFC8" stroke-width="1"/>
+  <circle cx="467" cy="553" r="3" fill="#A0C8E8"/>
+  <!-- Shower -->
+  <rect x="454" y="568" width="76" height="44" rx="2" fill="#D8EEF8" stroke="#7DAFC8" stroke-width="1" stroke-dasharray="4,2"/>
+  <line x1="492" y1="568" x2="492" y2="612" stroke="#7DAFC8" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.5"/>
+  <text x="490" y="596" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="#4A90B8">WC / BATH</text>
 
-  <!-- Horizontal wall row 2 / row 3 -->
-  <rect x="56" y="494" width="480" height="5" fill="#374151"/>
+  <!-- ── STAIR HALL / LOBBY ───────────────────────────── -->
+  <rect x="540" y="100" width="100" height="500" fill="#F4F0E8" stroke="#2D3748" stroke-width="1.5"/>
+  <!-- Stair case -->
+  <rect x="552" y="110" width="76" height="130" fill="none" stroke="#6B7280" stroke-width="1"/>
+  <!-- Stair treads (up to F2) -->
+  <line x1="552" y1="120" x2="628" y2="120" stroke="#9CA3AF" stroke-width="1"/>
+  <line x1="552" y1="130" x2="628" y2="130" stroke="#9CA3AF" stroke-width="1"/>
+  <line x1="552" y1="140" x2="628" y2="140" stroke="#9CA3AF" stroke-width="1"/>
+  <line x1="552" y1="150" x2="628" y2="150" stroke="#9CA3AF" stroke-width="1"/>
+  <line x1="552" y1="160" x2="628" y2="160" stroke="#9CA3AF" stroke-width="1"/>
+  <line x1="552" y1="170" x2="628" y2="170" stroke="#9CA3AF" stroke-width="1"/>
+  <line x1="552" y1="180" x2="628" y2="180" stroke="#9CA3AF" stroke-width="1"/>
+  <line x1="552" y1="190" x2="628" y2="190" stroke="#9CA3AF" stroke-width="1"/>
+  <line x1="552" y1="200" x2="628" y2="200" stroke="#9CA3AF" stroke-width="1"/>
+  <line x1="552" y1="210" x2="628" y2="210" stroke="#9CA3AF" stroke-width="1"/>
+  <!-- Stair direction arrows -->
+  <polygon points="590,112 584,122 596,122" fill="#78BF42" opacity="0.8"/>
+  <text x="590" y="132" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#2D5A27">UP TO F2</text>
+  <!-- Stair down -->
+  <rect x="552" y="250" width="76" height="90" fill="none" stroke="#6B7280" stroke-width="1"/>
+  <line x1="552" y1="260" x2="628" y2="260" stroke="#9CA3AF" stroke-width="1"/>
+  <line x1="552" y1="270" x2="628" y2="270" stroke="#9CA3AF" stroke-width="1"/>
+  <line x1="552" y1="280" x2="628" y2="280" stroke="#9CA3AF" stroke-width="1"/>
+  <line x1="552" y1="290" x2="628" y2="290" stroke="#9CA3AF" stroke-width="1"/>
+  <line x1="552" y1="300" x2="628" y2="300" stroke="#9CA3AF" stroke-width="1"/>
+  <line x1="552" y1="310" x2="628" y2="310" stroke="#9CA3AF" stroke-width="1"/>
+  <line x1="552" y1="320" x2="628" y2="320" stroke="#9CA3AF" stroke-width="1"/>
+  <polygon points="590,338 584,328 596,328" fill="#9CA3AF" opacity="0.8"/>
+  <text x="590" y="348" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#6B7280">DN TO GF</text>
+  <!-- Lift symbol -->
+  <rect x="556" y="380" width="35" height="35" rx="2" fill="#E0D8F0" stroke="#9088C0" stroke-width="1.5"/>
+  <text x="573" y="396" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9088C0">LIFT</text>
+  <text x="590" y="445" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="#374151">STAIR</text>
+  <text x="590" y="458" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">HALL</text>
 
-  <!-- FAMILY LOUNGE (left-center, lower) -->
-  <rect x="56" y="499" width="350" height="125" fill="#F5F9F1"/>
-  <rect x="72" y="528" width="200" height="50" rx="5" fill="none" stroke="#A8C99A" stroke-width="1.5"/>
-  <rect x="72" y="528" width="200" height="16" rx="4" fill="#C8E0B8" opacity="0.5"/>
-  <text x="231" y="520" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="12" font-weight="700" fill="#374151">FAMILY LOUNGE</text>
-  <text x="231" y="598" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">32 m²</text>
+  <!-- ── CORRIDOR ──────────────────────────────────────── -->
+  <rect x="280" y="300" width="0" height="0"/>
+  <!-- Horizontal divider -->
+  <line x1="280" y1="500" x2="540" y2="500" stroke="#2D3748" stroke-width="1.5"/>
+  <!-- Vertical divider (guest bed / office) -->
+  <line x1="440" y1="300" x2="440" y2="620" stroke="#2D3748" stroke-width="1.5"/>
+  <!-- Corridor strip between rooms -->
+  <rect x="280" y="300" width="260" height="0"/>
 
-  <!-- Vertical wall -->
-  <rect x="406" y="499" width="5" height="130" fill="#374151"/>
+  <!-- ── LOWER TERRACE / COVERED PORCH ────────────────── -->
+  <rect x="60" y="660" width="480" height="120" fill="#EAF4E0" stroke="#2D3748" stroke-width="1.5"/>
+  <rect x="60" y="660" width="480" height="120" fill="none" stroke="#78BF42" stroke-width="1" stroke-dasharray="8,4" opacity="0.4"/>
+  <!-- Pergola lines -->
+  <line x1="100" y1="660" x2="100" y2="780" stroke="#78BF42" stroke-width="0.8" opacity="0.4"/>
+  <line x1="160" y1="660" x2="160" y2="780" stroke="#78BF42" stroke-width="0.8" opacity="0.4"/>
+  <line x1="220" y1="660" x2="220" y2="780" stroke="#78BF42" stroke-width="0.8" opacity="0.4"/>
+  <line x1="280" y1="660" x2="280" y2="780" stroke="#78BF42" stroke-width="0.8" opacity="0.4"/>
+  <line x1="340" y1="660" x2="340" y2="780" stroke="#78BF42" stroke-width="0.8" opacity="0.4"/>
+  <line x1="400" y1="660" x2="400" y2="780" stroke="#78BF42" stroke-width="0.8" opacity="0.4"/>
+  <line x1="460" y1="660" x2="460" y2="780" stroke="#78BF42" stroke-width="0.8" opacity="0.4"/>
+  <text x="300" y="722" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" font-weight="600" fill="#2D5A27">COVERED TERRACE</text>
+  <text x="300" y="738" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="#6AAB50">~60 m²</text>
 
-  <!-- STAIRCASE (right, lower) -->
-  <rect x="411" y="499" width="125" height="125" fill="#F0EEE8"/>
-  <line x1="411" y1="519" x2="536" y2="519" stroke="#9CA3AF" stroke-width="1"/>
-  <line x1="411" y1="535" x2="536" y2="535" stroke="#9CA3AF" stroke-width="1"/>
-  <line x1="411" y1="551" x2="536" y2="551" stroke="#9CA3AF" stroke-width="1"/>
-  <line x1="411" y1="567" x2="536" y2="567" stroke="#9CA3AF" stroke-width="1"/>
-  <line x1="411" y1="583" x2="536" y2="583" stroke="#9CA3AF" stroke-width="1"/>
-  <line x1="411" y1="599" x2="536" y2="599" stroke="#9CA3AF" stroke-width="1"/>
-  <text x="474" y="612" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="#9CA3AF">TO ROOF FLOOR ↑</text>
+  <!-- ── CORRIDOR (right + inner walls) ─────────────────── -->
+  <line x1="280" y1="500" x2="280" y2="660" stroke="#2D3748" stroke-width="1.5"/>
+  <line x1="540" y1="300" x2="540" y2="620" stroke="#2D3748" stroke-width="1.5"/>
+  <!-- Inner passage from hall to rooms -->
+  <rect x="280" y="620" width="260" height="40" fill="#F4F0E8" stroke="#2D3748" stroke-width="1"/>
+  <text x="410" y="645" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="#9CA3AF">CORRIDOR</text>
 
-  <!-- Horizontal wall / balcony -->
-  <rect x="56" y="624" width="480" height="5" fill="#374151"/>
+  <!-- ── DOORS (arc symbols) ─────────────────────────────── -->
+  <!-- Terrace door (from living) -->
+  <line x1="280" y1="200" x2="280" y2="250" stroke="#E8E4DC" stroke-width="2"/>
+  <path d="M280,200 A50,50 0 0,1 330,200" fill="none" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="3,2"/>
+  <!-- Guest bedroom door -->
+  <line x1="280" y1="370" x2="280" y2="420" stroke="#E8E4DC" stroke-width="2"/>
+  <path d="M280,370 A50,50 0 0,1 330,370" fill="none" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="3,2"/>
+  <!-- Office door -->
+  <line x1="280" y1="560" x2="280" y2="610" stroke="#E8E4DC" stroke-width="2"/>
+  <path d="M280,560 A50,50 0 0,1 330,560" fill="none" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="3,2"/>
+  <!-- Bath door -->
+  <line x1="440" y1="350" x2="440" y2="395" stroke="#E8E4DC" stroke-width="2"/>
+  <path d="M440,350 A45,45 0 0,0 395,350" fill="none" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="3,2"/>
 
-  <!-- BALCONY -->
-  <rect x="56" y="629" width="480" height="55" fill="#D5EFCA"/>
-  <line x1="56" y1="650" x2="536" y2="650" stroke="#A8CC98" stroke-width="0.8" stroke-dasharray="8,4"/>
-  <text x="296" y="646" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="12" font-weight="700" fill="#2D5A27">PANORAMIC BALCONY</text>
-  <text x="296" y="672" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#6AAB50">full width · 22 m² · mountain + valley views</text>
+  <!-- ── AREA BADGE ─────────────────────────────────────── -->
+  <rect x="30" y="782" width="140" height="58" rx="8" fill="rgba(26,56,16,0.88)"/>
+  <text x="100" y="806" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" fill="#78BF42" letter-spacing="1">FLOOR AREA</text>
+  <text x="100" y="826" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="18" font-weight="700" fill="white">260 m²</text>
+  <text x="100" y="840" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="rgba(255,255,255,0.6)">gross BUA incl. terrace</text>
 
-  <!-- North arrow -->
-  <g transform="translate(556,110)">
-    <circle cx="0" cy="0" r="17" fill="white" stroke="#D1D5DB" stroke-width="1.5"/>
-    <polygon points="0,-12 -4,4 0,0 4,4" fill="#1A3810"/>
-    <polygon points="0,0 -4,4 0,12 4,4" fill="#9CA3AF"/>
-    <text x="0" y="26" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" font-weight="700" fill="#374151">N</text>
+  <!-- ── NORTH ARROW ────────────────────────────────────── -->
+  <g transform="translate(645,820)">
+    <circle cx="0" cy="0" r="18" fill="white" stroke="#D1D5DB" stroke-width="1.5"/>
+    <polygon points="0,-13 -4,5 0,0 4,5" fill="#1A3810"/>
+    <polygon points="0,0 -4,5 0,13 4,5" fill="#9CA3AF"/>
+    <text x="0" y="27" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" font-weight="700" fill="#374151">N</text>
   </g>
 
-  <!-- Footer -->
-  <rect x="0" y="732" width="600" height="68" fill="#F4F9EF"/>
-  <line x1="0" y1="732" x2="600" y2="732" stroke="#E5E7EB" stroke-width="1"/>
-  <rect x="30" y="750" width="10" height="10" rx="2" fill="#EBF3FA"/>
-  <text x="44" y="759" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">Bedroom / Suite</text>
-  <rect x="140" y="750" width="10" height="10" rx="2" fill="#E8F4FB"/>
-  <text x="154" y="759" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">Bathroom</text>
-  <rect x="210" y="750" width="10" height="10" rx="2" fill="#F5F9F1"/>
-  <text x="224" y="759" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">Living</text>
-  <rect x="260" y="750" width="10" height="10" rx="2" fill="#D5EFCA"/>
-  <text x="274" y="759" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">Balcony</text>
-  <rect x="320" y="750" width="10" height="10" rx="2" fill="#F0EEF9"/>
-  <text x="334" y="759" font-family="'DM Sans',sans-serif" font-size="8" fill="#6B7280">Walk-in</text>
-  <text x="300" y="782" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">Deddeh Hills Gated Community · Koura, Lebanon · For illustration purposes only</text>
+  <!-- ── LEGEND ────────────────────────────────────────── -->
+  <rect x="186" y="782" width="340" height="58" rx="6" fill="#F4F9EF" stroke="#E5E7EB" stroke-width="1"/>
+  <rect x="196" y="793" width="12" height="12" rx="2" fill="#FFF8F0" stroke="#2D3748" stroke-width="1"/>
+  <text x="214" y="803" font-family="'DM Sans',sans-serif" font-size="8" fill="#374151">Habitable</text>
+  <rect x="260" y="793" width="12" height="12" rx="2" fill="#EEF6FE" stroke="#7DAFC8" stroke-width="1"/>
+  <text x="278" y="803" font-family="'DM Sans',sans-serif" font-size="8" fill="#374151">Wet rooms</text>
+  <rect x="340" y="793" width="12" height="12" rx="2" fill="url(#void3f1)" stroke="#A8D4E8" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="358" y="803" font-family="'DM Sans',sans-serif" font-size="8" fill="#374151">Void (dbl-height)</text>
+  <rect x="196" y="812" width="12" height="12" rx="2" fill="#EAF4E0" stroke="#78BF42" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="214" y="822" font-family="'DM Sans',sans-serif" font-size="8" fill="#374151">Terrace / outdoor</text>
+  <rect x="340" y="812" width="12" height="12" rx="2" fill="#F4F0E8" stroke="#6B7280" stroke-width="1"/>
+  <text x="358" y="822" font-family="'DM Sans',sans-serif" font-size="8" fill="#374151">Stair / service</text>
+  <text x="303" y="836" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="8" fill="#9CA3AF">Deddeh Hills · Villa 3F · F1 · Illustrative only</text>
+
 </svg>

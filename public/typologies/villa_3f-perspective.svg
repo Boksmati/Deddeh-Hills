@@ -1,184 +1,202 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 560">
   <defs>
-    <linearGradient id="sky3" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#A8D0E8;stop-opacity:1"/>
-      <stop offset="100%" style="stop-color:#D8EEF8;stop-opacity:1"/>
+    <linearGradient id="sky3fp" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5A8FB0"/>
+      <stop offset="50%" stop-color="#9EC4D8"/>
+      <stop offset="100%" stop-color="#CBE4C0"/>
     </linearGradient>
-    <linearGradient id="grass3" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#A8CC88;stop-opacity:1"/>
-      <stop offset="100%" style="stop-color:#88AA68;stop-opacity:1"/>
+    <linearGradient id="facade3fp" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F8F6F2"/>
+      <stop offset="100%" stop-color="#E8E4DC"/>
     </linearGradient>
-    <linearGradient id="wall3f" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#F2EFE8;stop-opacity:1"/>
-      <stop offset="60%" style="stop-color:#EAE6DA;stop-opacity:1"/>
-      <stop offset="100%" style="stop-color:#DAD5C8;stop-opacity:1"/>
+    <linearGradient id="side3fp" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#D4D0C8"/>
+      <stop offset="100%" stop-color="#BCB8B0"/>
     </linearGradient>
-    <linearGradient id="wall3fl2" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#E2DFD8;stop-opacity:1"/>
-      <stop offset="100%" style="stop-color:#CAC6BB;stop-opacity:1"/>
+    <linearGradient id="ground3fp" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#9DC870"/>
+      <stop offset="100%" stop-color="#78A850"/>
     </linearGradient>
-    <linearGradient id="wall3fl3" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#D8D4CC;stop-opacity:1"/>
-      <stop offset="100%" style="stop-color:#C0BBB0;stop-opacity:1"/>
+    <linearGradient id="pool3fp" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5BB8D8"/>
+      <stop offset="100%" stop-color="#3A90B8"/>
     </linearGradient>
-    <filter id="shadow3">
-      <feDropShadow dx="5" dy="8" stdDeviation="8" flood-opacity="0.18"/>
+    <linearGradient id="basmt3fp" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#D8D4CC"/>
+      <stop offset="100%" stop-color="#C8C4BC"/>
+    </linearGradient>
+    <filter id="shadow3fp">
+      <feDropShadow dx="6" dy="12" stdDeviation="10" flood-color="#1A3810" flood-opacity="0.20"/>
     </filter>
   </defs>
 
   <!-- Sky -->
-  <rect width="800" height="600" fill="url(#sky3)"/>
+  <rect width="800" height="560" fill="url(#sky3fp)"/>
 
-  <!-- Mountains (deeper/more dramatic for hillside context) -->
-  <polygon points="0,280 80,150 180,230 320,100 460,200 580,120 720,170 800,190 800,310 0,310" fill="#9AB5A8" opacity="0.5"/>
-  <polygon points="0,310 60,190 160,260 300,145 440,220 610,145 760,185 800,210 800,330 0,330" fill="#B0C8B8" opacity="0.4"/>
-  <!-- Light mist layer -->
-  <rect x="0" y="295" width="800" height="25" fill="white" opacity="0.12"/>
+  <!-- Hills background -->
+  <ellipse cx="160" cy="255" rx="240" ry="70" fill="#7AB84E" opacity="0.25"/>
+  <ellipse cx="640" cy="260" rx="200" ry="60" fill="#6EAC44" opacity="0.20"/>
 
-  <!-- Ground / lawn -->
-  <rect x="0" y="420" width="800" height="180" fill="url(#grass3)"/>
-  <!-- Shadow on ground (larger for 3-floor villa) -->
-  <ellipse cx="320" cy="428" rx="230" ry="22" fill="rgba(0,0,0,0.14)"/>
+  <!-- Ground plane -->
+  <polygon points="0,400 800,400 800,560 0,560" fill="url(#ground3fp)"/>
+  <!-- Driveway / path -->
+  <polygon points="360,400 440,400 415,510 385,510" fill="#D0CABC" opacity="0.7"/>
+  <line x1="400" y1="400" x2="400" y2="510" stroke="#C0BAA8" stroke-width="1" stroke-dasharray="5,5" opacity="0.4"/>
 
-  <!-- ── VILLA BODY — 3 FLOORS ────────────────────────── -->
+  <!-- Building shadow on ground -->
+  <ellipse cx="400" cy="404" rx="250" ry="18" fill="#1A3810" opacity="0.12"/>
 
-  <!-- Ground floor -->
-  <rect x="60" y="295" width="510" height="130" fill="url(#wall3f)" filter="url(#shadow3)"/>
+  <!-- ── BASEMENT LEVEL (partially exposed, stone cladding) ── -->
+  <rect x="150" y="350" width="460" height="55" rx="1" fill="url(#basmt3fp)" filter="url(#shadow3fp)"/>
+  <!-- Stone coursing lines on basement -->
+  <line x1="150" y1="365" x2="610" y2="365" stroke="#B0ACA4" stroke-width="0.7" opacity="0.5"/>
+  <line x1="150" y1="380" x2="610" y2="380" stroke="#B0ACA4" stroke-width="0.7" opacity="0.5"/>
+  <line x1="150" y1="395" x2="610" y2="395" stroke="#B0ACA4" stroke-width="0.7" opacity="0.5"/>
+  <!-- Basement windows (small, ventilation) -->
+  <rect x="180" y="368" width="40" height="20" rx="2" fill="#6A9AB8" opacity="0.5"/>
+  <rect x="240" y="368" width="40" height="20" rx="2" fill="#6A9AB8" opacity="0.5"/>
+  <rect x="390" y="368" width="40" height="20" rx="2" fill="#6A9AB8" opacity="0.5"/>
+  <rect x="510" y="368" width="40" height="20" rx="2" fill="#6A9AB8" opacity="0.5"/>
 
-  <!-- Second floor (slightly inset) -->
-  <rect x="60" y="205" width="510" height="95" fill="url(#wall3fl2)"/>
+  <!-- ── RIGHT SIDE FACE (3-storey recessed) ──────────────── -->
+  <polygon points="610,90 685,116 685,354 610,328" fill="url(#side3fp)" filter="url(#shadow3fp)"/>
+  <!-- Side windows -->
+  <rect x="620" y="126" width="42" height="55" rx="2" fill="#7DAFC8" opacity="0.45"/>
+  <rect x="620" y="202" width="42" height="55" rx="2" fill="#7DAFC8" opacity="0.45"/>
+  <rect x="620" y="278" width="42" height="42" rx="2" fill="#7DAFC8" opacity="0.4"/>
 
-  <!-- Third floor / roof floor (more inset) -->
-  <rect x="80" y="130" width="470" height="80" fill="url(#wall3fl3)"/>
+  <!-- ── MAIN FACADE (3-storey) ──────────────────────────── -->
+  <rect x="150" y="80" width="460" height="275" rx="2" fill="url(#facade3fp)" filter="url(#shadow3fp)"/>
 
-  <!-- Parapet / roof edge -->
-  <rect x="68" y="118" width="494" height="18" fill="#2D5A27"/>
-  <rect x="68" y="118" width="494" height="5" fill="#78BF42" opacity="0.55"/>
+  <!-- ── SECOND FLOOR (F2) — top zone ─────────────────── -->
+  <!-- F2 slab line -->
+  <rect x="150" y="170" width="460" height="10" rx="0" fill="#DDDAD2"/>
 
-  <!-- Roof terrace railing (top floor) -->
-  <rect x="80" y="206" width="470" height="8" fill="#D4D0C8" stroke="#BCBAB0" stroke-width="1"/>
-  <line x1="95" y1="196" x2="95" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
-  <line x1="115" y1="196" x2="115" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
-  <line x1="135" y1="196" x2="135" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
-  <line x1="155" y1="196" x2="155" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
-  <line x1="175" y1="196" x2="175" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
-  <line x1="195" y1="196" x2="195" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
-  <line x1="215" y1="196" x2="215" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
-  <line x1="235" y1="196" x2="235" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
-  <line x1="255" y1="196" x2="255" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
-  <line x1="275" y1="196" x2="275" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
-  <line x1="295" y1="196" x2="295" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
-  <line x1="315" y1="196" x2="315" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
-  <line x1="335" y1="196" x2="335" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
-  <line x1="355" y1="196" x2="355" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
-  <line x1="375" y1="196" x2="375" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
-  <line x1="395" y1="196" x2="395" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
-  <line x1="415" y1="196" x2="415" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
-  <line x1="435" y1="196" x2="435" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
-  <line x1="455" y1="196" x2="455" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
-  <line x1="475" y1="196" x2="475" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
-  <line x1="495" y1="196" x2="495" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
-  <line x1="515" y1="196" x2="515" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
-  <line x1="535" y1="196" x2="535" y2="214" stroke="#C0BCB4" stroke-width="1.5"/>
+  <!-- F2: Master bedroom windows (large, with small balconies) -->
+  <rect x="166" y="90" width="90" height="75" rx="3" fill="#9BC8DC" opacity="0.60"/>
+  <line x1="210" y1="90" x2="210" y2="165" stroke="white" stroke-width="1" opacity="0.5"/>
+  <rect x="166" y="90" width="90" height="8" rx="1" fill="#E8E4DC" opacity="0.85"/>
+  <!-- Mini balcony rail (F2) -->
+  <rect x="160" y="162" width="100" height="8" rx="1" fill="#2D5A27" opacity="0.7"/>
+  <line x1="170" y1="165" x2="170" y2="172" stroke="#2D5A27" stroke-width="1" opacity="0.6"/>
+  <line x1="190" y1="165" x2="190" y2="172" stroke="#2D5A27" stroke-width="1" opacity="0.6"/>
+  <line x1="210" y1="165" x2="210" y2="172" stroke="#2D5A27" stroke-width="1" opacity="0.6"/>
+  <line x1="230" y1="165" x2="230" y2="172" stroke="#2D5A27" stroke-width="1" opacity="0.6"/>
+  <line x1="250" y1="165" x2="250" y2="172" stroke="#2D5A27" stroke-width="1" opacity="0.6"/>
 
-  <!-- Second floor balcony railing -->
-  <rect x="60" y="291" width="510" height="8" fill="#D8D5CC" stroke="#C0BDB5" stroke-width="1"/>
-  <line x1="80" y1="280" x2="80" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
-  <line x1="100" y1="280" x2="100" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
-  <line x1="120" y1="280" x2="120" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
-  <line x1="140" y1="280" x2="140" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
-  <line x1="160" y1="280" x2="160" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
-  <line x1="180" y1="280" x2="180" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
-  <line x1="200" y1="280" x2="200" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
-  <line x1="220" y1="280" x2="220" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
-  <line x1="240" y1="280" x2="240" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
-  <line x1="260" y1="280" x2="260" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
-  <line x1="280" y1="280" x2="280" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
-  <line x1="300" y1="280" x2="300" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
-  <line x1="320" y1="280" x2="320" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
-  <line x1="340" y1="280" x2="340" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
-  <line x1="360" y1="280" x2="360" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
-  <line x1="380" y1="280" x2="380" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
-  <line x1="400" y1="280" x2="400" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
-  <line x1="420" y1="280" x2="420" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
-  <line x1="440" y1="280" x2="440" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
-  <line x1="460" y1="280" x2="460" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
-  <line x1="480" y1="280" x2="480" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
-  <line x1="500" y1="280" x2="500" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
-  <line x1="520" y1="280" x2="520" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
-  <line x1="540" y1="280" x2="540" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
-  <line x1="560" y1="280" x2="560" y2="299" stroke="#C0BDB5" stroke-width="1.5"/>
+  <rect x="270" y="90" width="90" height="75" rx="3" fill="#9BC8DC" opacity="0.60"/>
+  <line x1="314" y1="90" x2="314" y2="165" stroke="white" stroke-width="1" opacity="0.5"/>
+  <rect x="270" y="90" width="90" height="8" rx="1" fill="#E8E4DC" opacity="0.85"/>
+  <rect x="264" y="162" width="100" height="8" rx="1" fill="#2D5A27" opacity="0.7"/>
 
-  <!-- Ground floor: garage (left) -->
-  <rect x="70" y="308" width="155" height="115" fill="#D0CCBF"/>
-  <rect x="70" y="308" width="155" height="115" fill="none" stroke="#B8B4AA" stroke-width="2"/>
-  <line x1="100" y1="308" x2="100" y2="423" stroke="#B8B4AA" stroke-width="1.5"/>
-  <line x1="130" y1="308" x2="130" y2="423" stroke="#B8B4AA" stroke-width="1.5"/>
-  <line x1="160" y1="308" x2="160" y2="423" stroke="#B8B4AA" stroke-width="1.5"/>
-  <line x1="196" y1="308" x2="196" y2="423" stroke="#B8B4AA" stroke-width="1.5"/>
-  <line x1="70" y1="340" x2="225" y2="340" stroke="#B8B4AA" stroke-width="1"/>
-  <line x1="70" y1="375" x2="225" y2="375" stroke="#B8B4AA" stroke-width="1"/>
-  <line x1="70" y1="405" x2="225" y2="405" stroke="#B8B4AA" stroke-width="1"/>
+  <!-- F2 Main master — large window -->
+  <rect x="376" y="85" width="130" height="80" rx="3" fill="#9BC8DC" opacity="0.60"/>
+  <line x1="440" y1="85" x2="440" y2="165" stroke="white" stroke-width="1.5" opacity="0.5"/>
+  <rect x="376" y="85" width="130" height="8" rx="1" fill="#E8E4DC" opacity="0.85"/>
+  <rect x="370" y="162" width="140" height="8" rx="1" fill="#2D5A27" opacity="0.7"/>
 
-  <!-- Ground floor windows -->
-  <rect x="240" y="318" width="90" height="62" fill="#C8E0EC" stroke="#A0BCCC" stroke-width="2"/>
-  <line x1="285" y1="318" x2="285" y2="380" stroke="#A0BCCC" stroke-width="1"/>
-  <line x1="240" y1="349" x2="330" y2="349" stroke="#A0BCCC" stroke-width="1"/>
-  <rect x="350" y="318" width="90" height="62" fill="#C8E0EC" stroke="#A0BCCC" stroke-width="2"/>
-  <line x1="395" y1="318" x2="395" y2="380" stroke="#A0BCCC" stroke-width="1"/>
-  <line x1="350" y1="349" x2="440" y2="349" stroke="#A0BCCC" stroke-width="1"/>
+  <!-- F2: small window right -->
+  <rect x="522" y="100" width="75" height="62" rx="2" fill="#9BC8DC" opacity="0.50"/>
 
-  <!-- Grand entrance (right of center) -->
-  <rect x="455" y="330" width="100" height="93" fill="#8A7050" stroke="#685030" stroke-width="2"/>
-  <!-- double door panels -->
-  <rect x="462" y="338" width="38" height="75" fill="#A08868" stroke="#685030" stroke-width="1"/>
-  <rect x="505" y="338" width="38" height="75" fill="#A08868" stroke="#685030" stroke-width="1"/>
-  <circle cx="501" cy="380" r="4.5" fill="#C8A860"/>
-  <circle cx="506" cy="380" r="4.5" fill="#C8A860"/>
-  <!-- transom window above door -->
-  <rect x="455" y="320" width="100" height="14" fill="#C8E0EC" stroke="#8A7050" stroke-width="1"/>
-  <line x1="505" y1="320" x2="505" y2="334" stroke="#A0BCCC" stroke-width="1"/>
+  <!-- ── FIRST FLOOR (F1) ─────────────────────────────── -->
+  <!-- F1 slab line -->
+  <rect x="150" y="250" width="460" height="10" rx="0" fill="#DDDAD2"/>
 
-  <!-- Second floor windows (5) -->
-  <rect x="70" y="218" width="80" height="48" fill="#C8E0EC" stroke="#A0BCCC" stroke-width="1.5"/>
-  <line x1="110" y1="218" x2="110" y2="266" stroke="#A0BCCC" stroke-width="1"/>
-  <rect x="168" y="218" width="80" height="48" fill="#C8E0EC" stroke="#A0BCCC" stroke-width="1.5"/>
-  <line x1="208" y1="218" x2="208" y2="266" stroke="#A0BCCC" stroke-width="1"/>
-  <rect x="266" y="218" width="80" height="48" fill="#C8E0EC" stroke="#A0BCCC" stroke-width="1.5"/>
-  <line x1="306" y1="218" x2="306" y2="266" stroke="#A0BCCC" stroke-width="1"/>
-  <rect x="364" y="218" width="80" height="48" fill="#C8E0EC" stroke="#A0BCCC" stroke-width="1.5"/>
-  <line x1="404" y1="218" x2="404" y2="266" stroke="#A0BCCC" stroke-width="1"/>
-  <rect x="462" y="218" width="80" height="48" fill="#C8E0EC" stroke="#A0BCCC" stroke-width="1.5"/>
-  <line x1="502" y1="218" x2="502" y2="266" stroke="#A0BCCC" stroke-width="1"/>
+  <!-- F1: Living room windows -->
+  <rect x="166" y="180" width="90" height="65" rx="3" fill="#9BC8DC" opacity="0.58"/>
+  <line x1="210" y1="180" x2="210" y2="245" stroke="white" stroke-width="1" opacity="0.5"/>
+  <rect x="166" y="180" width="90" height="8" rx="1" fill="#E8E4DC" opacity="0.85"/>
 
-  <!-- Third floor windows (4) -->
-  <rect x="88" y="138" width="80" height="42" fill="#C8E0EC" stroke="#A0BCCC" stroke-width="1.5"/>
-  <line x1="128" y1="138" x2="128" y2="180" stroke="#A0BCCC" stroke-width="1"/>
-  <rect x="208" y="138" width="80" height="42" fill="#C8E0EC" stroke="#A0BCCC" stroke-width="1.5"/>
-  <line x1="248" y1="138" x2="248" y2="180" stroke="#A0BCCC" stroke-width="1"/>
-  <rect x="328" y="138" width="80" height="42" fill="#C8E0EC" stroke="#A0BCCC" stroke-width="1.5"/>
-  <line x1="368" y1="138" x2="368" y2="180" stroke="#A0BCCC" stroke-width="1"/>
-  <rect x="448" y="138" width="80" height="42" fill="#C8E0EC" stroke="#A0BCCC" stroke-width="1.5"/>
-  <line x1="488" y1="138" x2="488" y2="180" stroke="#A0BCCC" stroke-width="1"/>
+  <rect x="270" y="180" width="90" height="65" rx="3" fill="#9BC8DC" opacity="0.58"/>
+  <line x1="314" y1="180" x2="314" y2="245" stroke="white" stroke-width="1" opacity="0.5"/>
+  <rect x="270" y="180" width="90" height="8" rx="1" fill="#E8E4DC" opacity="0.85"/>
 
-  <!-- Driveway -->
-  <path d="M160 423 L120 510 L240 510 L280 423 Z" fill="#C0B8A8" opacity="0.7"/>
+  <!-- F1: Large window + Office -->
+  <rect x="376" y="178" width="130" height="67" rx="3" fill="#9BC8DC" opacity="0.55"/>
+  <line x1="440" y1="178" x2="440" y2="245" stroke="white" stroke-width="1.5" opacity="0.5"/>
+  <rect x="376" y="178" width="130" height="8" rx="1" fill="#E8E4DC" opacity="0.85"/>
 
-  <!-- Landscaping hedge -->
-  <rect x="60" y="420" width="680" height="15" rx="5" fill="#4A8A30" opacity="0.65"/>
+  <rect x="522" y="185" width="75" height="60" rx="2" fill="#9BC8DC" opacity="0.45"/>
 
-  <!-- Trees (taller for 3-story framing) -->
-  <ellipse cx="670" cy="360" rx="45" ry="65" fill="#3A7820" opacity="0.8"/>
-  <rect x="665" y="418" width="10" height="38" fill="#6B4A2A"/>
-  <ellipse cx="730" cy="375" rx="32" ry="50" fill="#4A8A38" opacity="0.7"/>
-  <rect x="726" y="418" width="8" height="32" fill="#6B4A2A"/>
-  <!-- Smaller tree left -->
-  <ellipse cx="30" cy="375" rx="28" ry="45" fill="#3A7820" opacity="0.6"/>
-  <rect x="26" y="418" width="8" height="30" fill="#6B4A2A"/>
+  <!-- ── GROUND FLOOR (GF) ────────────────────────────── -->
+  <!-- GF: Salon windows -->
+  <rect x="166" y="262" width="85" height="90" rx="3" fill="#8BBFD8" opacity="0.65"/>
+  <line x1="207" y1="262" x2="207" y2="352" stroke="white" stroke-width="1" opacity="0.5"/>
+  <rect x="166" y="262" width="85" height="9" rx="1" fill="#E8E4DC" opacity="0.85"/>
 
-  <!-- Label overlay -->
-  <rect x="0" y="542" width="800" height="58" fill="rgba(26,56,16,0.90)"/>
-  <text x="30" y="565" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="#78BF42" letter-spacing="2">DEDDEH HILLS</text>
-  <text x="30" y="584" font-family="'DM Sans',sans-serif" font-size="16" font-weight="700" fill="white">Villa 3F — Luxury Three-Floor Villa</text>
-  <text x="750" y="575" text-anchor="end" font-family="'DM Sans',sans-serif" font-size="10" fill="rgba(255,255,255,0.6)">Exterior Perspective · Indicative</text>
+  <rect x="265" y="262" width="85" height="90" rx="3" fill="#8BBFD8" opacity="0.65"/>
+  <line x1="306" y1="262" x2="306" y2="352" stroke="white" stroke-width="1" opacity="0.5"/>
+  <rect x="265" y="262" width="85" height="9" rx="1" fill="#E8E4DC" opacity="0.85"/>
+
+  <!-- GF: Entry door -->
+  <rect x="365" y="288" width="68" height="67" rx="2" fill="#7DAFC8" opacity="0.85"/>
+  <polygon points="355,290 445,290 435,273 366,273" fill="#2D5A27" opacity="0.88"/>
+  <line x1="398" y1="288" x2="398" y2="355" stroke="white" stroke-width="1" opacity="0.5"/>
+  <text x="399" y="330" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="700" fill="white">ENTRY</text>
+
+  <!-- GF: Kitchen windows -->
+  <rect x="448" y="300" width="60" height="55" rx="2" fill="#9BC8DC" opacity="0.55"/>
+  <rect x="524" y="300" width="74" height="55" rx="2" fill="#9BC8DC" opacity="0.50"/>
+
+  <!-- ── POOL (left of building, GF level) ──────────────── -->
+  <!-- Pool deck -->
+  <polygon points="60,130 150,108 150,354 60,376" fill="#D4CEB8" opacity="0.55"/>
+  <!-- Pool water -->
+  <polygon points="72,152 143,133 143,338 72,356" fill="url(#pool3fp)" opacity="0.88"/>
+  <!-- Pool shimmer lines -->
+  <line x1="80" y1="175" x2="137" y2="162" stroke="white" stroke-width="1.2" opacity="0.35"/>
+  <line x1="78" y1="210" x2="140" y2="196" stroke="white" stroke-width="1" opacity="0.28"/>
+  <line x1="76" y1="250" x2="140" y2="234" stroke="white" stroke-width="1" opacity="0.25"/>
+  <line x1="75" y1="290" x2="141" y2="274" stroke="white" stroke-width="1" opacity="0.22"/>
+  <text x="108" y="255" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="10" font-weight="700" fill="white" opacity="0.85" transform="rotate(-5,108,255)">POOL</text>
+  <!-- Pool coping edge -->
+  <line x1="60" y1="130" x2="150" y2="108" stroke="#A8D8F0" stroke-width="2"/>
+  <line x1="60" y1="376" x2="150" y2="354" stroke="#A8D8F0" stroke-width="1.5"/>
+
+  <!-- ── ROOFTOP (flat roof + parapet) ────────────────── -->
+  <rect x="150" y="72" width="460" height="14" rx="2" fill="#2D5A27"/>
+  <!-- Parapet crenellations -->
+  <rect x="162" y="60" width="26" height="18" rx="1" fill="#2D5225"/>
+  <rect x="202" y="60" width="26" height="18" rx="1" fill="#2D5225"/>
+  <rect x="242" y="60" width="26" height="18" rx="1" fill="#2D5225"/>
+  <rect x="282" y="60" width="26" height="18" rx="1" fill="#2D5225"/>
+  <rect x="322" y="60" width="26" height="18" rx="1" fill="#2D5225"/>
+  <rect x="362" y="60" width="26" height="18" rx="1" fill="#2D5225"/>
+  <rect x="402" y="60" width="26" height="18" rx="1" fill="#2D5225"/>
+  <rect x="442" y="60" width="26" height="18" rx="1" fill="#2D5225"/>
+  <rect x="482" y="60" width="26" height="18" rx="1" fill="#2D5225"/>
+  <rect x="522" y="60" width="26" height="18" rx="1" fill="#2D5225"/>
+  <rect x="562" y="60" width="26" height="18" rx="1" fill="#2D5225"/>
+  <!-- Rooftop planters -->
+  <ellipse cx="220" cy="68" rx="22" ry="10" fill="#78BF42" opacity="0.75"/>
+  <ellipse cx="340" cy="68" rx="18" ry="9" fill="#95CC58" opacity="0.70"/>
+  <ellipse cx="470" cy="68" rx="24" ry="11" fill="#78BF42" opacity="0.75"/>
+
+  <!-- ── GARDEN / FOREGROUND ─────────────────────────── -->
+  <!-- Shrubs -->
+  <ellipse cx="720" cy="398" rx="42" ry="22" fill="#5A9040" opacity="0.82"/>
+  <ellipse cx="700" cy="392" rx="28" ry="15" fill="#6EAA4C" opacity="0.85"/>
+  <!-- Left garden -->
+  <ellipse cx="30" cy="396" rx="36" ry="20" fill="#5A9040" opacity="0.78"/>
+  <!-- Trees (right) -->
+  <rect x="735" y="310" width="8" height="90" fill="#6B4226"/>
+  <ellipse cx="739" cy="300" rx="32" ry="38" fill="#4A8830" opacity="0.90"/>
+  <ellipse cx="739" cy="288" rx="22" ry="26" fill="#5A9840" opacity="0.85"/>
+  <!-- Left cypress -->
+  <rect x="30" y="290" width="7" height="112" fill="#6B4226"/>
+  <ellipse cx="33" cy="270" rx="15" ry="50" fill="#2D5A27" opacity="0.85"/>
+
+  <!-- ── HEADER ────────────────────────────────────────── -->
+  <rect x="0" y="0" width="800" height="52" fill="rgba(26,56,16,0.84)"/>
+  <text x="24" y="20" font-family="'DM Sans',sans-serif" font-size="8" font-weight="600" fill="#78BF42" letter-spacing="3">DEDDEH HILLS</text>
+  <text x="24" y="40" font-family="'DM Sans',sans-serif" font-size="16" font-weight="700" fill="white">Villa 3F — Three-Storey with Pool</text>
+  <text x="776" y="20" text-anchor="end" font-family="'DM Sans',sans-serif" font-size="8" fill="rgba(255,255,255,0.5)">B1 + GF + F1 + F2 · 3 masters · ~665 m² BUA</text>
+  <text x="776" y="38" text-anchor="end" font-family="'DM Sans',sans-serif" font-size="10" fill="rgba(255,255,255,0.7)">Koura, Lebanon</text>
+
+  <!-- ── CAPTION BAR ─────────────────────────────────── -->
+  <rect x="0" y="508" width="800" height="52" fill="rgba(26,56,16,0.78)"/>
+  <text x="24" y="528" font-family="'DM Sans',sans-serif" font-size="10" font-weight="600" fill="#78BF42">Basement: Parking · Storage · Utilities · Technical rooms</text>
+  <text x="24" y="544" font-family="'DM Sans',sans-serif" font-size="9" fill="rgba(255,255,255,0.7)">GF: Salon · Sitting · Dining · Kitchen · Guest WC · Pool Terrace  ·  F1: Living · Guest Bed · Office · Archive  ·  F2: 3 Master Suites</text>
+  <text x="776" y="540" text-anchor="end" font-family="'DM Sans',sans-serif" font-size="8" fill="rgba(255,255,255,0.4)">Illustrative rendering only</text>
+
 </svg>

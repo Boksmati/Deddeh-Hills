@@ -36,14 +36,12 @@ function fmtUSD(n: number) {
 }
 function fmt(n: number) { return n.toLocaleString("en-US", { maximumFractionDigits: 0 }); }
 
-// twin_villa has real PNG/JPG assets; all other types use SVG floor plans
+// All typologies now use SVG floor plans and perspectives
 function floorPlanSrc(devType: string, floor: number): string {
-  const ext = devType === "twin_villa" ? "png" : "svg";
-  return `/typologies/${devType}-floor${floor}.${ext}`;
+  return `/typologies/${devType}-floor${floor}.svg`;
 }
 function perspectiveSrc(devType: string): string {
-  const ext = devType === "twin_villa" ? "jpg" : "svg";
-  return `/typologies/${devType}-perspective.${ext}`;
+  return `/typologies/${devType}-perspective.svg`;
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
