@@ -145,6 +145,29 @@ export default function AssumptionsPage() {
     setTimeout(() => setSaveStatus("idle"), 2000);
   }
 
+  /** Sync buaPerVilla and landPerVilla from actual villa lot assignments */
+  function syncWaterfallFromSimulator() {
+    const villaTypes: DevelopmentType[] = ["twin_villa", "villa_2f", "villa_3f"];
+    let totalBUA = 0;
+    let totalArea = 0;
+    let totalUnits = 0;
+    for (const a of Array.from(assignments.values())) {
+      if (!villaTypes.includes(a.developmentType)) continue;
+      const lot = LOTS.find((l) => l.id === a.lotId);
+      if (!lot) continue;
+      const { units } = computeDerivedUnits(typeAssumptions[a.developmentType]);
+      if (units <= 0) continue;
+      totalBUA += lot.total_bua_sqm;
+      totalArea += lot.area_sqm;
+      totalUnits += units;
+    }
+    if (totalUnits === 0) return;
+    setConfig({
+      buaPerVilla: Math.round(totalBUA / totalUnits),
+      landPerVilla: Math.round(totalArea / totalUnits),
+    });
+  }
+
   function updatePhaseLandPrice(phaseIdx: number, newPrice: number) {
     const updated = config.phaseLandPrices.map((p, i) =>
       i === phaseIdx ? { ...p, pricePerSqm: newPrice } : p
@@ -662,6 +685,42 @@ export default function AssumptionsPage() {
                   />
                   <span className="text-xs text-gray-700">{t("inv_config_priority_enabled")}</span>
                 </label>
+              </section>
+
+              {/* Villa Geometry — ADMIN ONLY — synced from simulator */}
+              <section className="bg-blue-50/40 border border-blue-200/50 rounded-xl p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 text-[9px] font-bold text-blue-700 bg-blue-200 rounded-full uppercase tracking-wide">Admin Only</span>
+                    <h3 className="text-xs font-semibold text-blue-900 uppercase tracking-wide">Villa Geometry &amp; Pricing</h3>
+                  </div>
+                  <button
+                    onClick={syncWaterfallFromSimulator}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-100 hover:bg-blue-200 border border-blue-300 rounded-lg transition-colors"
+                    title="Derive BUA/villa and land/villa from actual villa-type lot assignments in the simulator"
+                  >
+                    ↺ Sync from Simulator
+                  </button>
+                </div>
+                <p className="text-[10px] text-blue-700 mb-4">
+                  BUA/villa and Land/villa drive the investor waterfall calculations. Click "Sync from Simulator" to auto-derive from actual lot assignments, or set manually below.
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <ConfigField label="BUA / Villa" unit="m²" value={config.buaPerVilla} step={10} min={50} max={1000}
+                    onChange={(v) => setConfig({ buaPerVilla: v })} />
+                  <ConfigField label="Land / Villa" unit="m²" value={config.landPerVilla} step={10} min={100} max={2000}
+                    onChange={(v) => setConfig({ landPerVilla: v })} />
+                  <ConfigField label="Construction Cost" unit="$/m²" value={config.constructionCostSqm} step={25} min={200} max={2000}
+                    onChange={(v) => setConfig({ constructionCostSqm: v })} />
+                  <ConfigField label="Selling Price" unit="$/m²" value={config.sellingPriceSqm} step={50} min={500} max={5000}
+                    onChange={(v) => setConfig({ sellingPriceSqm: v })} />
+                </div>
+                <div className="mt-3 flex items-center gap-2 text-[10px] text-blue-600">
+                  <span className="font-medium">Current derived:</span>
+                  <span>BUA = {config.buaPerVilla} m² → construction cost = ${(config.buaPerVilla * config.constructionCostSqm).toLocaleString()}</span>
+                  <span className="text-blue-300">|</span>
+                  <span>Revenue = ${(config.buaPerVilla * config.sellingPriceSqm).toLocaleString()}/villa</span>
+                </div>
               </section>
 
               {/* Land Transfer Mode — ADMIN ONLY */}
