@@ -345,7 +345,7 @@ export default function InvestorPage() {
             <div className="bg-dh-dark text-white rounded-2xl p-5 sm:p-6">
               <div className="text-[10px] uppercase tracking-widest text-white/50 mb-2">Your investment opportunity</div>
               <h2 className="text-xl sm:text-2xl font-serif font-semibold leading-snug mb-3">
-                Invest from $300K. Earn {formatPct(waterfall.l2InvestorROI)} on cash — in under 2 years.
+                Invest from $300K. Earn {formatPct(waterfall.l2InvestorROI)} on cash — in under 3 years.
               </h2>
               <p className="text-sm text-gray-300 leading-relaxed">
                 You fund villa construction. Your capital is returned first when each villa sells — then you receive 50% of the remaining profit. No subordination. No long lock-ups.
@@ -358,7 +358,7 @@ export default function InvestorPage() {
                 className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${waterfallModel === "split" ? "bg-dh-dark text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
                 {t("inv_waterfall_model_a")}
               </button>
-              {investorFeatureFlags.showModelB && (
+              {mounted && investorFeatureFlags.showModelB && (
                 <button onClick={() => setWaterfallModel("priority")}
                   className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${waterfallModel === "priority" ? "bg-dh-dark text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
                   {t("inv_waterfall_model_b")}

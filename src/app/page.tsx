@@ -163,6 +163,7 @@ function fmtPrice(v: number): string {
 export default function LandingPage() {
   const { t, lang, isRTL } = useTranslations();
   const [scrolled, setScrolled] = useState(false);
+  const [mounted,  setMounted]  = useState(false);
 
   /* ── Store state ──────────────────────────────────────────── */
   const assignments        = useSimulationStore((s) => s.assignments);
@@ -170,7 +171,7 @@ export default function LandingPage() {
   const typeAssumptions    = useSimulationStore((s) => s.typeAssumptions);
   const initStateFromServer = useSimulationStore((s) => s.initStateFromServer);
 
-  useEffect(() => { initStateFromServer(); }, [initStateFromServer]);
+  useEffect(() => { setMounted(true); initStateFromServer(); }, [initStateFromServer]);
 
   /* ── Dynamic typology stats ───────────────────────────────── */
   const typologyData = useMemo(() => {
@@ -679,8 +680,8 @@ export default function LandingPage() {
                 {[
                   { k: t("landing_typo_size"), v: ty.size,                           accent: false },
                   { k: t("landing_typo_beds"), v: ty.beds,                           accent: false },
-                  { k: t("landing_typo_from"), v: typologyData[ty.id]?.fromPrice && typologyData[ty.id].fromPrice < Infinity ? fmtPrice(typologyData[ty.id].fromPrice) : "—", accent: true  },
-                  { k: t("landing_typo_available"), v: typologyData[ty.id]?.unitCount != null ? `${typologyData[ty.id].unitCount} ${t("landing_typo_units")}` : "—", accent: false },
+                  { k: t("landing_typo_from"), v: mounted && typologyData[ty.id]?.fromPrice && typologyData[ty.id].fromPrice < Infinity ? fmtPrice(typologyData[ty.id].fromPrice) : "—", accent: true  },
+                  { k: t("landing_typo_available"), v: mounted && typologyData[ty.id]?.unitCount != null ? `${typologyData[ty.id].unitCount} ${t("landing_typo_units")}` : "—", accent: false },
                 ].map(row => (
                   <div key={row.k} style={{
                     display: "flex", justifyContent: "space-between",
