@@ -162,8 +162,9 @@ function fmtPrice(v: number): string {
 /* ─── Main landing page ─────────────────────────────────────── */
 export default function LandingPage() {
   const { t, lang, isRTL } = useTranslations();
-  const [scrolled, setScrolled] = useState(false);
-  const [mounted,  setMounted]  = useState(false);
+  const [scrolled,  setScrolled]  = useState(false);
+  const [mounted,   setMounted]   = useState(false);
+  const [menuOpen,  setMenuOpen]  = useState(false);
 
   /* ── Store state ──────────────────────────────────────────── */
   const assignments        = useSimulationStore((s) => s.assignments);
@@ -354,7 +355,19 @@ export default function LandingPage() {
           border: 1px solid rgba(149,204,88,0.22); border-radius: 14px; overflow: hidden;
           white-space: nowrap;
         }
+        /* Mobile nav */
+        .dh-nav-links  { display: flex !important; }
+        .dh-nav-cta    { display: inline-flex !important; }
+        .dh-hamburger  { display: none !important; }
+        @keyframes menuSlide {
+          from { opacity: 0; transform: translateY(-8px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .dh-mobile-menu { animation: menuSlide 0.18s ease both; }
         @media (max-width: 640px) {
+          .dh-nav-links { display: none !important; }
+          .dh-nav-cta   { display: none !important; }
+          .dh-hamburger { display: flex !important; }
           .dh-stats-bar {
             position: relative; bottom: auto; left: auto; transform: none;
             width: calc(100% - 0px); margin-top: 36px; flex-wrap: wrap;
@@ -364,9 +377,7 @@ export default function LandingPage() {
             flex: 1 1 calc(50% - 2px); min-width: 0;
             padding: 14px 12px !important;
           }
-          /* remove right border on 2nd cell (end of first row) */
           .dh-stats-bar > div:nth-child(2) { border-right: none !important; }
-          /* add bottom border between rows */
           .dh-stats-bar > div:nth-child(1),
           .dh-stats-bar > div:nth-child(2) {
             border-bottom: 1px solid rgba(149,204,88,0.18);
@@ -381,68 +392,114 @@ export default function LandingPage() {
   }, []);
 
   /* ── Nav ──────────────────────────────────────────────────── */
+  const navLinks = [
+    { label: t("landing_nav_typologies"), href: "#typologies" },
+    { label: t("landing_nav_location"),   href: "#location"   },
+    { label: t("landing_nav_contact"),    href: "#contact"    },
+  ];
+  const navBg    = scrolled ? "rgba(255,255,255,0.95)" : (menuOpen ? "rgba(26,56,16,0.97)" : "transparent");
+  const linkCol  = scrolled ? C.muted : "rgba(255,255,255,0.80)";
+
   const Nav = () => (
-    <nav className="dh-sans" style={{
-      position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
-      padding: "0 32px", height: 64,
-      display: "flex", alignItems: "center", justifyContent: "space-between",
-      background: scrolled ? "rgba(255,255,255,0.95)" : "transparent",
-      backdropFilter: scrolled ? "blur(14px)" : "none",
-      borderBottom: scrolled ? `1px solid ${C.border}` : "none",
-      boxShadow: scrolled ? "0 1px 16px rgba(62,122,36,0.08)" : "none",
-      transition: "all 0.3s",
-    }}>
-      {/* Logo */}
-      <a href="/" style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <div style={{
-          width: 36, height: 36, borderRadius: 8,
-          background: C.lightBg, border: `1.5px solid ${C.hills}44`,
-          display: "flex", alignItems: "center", justifyContent: "center",
-        }}>
-          <span className="dh-serif" style={{ color: C.hills, fontSize: 14, fontWeight: 700 }}>DH</span>
-        </div>
-        <span className="dh-serif" style={{
-          color: scrolled ? C.ink : C.white,
-          fontSize: 16, fontWeight: 600,
-          transition: "color 0.3s",
-        }}>
-          Deddeh Hills
-        </span>
-      </a>
-
-      {/* Desktop links — hidden on mobile via dh-nav-links */}
-      <div className="dh-nav-links" style={{ display: "flex", alignItems: "center", gap: 28, fontSize: 13 }}>
-        {[
-          { label: t("landing_nav_typologies"), href: "#typologies" },
-          { label: t("landing_nav_location"),   href: "#location"   },
-          { label: t("landing_nav_contact"),    href: "#contact"    },
-        ].map(({ label, href }) => (
-          <a key={href} href={href}
-            style={{ color: scrolled ? C.muted : "rgba(255,255,255,0.75)", transition: "color 0.2s", fontFamily: bFont }}
-            onMouseOver={e => (e.currentTarget.style.color = scrolled ? C.deep : C.white)}
-            onMouseOut={e => (e.currentTarget.style.color = scrolled ? C.muted : "rgba(255,255,255,0.75)")}
-          >{label}</a>
-        ))}
-      </div>
-
-      {/* Lang toggle + CTA — always visible */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-        <LanguageToggle className={scrolled ? "" : "border-white/30 bg-white/10 text-white hover:bg-white/20"} />
-        <a
-          href="/customer"
-          style={{
-            padding: "8px 20px", background: C.hills, color: C.white,
-            borderRadius: 8, fontWeight: 600, fontSize: 13,
-            transition: "background 0.2s",
-            fontFamily: bFont,
-          }}
-          onMouseOver={e => (e.currentTarget.style.background = C.hillsHov)}
-          onMouseOut={e => (e.currentTarget.style.background = C.hills)}
-        >
-          {t("landing_nav_explore")}
+    <>
+      <nav className="dh-sans" style={{
+        position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
+        padding: "0 20px", height: 64,
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        background: navBg,
+        backdropFilter: scrolled ? "blur(14px)" : "none",
+        borderBottom: scrolled ? `1px solid ${C.border}` : "none",
+        boxShadow: scrolled ? "0 1px 16px rgba(62,122,36,0.08)" : "none",
+        transition: "background 0.3s, box-shadow 0.3s",
+      }}>
+        {/* Logo */}
+        <a href="/" style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+          <div style={{
+            width: 36, height: 36, borderRadius: 8,
+            background: C.lightBg, border: `1.5px solid ${C.hills}44`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <span className="dh-serif" style={{ color: C.hills, fontSize: 14, fontWeight: 700 }}>DH</span>
+          </div>
+          <span className="dh-serif" style={{
+            color: scrolled ? C.ink : C.white,
+            fontSize: 16, fontWeight: 600, transition: "color 0.3s",
+          }}>Deddeh Hills</span>
         </a>
-      </div>
-    </nav>
+
+        {/* Desktop links — hidden on mobile */}
+        <div className="dh-nav-links" style={{ alignItems: "center", gap: 28, fontSize: 13 }}>
+          {navLinks.map(({ label, href }) => (
+            <a key={href} href={href}
+              style={{ color: linkCol, transition: "color 0.2s", fontFamily: bFont }}
+              onMouseOver={e => (e.currentTarget.style.color = scrolled ? C.deep : C.white)}
+              onMouseOut={e => (e.currentTarget.style.color = linkCol)}
+            >{label}</a>
+          ))}
+        </div>
+
+        {/* Right side */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+          <LanguageToggle className={scrolled ? "" : "border-white/30 bg-white/10 text-white hover:bg-white/20"} />
+          {/* CTA — hidden on mobile */}
+          <a className="dh-nav-cta" href="/customer" style={{
+            padding: "8px 18px", background: C.hills, color: C.white,
+            borderRadius: 8, fontWeight: 600, fontSize: 13,
+            transition: "background 0.2s", fontFamily: bFont,
+          }}
+            onMouseOver={e => (e.currentTarget.style.background = C.hillsHov)}
+            onMouseOut={e => (e.currentTarget.style.background = C.hills)}
+          >{t("landing_nav_explore")}</a>
+          {/* Hamburger — mobile only */}
+          <button
+            className="dh-hamburger"
+            onClick={() => setMenuOpen(o => !o)}
+            aria-label="Toggle menu"
+            style={{
+              alignItems: "center", justifyContent: "center",
+              width: 36, height: 36, borderRadius: 8, border: "none",
+              background: menuOpen ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.10)",
+              cursor: "pointer", flexShrink: 0,
+            }}
+          >
+            {menuOpen
+              ? <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="2" y1="2" x2="14" y2="14" stroke="white" strokeWidth="2" strokeLinecap="round"/><line x1="14" y1="2" x2="2" y2="14" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>
+              : <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="2" y1="4" x2="14" y2="4" stroke="white" strokeWidth="2" strokeLinecap="round"/><line x1="2" y1="8" x2="14" y2="8" stroke="white" strokeWidth="2" strokeLinecap="round"/><line x1="2" y1="12" x2="14" y2="12" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>
+            }
+          </button>
+        </div>
+      </nav>
+
+      {/* Mobile dropdown menu */}
+      {menuOpen && (
+        <div className="dh-mobile-menu dh-sans" style={{
+          position: "fixed", top: 64, left: 0, right: 0, zIndex: 99,
+          background: "rgba(22,47,14,0.98)", backdropFilter: "blur(16px)",
+          padding: "8px 0 20px", borderBottom: `1px solid rgba(120,191,66,0.18)`,
+        }}>
+          {navLinks.map(({ label, href }) => (
+            <a key={href} href={href}
+              onClick={() => setMenuOpen(false)}
+              style={{
+                display: "block", padding: "14px 24px",
+                color: "rgba(255,255,255,0.85)", fontSize: 15, fontFamily: bFont,
+                borderBottom: "1px solid rgba(255,255,255,0.06)",
+                transition: "background 0.15s",
+              }}
+              onMouseOver={e => (e.currentTarget.style.background = "rgba(120,191,66,0.08)")}
+              onMouseOut={e => (e.currentTarget.style.background = "transparent")}
+            >{label}</a>
+          ))}
+          <div style={{ padding: "16px 24px 4px" }}>
+            <a href="/customer" onClick={() => setMenuOpen(false)} style={{
+              display: "block", textAlign: "center",
+              padding: "12px", background: C.hills, color: C.white,
+              borderRadius: 10, fontWeight: 600, fontSize: 14, fontFamily: bFont,
+            }}>{t("landing_nav_explore")} →</a>
+          </div>
+        </div>
+      )}
+    </>
   );
 
   /* ── Hero ─────────────────────────────────────────────────── */
