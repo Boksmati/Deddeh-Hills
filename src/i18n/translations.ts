@@ -464,7 +464,7 @@ const en = {
   inv_tab_simulate: "Simulate",
   inv_tab_sub_simulate: "Adjust the model",
   // hero narrative
-  inv_hero_headline: "A structured investment in North Lebanon real estate",
+  inv_hero_headline: "Invest in the finest private villas project in North Lebanon.",
   inv_bullet_1: "Phased development — reduce exposure, enter at Phase 1",
   inv_bullet_2: "Asset-backed — capital secured against land titles",
   inv_bullet_3: "Clear exit — villa sale proceeds distributed within 2–3 years",
@@ -969,7 +969,7 @@ const ar: Record<TranslationKey, string> = {
   inv_tab_simulate: "محاكاة",
   inv_tab_sub_simulate: "تعديل النموذج",
   // hero narrative
-  inv_hero_headline: "استثمار منظم في العقارات في شمال لبنان",
+  inv_hero_headline: "استثمر في أفضل مشروع فلل خاصة في شمال لبنان.",
   inv_bullet_1: "تطوير مرحلي — قلّل المخاطر، ادخل في المرحلة الأولى",
   inv_bullet_2: "مدعوم بأصول — رأس مالك مضمون بسندات الأرض",
   inv_bullet_3: "خروج واضح — عائدات بيع الفلل خلال 2–3 سنوات",
