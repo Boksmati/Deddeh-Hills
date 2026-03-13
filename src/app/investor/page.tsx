@@ -253,7 +253,7 @@ export default function InvestorPage() {
               {[
                 { val: mounted ? summary.totalLots : "—", unit: "lots", label: lang === "ar" ? "قطعة أرض" : "in 3 phases" },
                 { val: "80,000", unit: "m²", label: lang === "ar" ? "مساحة إجمالية" : "total land area" },
-                { val: mounted ? formatUSD(summary.totalRevenue) : "—", unit: "", label: lang === "ar" ? "إجمالي الإيرادات" : "projected revenue" },
+                { val: mounted ? formatPct(waterfall.l2InvestorROI) : "—", unit: "", label: lang === "ar" ? "عائد على النقد" : "projected ROI on cash" },
               ].map((s, i) => (
                 <div key={i} className="text-right">
                   <div className="text-white font-bold text-lg tabular-nums">
@@ -418,16 +418,12 @@ export default function InvestorPage() {
                       <td className="py-1.5 text-right tabular-nums text-dh-green font-bold">{formatUSD(activeWaterfall.revenue)}</td>
                     </tr>
                     <tr>
-                      <td className="py-1.5 text-gray-400 pl-3">− Return your capital</td>
+                      <td className="py-1.5 text-gray-400 pl-3">− Return of capital</td>
                       <td className="py-1.5 text-right tabular-nums text-gray-400">({formatUSD(activeWaterfall.l2InvestorCash)})</td>
                     </tr>
                     <tr>
-                      <td className="py-1.5 text-gray-400 pl-3">− L1 land repayment</td>
-                      <td className="py-1.5 text-right tabular-nums text-gray-400">({formatUSD(activeWaterfall.l1LandPayment)})</td>
-                    </tr>
-                    <tr>
-                      <td className="py-1.5 text-gray-400 pl-3">− Landowner equity</td>
-                      <td className="py-1.5 text-right tabular-nums text-gray-400">({formatUSD(activeWaterfall.ownerLandEquity)})</td>
+                      <td className="py-1.5 text-gray-400 pl-3">− Land cost</td>
+                      <td className="py-1.5 text-right tabular-nums text-gray-400">({formatUSD(activeWaterfall.l1LandPayment + activeWaterfall.ownerLandEquity)})</td>
                     </tr>
                     {waterfallModel === "priority" && activeWaterfall.priorityAmount > 0 && (
                       <tr>
