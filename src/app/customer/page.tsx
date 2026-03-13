@@ -1306,7 +1306,7 @@ function CustomerPageInner() {
           ) : (
             <div className="flex gap-5 items-start">
               {/* Lot sections */}
-              <div className={`${selectedUnit ? "flex-1 min-w-0" : "w-full"} space-y-8`}>
+              <div className={`${selectedUnit ? "md:w-1/3 min-w-0" : "w-full"} space-y-8`}>
                 {lots.map(({ lot, assignment, status }) => {
                   const devCfg     = DEVELOPMENT_TYPES[assignment.developmentType];
                   const phaseColor = PHASE_COLORS[assignment.phase];
@@ -1463,10 +1463,10 @@ function CustomerPageInner() {
                 })}
               </div>
 
-              {/* Desktop side panel — hidden on mobile */}
+              {/* Desktop side panel — hidden on mobile; takes 2/3 width */}
               {selectedUnit && (
                 <div
-                  className="hidden md:flex w-80 flex-shrink-0 rounded-2xl overflow-hidden flex-col sticky top-28"
+                  className="hidden md:flex md:flex-1 min-w-0 rounded-2xl overflow-hidden flex-col sticky top-28"
                   style={{
                     background: C.white,
                     border: `1px solid ${C.sand}`,
@@ -1595,11 +1595,11 @@ function CustomerPageInner() {
                         </div>
                       </div>
 
-                      {/* Explore CTA */}
+                      {/* Browse CTA */}
                       <button
                         onClick={() => {
                           setFilterType(tp as DevelopmentType);
-                          setViewMode("map");
+                          setViewMode("grid");
                           setSelectedUnit(null);
                           setSelectedMapLotId(null);
                         }}
@@ -1610,7 +1610,7 @@ function CustomerPageInner() {
                           fontFamily: "'DM Sans', system-ui, sans-serif",
                         }}
                       >
-                        {lang === "ar" ? "استكشف على الخريطة" : "Explore on Map"}
+                        {lang === "ar" ? "تصفح الوحدات" : "Browse Units"}
                         <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor">
                           <path fillRule="evenodd" d="M1 8a.5.5 0 01.5-.5h11.793l-3.147-3.146a.5.5 0 01.708-.708l4 4a.5.5 0 010 .708l-4 4a.5.5 0 01-.708-.708L13.293 8.5H1.5A.5.5 0 011 8z"/>
                         </svg>
@@ -1632,8 +1632,8 @@ function CustomerPageInner() {
                 </p>
                 <p className="text-xs" style={{ color: C.muted, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
                   {lang === "ar"
-                    ? "انقر على \"استكشف على الخريطة\" لرؤية المواقع الدقيقة على المخطط الرئيسي."
-                    : "Click \"Explore on Map\" to see exact locations on the master plan, or switch to Browse for a full list."}
+                    ? "انقر على \"تصفح الوحدات\" لعرض القائمة الكاملة والتفاصيل، أو انتقل إلى الخريطة لرؤية المواقع."
+                    : "Click \"Browse Units\" to see the full list with details, or switch to Map to see exact locations."}
                 </p>
               </div>
               <button onClick={() => setViewMode("grid")}

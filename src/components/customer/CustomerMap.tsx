@@ -5,19 +5,34 @@ import { LOT_POLYGONS, SVG_VIEWBOX } from "@/data/lot-polygons";
 import { DEVELOPMENT_TYPES } from "@/data/development-types";
 import { LotAssignment, LotStatus, LotGroup } from "@/types";
 
-const STATUS_FILL: Record<LotStatus, string> = {
-  available: "#22c55e",
-  reserved: "#f59e0b",
+// Stroke color indicates availability status (fill = dev type color)
+const STATUS_STROKE: Record<LotStatus, string> = {
+  available:      "white",
+  reserved:       "#f59e0b",
   under_contract: "#f97316",
-  sold: "#ef4444",
+  sold:           "#ef4444",
+};
+const STATUS_STROKE_WIDTH: Record<LotStatus, number> = {
+  available:      1.5,
+  reserved:       2.5,
+  under_contract: 2.5,
+  sold:           2.5,
+};
+const STATUS_OPACITY: Record<LotStatus, number> = {
+  available:      1,
+  reserved:       0.9,
+  under_contract: 0.85,
+  sold:           0.5,
 };
 
-const LEGEND = [
-  { status: "available",      color: "#22c55e", label_en: "Available",      label_ar: "متاح"       },
-  { status: "reserved",       color: "#f59e0b", label_en: "Reserved",       label_ar: "محجوز"      },
-  { status: "under_contract", color: "#f97316", label_en: "Under Contract", label_ar: "تحت العقد"  },
-  { status: "sold",           color: "#ef4444", label_en: "Sold",           label_ar: "مباع"        },
-];
+// Human-readable labels for each dev type (customer-facing)
+const DEV_TYPE_LABELS: Record<string, { en: string; ar: string }> = {
+  villa_2f:   { en: "Standalone Villa",      ar: "فيلا مستقلة"       },
+  villa_3f:   { en: "Luxury Villa",          ar: "فيلا فاخرة"         },
+  twin_villa: { en: "Twin Villa",            ar: "فيلا توأم"          },
+  apartments: { en: "Apartments & Duplexes", ar: "شقق ودوبلكس"        },
+  lot_sale:   { en: "Lot Sale",              ar: "بيع قطعة"           },
+};
 
 interface Props {
   filteredLotIds: Set<number>;
@@ -168,7 +183,11 @@ export default function CustomerMap({
           if (!assignment || assignment.developmentType === "unassigned") return null;
 
           const status: LotStatus = lotStatuses.get(polygon.id) ?? "available";
-          const fill = STATUS_FILL[status];
+          // Fill = dev type colour; stroke = status indicator
+          const fill = DEVELOPMENT_TYPES[assignment.developmentType]?.color ?? "#9CA3AF";
+          const strokeColor = STATUS_STROKE[status];
+          const strokeWidth = STATUS_STROKE_WIDTH[status];
+          const dotOpacity = STATUS_OPACITY[status];
           const [cx, cy] = polygon.center;
           const inFilter = filteredLotIds.has(polygon.id);
           const isSelected = selectedLotId === polygon.id;
@@ -178,7 +197,7 @@ export default function CustomerMap({
           return (
             <g
               key={polygon.id}
-              opacity={inFilter ? 1 : 0.18}
+              opacity={inFilter ? dotOpacity : 0.15}
               onClick={(e) => {
                 e.stopPropagation();
                 if (inFilter) onSelectLot(polygon.id);
@@ -206,8 +225,8 @@ export default function CustomerMap({
               {isHovered && !isSelected && (
                 <circle cx={cx} cy={cy} r={r + 4} fill={fill} fillOpacity={0.3} />
               )}
-              {/* Main dot */}
-              <circle cx={cx} cy={cy} r={r} fill={fill} stroke="white" strokeWidth={1.5} />
+              {/* Main dot — fill = dev type colour */}
+              <circle cx={cx} cy={cy} r={r} fill={fill} stroke={strokeColor} strokeWidth={strokeWidth} />
               {/* Lot number */}
               <text
                 x={cx} y={cy}
@@ -247,16 +266,32 @@ export default function CustomerMap({
         >−</button>
       </div>
 
-      {/* Legend */}
+      {/* Legend — dev type colours */}
       <div className="absolute bottom-4 start-4 bg-white/90 backdrop-blur-sm rounded-xl p-2.5 shadow-md z-10">
-        {LEGEND.map((item) => (
-          <div key={item.status} className="flex items-center gap-2 mb-1 last:mb-0">
-            <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
-            <span className="text-[10px] text-stone-600">
-              {lang === "ar" ? item.label_ar : item.label_en}
-            </span>
-          </div>
-        ))}
+        {Object.entries(DEV_TYPE_LABELS).map(([key, label]) => {
+          const color = DEVELOPMENT_TYPES[key]?.color ?? "#9CA3AF";
+          return (
+            <div key={key} className="flex items-center gap-2 mb-1 last:mb-0">
+              <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+              <span className="text-[10px] text-stone-600">
+                {lang === "ar" ? label.ar : label.en}
+              </span>
+            </div>
+          );
+        })}
+        {/* Status stroke key */}
+        <div className="mt-1.5 pt-1.5 border-t border-stone-200 space-y-1">
+          {([
+            { status: "reserved",       color: "#f59e0b", en: "Reserved",       ar: "محجوز"       },
+            { status: "under_contract", color: "#f97316", en: "Under Contract",  ar: "تحت العقد"   },
+            { status: "sold",           color: "#ef4444", en: "Sold",            ar: "مباع"        },
+          ] as const).map((s) => (
+            <div key={s.status} className="flex items-center gap-2">
+              <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: "#d6d3d1", outline: `2px solid ${s.color}`, outlineOffset: "1px" }} />
+              <span className="text-[10px] text-stone-500">{lang === "ar" ? s.ar : s.en}</span>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Hint pill */}
@@ -269,9 +304,9 @@ export default function CustomerMap({
       {/* Hover tooltip */}
       {hoveredId && (() => {
         const assignment = assignments.get(hoveredId);
-        const status = lotStatuses.get(hoveredId) ?? "available";
         const devCfg = assignment ? DEVELOPMENT_TYPES[assignment.developmentType] : null;
-        const fill = STATUS_FILL[status];
+        const fill = devCfg?.color ?? "#9CA3AF";
+        const label = assignment ? DEV_TYPE_LABELS[assignment.developmentType] : null;
         return (
           <div
             className="fixed z-50 pointer-events-none"
@@ -281,7 +316,7 @@ export default function CustomerMap({
               <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: fill }} />
               <div>
                 <div className="font-bold">{lang === "ar" ? "قطعة" : "Lot"} {hoveredId}</div>
-                {devCfg && <div className="text-stone-300">{devCfg.label}</div>}
+                {label && <div className="text-stone-300">{lang === "ar" ? label.ar : label.en}</div>}
               </div>
             </div>
           </div>
