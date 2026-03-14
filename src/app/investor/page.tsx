@@ -117,8 +117,9 @@ export default function InvestorPage() {
     waterfall, l1Returns, l1ExitOptions, phasedPricing, cashSufficiency,
   } = useInvestmentConfig();
 
+  const initStateFromServer = useSimulationStore((s) => s.initStateFromServer);
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => { setMounted(true); initStateFromServer(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [activeTab, setActiveTab] = useState<"returns" | "deal">("returns");
   const [waterfallModel, setWaterfallModel] = useState<"split" | "priority">("split");
