@@ -119,7 +119,8 @@ export default function InvestorPage() {
 
   const initStateFromServer = useSimulationStore((s) => s.initStateFromServer);
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); initStateFromServer(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const [serverReady, setServerReady] = useState(false);
+  useEffect(() => { setMounted(true); initStateFromServer().finally(() => setServerReady(true)); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [activeTab, setActiveTab] = useState<"returns" | "deal">("returns");
   const [waterfallModel, setWaterfallModel] = useState<"split" | "priority">("split");
@@ -251,9 +252,9 @@ export default function InvestorPage() {
             {/* Right side — quick project stats */}
             <div className="hidden md:flex flex-col gap-3 flex-shrink-0 text-right" dir="ltr">
               {[
-                { val: mounted ? summary.totalLots : "—", unit: "lots", label: lang === "ar" ? "قطعة أرض" : "in 3 phases" },
+                { val: serverReady ? summary.totalLots : "—", unit: "lots", label: lang === "ar" ? "قطعة أرض" : "in 3 phases" },
                 { val: "80,000", unit: "m²", label: lang === "ar" ? "مساحة إجمالية" : "total land area" },
-                { val: mounted ? formatPct(waterfall.l2InvestorROI) : "—", unit: "", label: lang === "ar" ? "عائد على النقد" : "projected ROI on cash" },
+                { val: serverReady ? formatPct(waterfall.l2InvestorROI) : "—", unit: "", label: lang === "ar" ? "عائد على النقد" : "projected ROI on cash" },
               ].map((s, i) => (
                 <div key={i} className="text-right">
                   <div className="text-white font-bold text-lg tabular-nums">

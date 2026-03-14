@@ -19,6 +19,11 @@ export default function InvitePage() {
       .then((res) => res.json().then((d) => ({ ok: res.ok, d })))
       .then(({ ok, d }) => {
         if (ok && d.destination) {
+          // Store invite context for analytics attribution
+          try {
+            sessionStorage.setItem("dh_invite_token", d.token as string ?? token);
+            sessionStorage.setItem("dh_invite_label", d.label as string ?? "");
+          } catch {}
           setStatus("success");
           setTimeout(() => router.replace(d.destination as string), 800);
         } else {

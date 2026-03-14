@@ -1647,6 +1647,8 @@ interface StoredEvent {
   ts: number;
   ip: string;
   ua: string;
+  inviteToken?: string;
+  inviteLabel?: string;
 }
 
 const EVENT_COLORS: Record<string, string> = {
@@ -1671,17 +1673,206 @@ function fmtDuration(sec: number): string {
   return `${Math.floor(sec / 60)}m ${sec % 60}s`;
 }
 
+function InviteBreakdown({ events, invites, filterToken, onFilterToken }: {
+  events: StoredEvent[];
+  invites: InviteToken[];
+  filterToken: string;
+  onFilterToken: (t: string) => void;
+}) {
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const inviteEvents = events.filter(e => e.inviteToken);
+  if (inviteEvents.length === 0 && invites.length === 0) return null;
+
+  // Build lookup: token → label from actual invites list (authoritative)
+  const inviteMap = new Map<string, string>(invites.map(i => [i.token, i.label]));
+
+  // Group events by token
+  const tokenMap = new Map<string, { label: string; events: StoredEvent[] }>();
+  for (const e of inviteEvents) {
+    const t = e.inviteToken!;
+    const label = inviteMap.get(t) ?? e.inviteLabel ?? t.slice(0, 10);
+    if (!tokenMap.has(t)) tokenMap.set(t, { label, events: [] });
+    tokenMap.get(t)!.events.push(e);
+  }
+
+  const rows = Array.from(tokenMap.entries()).map(([token, { label, events: evs }]) => {
+    const sessionIds = Array.from(new Set(evs.map(e => e.sessionId)));
+    const pages = Array.from(new Set(evs.filter(e => e.event === "page_view").map(e => e.page)));
+    const unitOpens = evs.filter(e => e.event === "unit_open");
+    const topUnitsMap: Record<string, number> = {};
+    for (const e of unitOpens) {
+      const k = `Lot ${(e.data as Record<string,unknown>)?.lotId} · ${(e.data as Record<string,unknown>)?.devType}`;
+      topUnitsMap[k] = (topUnitsMap[k] ?? 0) + 1;
+    }
+    const topUnits = Object.entries(topUnitsMap).sort((a, b) => b[1] - a[1]);
+    const enquiries = evs.filter(e => e.event === "enquire_open").length;
+    const timeSecs = evs
+      .filter(e => e.event === "time_on_page")
+      .reduce((s, e) => s + ((e.data as Record<string,unknown>)?.seconds as number ?? 0), 0);
+    const firstSeen = Math.min(...evs.map(e => e.ts));
+    const lastSeen  = Math.max(...evs.map(e => e.ts));
+    const ips = Array.from(new Set(evs.map(e => e.ip).filter(ip => ip && ip !== "unknown")));
+    // chronological event timeline (newest first for display)
+    const timeline = [...evs].sort((a, b) => b.ts - a.ts);
+    return { token, label, sessions: sessionIds, pages, topUnits, enquiries, timeSecs, firstSeen, lastSeen, ips, timeline, totalEvents: evs.length };
+  }).sort((a, b) => b.lastSeen - a.lastSeen);
+
+  return (
+    <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: 16 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+        <h3 style={{ fontSize: 13, fontWeight: 600, color: C.ink, margin: 0 }}>
+          Per Invite Link ({rows.length})
+        </h3>
+        {filterToken !== "all" && (
+          <button onClick={() => onFilterToken("all")}
+            style={{ fontSize: 11, padding: "4px 10px", background: "#EEF2FF", color: "#6366F1", border: "none", borderRadius: 6, cursor: "pointer", fontWeight: 600 }}>
+            ✕ Clear filter
+          </button>
+        )}
+      </div>
+      {rows.length === 0 ? (
+        <p style={{ fontSize: 12, color: C.muted }}>No attributed events yet. Events will appear here once someone visits via an invite link.</p>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {rows.map(r => {
+            const isExpanded = expanded === r.token;
+            const isFiltered = filterToken === r.token;
+            return (
+              <div key={r.token} style={{
+                background: isFiltered ? "#EEF2FF" : "#F9FAFB",
+                border: `1px solid ${isFiltered ? "#6366F1" : C.border}`,
+                borderRadius: 10,
+              }}>
+                {/* Header row */}
+                <div style={{ padding: "12px 14px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: C.ink }}>{r.label || "Unnamed"}</span>
+                      <span style={{ fontSize: 10, fontFamily: "monospace", color: C.muted, background: "#F3F4F6", borderRadius: 4, padding: "1px 5px" }}>
+                        {r.token.slice(0, 14)}…
+                      </span>
+                      {r.ips.map(ip => (
+                        <span key={ip} style={{ fontSize: 10, fontFamily: "monospace", color: "#6B7280", background: "#F3F4F6", borderRadius: 4, padding: "1px 6px" }}>{ip}</span>
+                      ))}
+                    </div>
+                    <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                      <span style={{ fontSize: 10, color: C.muted }}>First: {fmtTs(r.firstSeen)}</span>
+                      <span style={{ fontSize: 10, color: C.muted }}>Last: {fmtTs(r.lastSeen)}</span>
+                    </div>
+                  </div>
+
+                  {/* KPI pills */}
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
+                    {[
+                      { label: "Sessions",  val: r.sessions.length, color: "#6366F1" },
+                      { label: "Events",    val: r.totalEvents,     color: C.ink },
+                      { label: "Time",      val: r.timeSecs ? fmtDuration(r.timeSecs) : "—", color: "#8B5CF6" },
+                      { label: "Units Opened", val: r.topUnits.reduce((s, [,c]) => s + c, 0), color: C.amber },
+                      ...(r.enquiries > 0 ? [{ label: "Enquiries", val: r.enquiries, color: C.red }] : []),
+                    ].map(({ label, val, color }) => (
+                      <div key={label} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 6, padding: "4px 10px", fontSize: 11 }}>
+                        <span style={{ color: C.muted }}>{label}: </span>
+                        <strong style={{ color }}>{val}</strong>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Pages visited */}
+                  {r.pages.length > 0 && (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 8 }}>
+                      <span style={{ fontSize: 10, color: C.muted, alignSelf: "center", marginRight: 2 }}>Pages:</span>
+                      {r.pages.map(p => (
+                        <span key={p} style={{ fontSize: 10, background: "#EEF2FF", color: "#6366F1", borderRadius: 4, padding: "2px 7px" }}>{p}</span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Top units */}
+                  {r.topUnits.length > 0 && (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 6 }}>
+                      <span style={{ fontSize: 10, color: C.muted, alignSelf: "center", marginRight: 2 }}>Units:</span>
+                      {r.topUnits.slice(0, 5).map(([key, count]) => (
+                        <span key={key} style={{ fontSize: 10, background: "#FFFBEB", color: "#92400E", borderRadius: 4, padding: "2px 7px" }}>
+                          {key}{count > 1 ? ` ×${count}` : ""}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Action buttons */}
+                  <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
+                    <button onClick={() => onFilterToken(isFiltered ? "all" : r.token)}
+                      style={{ fontSize: 11, padding: "4px 10px", background: isFiltered ? "#6366F1" : "#EEF2FF", color: isFiltered ? "#fff" : "#6366F1", border: "none", borderRadius: 6, cursor: "pointer", fontWeight: 600 }}>
+                      {isFiltered ? "✓ Filtering" : "Filter events"}
+                    </button>
+                    <button onClick={() => setExpanded(isExpanded ? null : r.token)}
+                      style={{ fontSize: 11, padding: "4px 10px", background: "#F3F4F6", color: C.ink, border: "none", borderRadius: 6, cursor: "pointer" }}>
+                      {isExpanded ? "Hide timeline ▲" : `Show timeline (${r.totalEvents}) ▼`}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Expanded event timeline */}
+                {isExpanded && (
+                  <div style={{ borderTop: `1px solid ${C.border}`, padding: "10px 14px", maxHeight: 280, overflowY: "auto" }}>
+                    <p style={{ fontSize: 11, fontWeight: 600, color: C.muted, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.06em" }}>Event Timeline</p>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                      {r.timeline.map(ev => {
+                        const color = EVENT_COLORS[ev.event] ?? "#9CA3AF";
+                        return (
+                          <div key={ev.id} style={{ display: "flex", gap: 8, alignItems: "flex-start", padding: "5px 8px", background: "#F9FAFB", borderRadius: 6, borderLeft: `3px solid ${color}` }}>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
+                                <span style={{ fontSize: 11, fontWeight: 600, color }}>{ev.event}</span>
+                                <span style={{ fontSize: 10, color: C.muted }}>{ev.page}</span>
+                                {ev.data && Object.entries(ev.data).map(([k, v]) => (
+                                  <span key={k} style={{ fontSize: 9, background: "#E5E7EB", color: "#374151", borderRadius: 3, padding: "1px 4px" }}>{k}: {String(v)}</span>
+                                ))}
+                              </div>
+                              <span style={{ fontSize: 9, color: C.muted }}>{fmtTs(ev.ts)} · {ev.ip}</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function AnalyticsTab() {
   const [events, setEvents] = useState<StoredEvent[]>([]);
+  const [invites, setInvites] = useState<InviteToken[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
+  const [inviteFilter, setInviteFilter] = useState<string>("all"); // "all" or token
   const [clearing, setClearing] = useState(false);
+
+  // Build token→name map for lookups everywhere
+  const inviteNameMap = useMemo(() =>
+    new Map<string, string>(invites.map(i => [i.token, i.label])),
+  [invites]);
+
+  function nameForEvent(ev: StoredEvent): string | undefined {
+    if (!ev.inviteToken) return undefined;
+    return inviteNameMap.get(ev.inviteToken) ?? ev.inviteLabel ?? undefined;
+  }
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/analytics/events");
-      if (res.ok) setEvents(await res.json());
+      const [evRes, invRes] = await Promise.all([
+        fetch("/api/analytics/events"),
+        fetch("/api/admin/invites"),
+      ]);
+      if (evRes.ok) setEvents(await evRes.json());
+      if (invRes.ok) setInvites(await invRes.json());
     } catch {}
     setLoading(false);
   }, []);
@@ -1729,7 +1920,11 @@ function AnalyticsTab() {
   }, [events]);
 
   const eventTypes = useMemo(() => ["all", ...Array.from(new Set(events.map(e => e.event)))], [events]);
-  const filtered = filter === "all" ? events : events.filter(e => e.event === filter);
+  const filtered = useMemo(() =>
+    events
+      .filter(e => filter === "all" || e.event === filter)
+      .filter(e => inviteFilter === "all" || e.inviteToken === inviteFilter),
+  [events, filter, inviteFilter]);
 
   // Top units opened
   const topUnits = useMemo(() => {
@@ -1836,63 +2031,114 @@ function AnalyticsTab() {
 
       {/* Sessions list */}
       <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: 16 }}>
-        <h3 style={{ fontSize: 13, fontWeight: 600, color: C.ink, marginBottom: 12 }}>
-          Sessions ({sessions.size})
-        </h3>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+          <h3 style={{ fontSize: 13, fontWeight: 600, color: C.ink, margin: 0 }}>
+            Sessions
+            {inviteFilter !== "all" && (
+              <span style={{ fontSize: 11, fontWeight: 500, color: "#6366F1", marginLeft: 8 }}>
+                — filtered by {inviteNameMap.get(inviteFilter) ?? inviteFilter.slice(0, 8)}
+              </span>
+            )}
+          </h3>
+        </div>
         {sessions.size === 0 ? (
           <p style={{ fontSize: 12, color: C.muted }}>No sessions yet.</p>
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: 320, overflowY: "auto" }}>
-            {Array.from(sessions.entries()).map(([sid, evs]) => {
-              const pv = evs.find((e: StoredEvent) => e.event === "page_view");
-              const top = evs.find((e: StoredEvent) => e.event === "time_on_page");
-              const secs = top ? (top.data as Record<string,unknown>)?.seconds as number : undefined;
-              const enquiries = evs.filter((e: StoredEvent) => e.event === "enquire_open").length;
-              const units = evs.filter((e: StoredEvent) => e.event === "unit_open").length;
-              const ip = evs[0]?.ip ?? "—";
-              return (
-                <div key={sid} style={{ padding: "10px 12px", background: "#F9FAFB", borderRadius: 8, border: `1px solid ${C.border}` }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 6 }}>
-                    <div>
-                      <span style={{ fontSize: 11, fontFamily: "monospace", color: C.muted }}>{ip}</span>
-                      <span style={{ fontSize: 10, color: C.muted, marginLeft: 8 }}>
-                        {pv ? fmtTs(pv.ts) : "—"}
-                      </span>
-                    </div>
-                    <div style={{ display: "flex", gap: 8 }}>
-                      <span style={{ fontSize: 11, color: "#3B82F6" }}>{evs.length} events</span>
-                      {units > 0 && <span style={{ fontSize: 11, color: C.amber }}>{units} unit{units !== 1 ? "s" : ""}</span>}
-                      {enquiries > 0 && <span style={{ fontSize: 11, color: C.red, fontWeight: 600 }}>{enquiries} enquir{enquiries !== 1 ? "ies" : "y"}</span>}
-                      {secs && <span style={{ fontSize: 11, color: "#8B5CF6" }}>{fmtDuration(secs)}</span>}
+        ) : (() => {
+          const filteredSessions = Array.from(sessions.entries()).filter(([, evs]) =>
+            inviteFilter === "all" || evs.some((e: StoredEvent) => e.inviteToken === inviteFilter)
+          );
+          if (filteredSessions.length === 0) return (
+            <p style={{ fontSize: 12, color: C.muted }}>No sessions match the current filter.</p>
+          );
+          return (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: 320, overflowY: "auto" }}>
+              {filteredSessions.map(([sid, evs]) => {
+                const pv = evs.find((e: StoredEvent) => e.event === "page_view");
+                const top = evs.find((e: StoredEvent) => e.event === "time_on_page");
+                const secs = top ? (top.data as Record<string,unknown>)?.seconds as number : undefined;
+                const enquiries = evs.filter((e: StoredEvent) => e.event === "enquire_open").length;
+                const units = evs.filter((e: StoredEvent) => e.event === "unit_open").length;
+                const ip = evs[0]?.ip ?? "—";
+                const name = nameForEvent(evs.find((e: StoredEvent) => e.inviteToken) ?? evs[0]);
+                return (
+                  <div key={sid} style={{ padding: "10px 12px", background: "#F9FAFB", borderRadius: 8, border: `1px solid ${C.border}` }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 6 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                        {name && (
+                          <span style={{ fontSize: 11, fontWeight: 700, color: "#6366F1", background: "#EEF2FF", borderRadius: 5, padding: "2px 7px" }}>
+                            {name}
+                          </span>
+                        )}
+                        <span style={{ fontSize: 11, fontFamily: "monospace", color: C.muted }}>{ip}</span>
+                        <span style={{ fontSize: 10, color: C.muted }}>
+                          {pv ? fmtTs(pv.ts) : "—"}
+                        </span>
+                      </div>
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <span style={{ fontSize: 11, color: "#3B82F6" }}>{evs.length} events</span>
+                        {units > 0 && <span style={{ fontSize: 11, color: C.amber }}>{units} unit{units !== 1 ? "s" : ""}</span>}
+                        {enquiries > 0 && <span style={{ fontSize: 11, color: C.red, fontWeight: 600 }}>{enquiries} enquir{enquiries !== 1 ? "ies" : "y"}</span>}
+                        {secs && <span style={{ fontSize: 11, color: "#8B5CF6" }}>{fmtDuration(secs)}</span>}
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+                );
+              })}
+            </div>
+          );
+        })()}
       </div>
+
+      {/* Per invite link breakdown */}
+      <InviteBreakdown
+        events={events}
+        invites={invites}
+        filterToken={inviteFilter}
+        onFilterToken={setInviteFilter}
+      />
 
       {/* Event feed */}
       <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: 16 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
-          <h3 style={{ fontSize: 13, fontWeight: 600, color: C.ink, margin: 0 }}>Event Feed</h3>
-          <select
-            value={filter}
-            onChange={e => setFilter(e.target.value)}
-            style={{ fontSize: 12, padding: "5px 10px", border: `1px solid ${C.border}`, borderRadius: 6, background: C.white, color: C.ink, cursor: "pointer" }}
-          >
-            {eventTypes.map(t => (
-              <option key={t} value={t}>{t === "all" ? "All events" : t}</option>
-            ))}
-          </select>
+          <h3 style={{ fontSize: 13, fontWeight: 600, color: C.ink, margin: 0 }}>
+            Event Feed
+            {filtered.length !== events.length && (
+              <span style={{ fontSize: 11, fontWeight: 500, color: C.muted, marginLeft: 8 }}>
+                ({filtered.length} of {events.length})
+              </span>
+            )}
+          </h3>
+          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+            {/* Person filter */}
+            <select
+              value={inviteFilter}
+              onChange={e => setInviteFilter(e.target.value)}
+              style={{ fontSize: 12, padding: "5px 10px", border: `1px solid ${inviteFilter !== "all" ? "#6366F1" : C.border}`, borderRadius: 6, background: inviteFilter !== "all" ? "#EEF2FF" : C.white, color: inviteFilter !== "all" ? "#6366F1" : C.ink, cursor: "pointer", fontWeight: inviteFilter !== "all" ? 600 : 400 }}
+            >
+              <option value="all">All people</option>
+              {invites.filter(i => !i.revokedAt).map(i => (
+                <option key={i.token} value={i.token}>{i.label}</option>
+              ))}
+            </select>
+            {/* Event type filter */}
+            <select
+              value={filter}
+              onChange={e => setFilter(e.target.value)}
+              style={{ fontSize: 12, padding: "5px 10px", border: `1px solid ${C.border}`, borderRadius: 6, background: C.white, color: C.ink, cursor: "pointer" }}
+            >
+              {eventTypes.map(t => (
+                <option key={t} value={t}>{t === "all" ? "All events" : t}</option>
+              ))}
+            </select>
+          </div>
         </div>
         {filtered.length === 0 ? (
-          <p style={{ fontSize: 12, color: C.muted }}>No events.</p>
+          <p style={{ fontSize: 12, color: C.muted }}>No events match the current filters.</p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 4, maxHeight: 400, overflowY: "auto" }}>
             {filtered.slice(0, 200).map(ev => {
               const color = EVENT_COLORS[ev.event] ?? "#9CA3AF";
+              const name = nameForEvent(ev);
               return (
                 <div key={ev.id} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "7px 10px", background: "#F9FAFB", borderRadius: 7, borderLeft: `3px solid ${color}` }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -1905,9 +2151,14 @@ function AnalyticsTab() {
                         </span>
                       ))}
                     </div>
-                    <div style={{ display: "flex", gap: 10, marginTop: 2 }}>
+                    <div style={{ display: "flex", gap: 10, marginTop: 2, flexWrap: "wrap" }}>
                       <span style={{ fontSize: 10, color: C.muted }}>{fmtTs(ev.ts)}</span>
                       <span style={{ fontSize: 10, color: C.muted, fontFamily: "monospace" }}>{ev.ip}</span>
+                      {name && (
+                        <span style={{ fontSize: 10, background: "#EEF2FF", color: "#6366F1", borderRadius: 4, padding: "1px 5px", fontWeight: 600 }}>
+                          🔗 {name}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>

@@ -676,7 +676,15 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
       if (!res.ok) return;
       const data = await res.json() as Partial<PersistedServerState>;
       // Only override if server has actual assignment data
-      if (!data.assignments || data.assignments.length === 0) return;
+      if (!data.assignments || data.assignments.length === 0) {
+        // Server is empty — push current localStorage state to server so other
+        // sessions (investors in incognito, etc.) can read it.
+        const currentState = get();
+        if (currentState.assignments.size > 0) {
+          queueServerSave(buildServerState(currentState));
+        }
+        return;
+      }
 
       const defaultAssumptions = createDefaultTypeAssumptions();
       const assignments = new Map<number, LotAssignment>(

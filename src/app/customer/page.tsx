@@ -70,8 +70,101 @@ function fmt(n: number) { return n.toLocaleString("en-US", { maximumFractionDigi
 function floorPlanSrc(devType: string, floor: number): string {
   return `/typologies/${devType}-floor${floor}.jpg`;
 }
-function perspectiveSrc(devType: string): string {
-  return `/typologies/${devType}-perspective.jpg`;
+
+// ─── Perspective images per typology ─────────────────────────────────────────
+const PERSPECTIVE_IMAGES: Record<string, { src: string; label_en: string; label_ar: string }[]> = {
+  twin_villa: [
+    { src: "/typologies/twin_villa-perspective.jpg",  label_en: "Front",    label_ar: "الواجهة الأمامية" },
+    { src: "/typologies/twin_villa-perspective2.jpg", label_en: "Side",     label_ar: "الواجهة الجانبية" },
+  ],
+  villa_2f:   [{ src: "/typologies/villa_2f-perspective.jpg",   label_en: "Front", label_ar: "الواجهة الأمامية" }],
+  villa_3f:   [{ src: "/typologies/villa_3f-perspective.jpg",   label_en: "Front", label_ar: "الواجهة الأمامية" }],
+  apartments: [{ src: "/typologies/apartments-perspective.jpg", label_en: "Front", label_ar: "الواجهة الأمامية" }],
+};
+
+function PerspectiveCarousel({
+  devType, style, className = "", compact = false, heroMode = false,
+}: {
+  devType: string; style?: React.CSSProperties; className?: string;
+  compact?: boolean; heroMode?: boolean;
+}) {
+  const images = PERSPECTIVE_IMAGES[devType] ?? [];
+  const [idx, setIdx] = useState(0);
+  const { lang } = useTranslations();
+  const multi = images.length > 1;
+  const cur = images[idx];
+  return (
+    <div className={`overflow-hidden ${className}`} style={style}>
+      {/* Inner div provides the relative positioning context — avoids conflict when className contains "absolute" */}
+      <div className="relative w-full h-full">
+      {/* Crossfading images */}
+      {images.map((img, i) => (
+        <img key={img.src} src={img.src} alt=""
+          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
+          style={{ opacity: i === idx ? 1 : 0 }}
+          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+      ))}
+      {/* Fallback placeholder */}
+      {images.length === 0 && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 pointer-events-none">
+          <svg className={compact ? "w-5 h-5" : "w-8 h-8"} viewBox="0 0 24 24" fill="none" stroke={C.border} strokeWidth="1.5">
+            <path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1V9z"/><path d="M9 22V12h6v10"/>
+          </svg>
+          {!compact && <span className="text-[10px]" style={{ color: C.border }}>{lang === "ar" ? "المنظور" : "Perspective"}</span>}
+        </div>
+      )}
+      {/* Arrows — normal mode only */}
+      {multi && !compact && !heroMode && (
+        <>
+          <button onClick={(e) => { e.stopPropagation(); setIdx((idx - 1 + images.length) % images.length); }}
+            className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full flex items-center justify-center text-base font-bold z-10 transition-transform hover:scale-110"
+            style={{ background: "rgba(28,32,16,0.6)", color: "#fff" }}>‹</button>
+          <button onClick={(e) => { e.stopPropagation(); setIdx((idx + 1) % images.length); }}
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full flex items-center justify-center text-base font-bold z-10 transition-transform hover:scale-110"
+            style={{ background: "rgba(28,32,16,0.6)", color: "#fff" }}>›</button>
+        </>
+      )}
+      {/* Normal mode: label (start) + dots (end) */}
+      {!compact && !heroMode && (
+        <div className="absolute bottom-0 left-0 right-0 flex items-end justify-between px-2 pb-2 z-10 pointer-events-none">
+          {cur ? (
+            <div className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: "rgba(28,32,16,0.5)", color: C.white }}>
+              {lang === "ar" ? cur.label_ar : cur.label_en}
+            </div>
+          ) : <div />}
+          {multi && (
+            <div className="flex items-center gap-1 pointer-events-auto">
+              {images.map((_, i) => (
+                <span key={i} role="button" tabIndex={0} onClick={(e) => { e.stopPropagation(); setIdx(i); }}
+                  className="rounded-full transition-all inline-block cursor-pointer"
+                  style={{ width: i === idx ? 14 : 5, height: 5, background: i === idx ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.5)" }} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+      {/* Compact: dots at bottom-center — use span to avoid nested <button> inside parent card buttons */}
+      {compact && multi && (
+        <div className="absolute bottom-1.5 left-0 right-0 flex justify-center gap-1 z-10 pointer-events-none">
+          {images.map((_, i) => (
+            <span key={i} className="rounded-full transition-all inline-block"
+              style={{ width: i === idx ? 10 : 4, height: 4, background: i === idx ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.5)" }} />
+          ))}
+        </div>
+      )}
+      {/* Hero mode: dots at bottom-end, z-20 so they show above caller's gradient overlay */}
+      {heroMode && multi && (
+        <div className="absolute bottom-2 end-3 flex items-center gap-1 z-20 pointer-events-auto">
+          {images.map((_, i) => (
+            <span key={i} role="button" tabIndex={0} onClick={(e) => { e.stopPropagation(); setIdx(i); }}
+              className="rounded-full transition-all inline-block cursor-pointer"
+              style={{ width: i === idx ? 10 : 4, height: 4, background: i === idx ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.5)" }} />
+          ))}
+        </div>
+      )}
+      </div>
+    </div>
+  );
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -344,20 +437,18 @@ function UnitDetail({ sel, lang, t, projectSpecs, onClose, onEnquire, wide = fal
     <div className="flex flex-col flex-1 min-h-0">
       {/* Perspective header */}
       <div className="relative h-40 flex-shrink-0" style={{ backgroundColor: devCfg.color + "20" }}>
-        <img src={perspectiveSrc(devType)} alt=""
-          className="absolute inset-0 w-full h-full object-cover"
-          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(28,32,16,0.75) 0%, rgba(28,32,16,0.15) 55%, transparent 100%)" }} />
+        <PerspectiveCarousel devType={devType} heroMode className="absolute inset-0" />
+        <div className="absolute inset-0 z-10 pointer-events-none" style={{ background: "linear-gradient(to top, rgba(28,32,16,0.75) 0%, rgba(28,32,16,0.15) 55%, transparent 100%)" }} />
         {onClose && (
           <button onClick={onClose}
             className="absolute top-3 end-3 w-7 h-7 rounded-full flex items-center justify-center text-sm z-10 transition-colors"
             style={{ background: "rgba(28,32,16,0.55)", color: C.white }}>×</button>
         )}
-        <div className="absolute bottom-3 start-3">
+        <div className="absolute bottom-3 start-3 z-30 pointer-events-none">
           <div className="text-sm font-bold" style={{ color: C.white, fontFamily: "'Playfair Display', Georgia, serif" }}>{unitTitle}</div>
           <div className="text-[10px] mt-0.5" style={{ color: "rgba(245,240,232,0.65)" }}>{devCfg.label}</div>
         </div>
-        <div className="absolute bottom-3 end-3">
+        <div className="absolute bottom-3 end-3 z-30 pointer-events-none">
           <div className="flex items-center gap-1 text-[10px] font-semibold px-2.5 py-1 rounded-full"
             style={{ background: scfg.bg, color: C.white }}>
             <span className="w-1.5 h-1.5 rounded-full bg-white/70" />
@@ -545,23 +636,10 @@ function UnitDetail({ sel, lang, t, projectSpecs, onClose, onEnquire, wide = fal
                     </div>
                     <div>
                       <div className="text-[9px] uppercase tracking-wider mb-1.5 font-medium" style={{ color: C.gold }}>
-                        {lang === "ar" ? "المنظور الخارجي" : "Exterior Perspective"}
+                        {lang === "ar" ? "المناظر" : "Perspectives"}
                       </div>
-                      <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: "3/4", background: C.bg, border: `1px solid ${C.sand}` }}>
-                        <img src={perspectiveSrc(devType)} alt=""
-                          className="absolute inset-0 w-full h-full object-cover"
-                          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
-                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 pointer-events-none">
-                          <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke={C.border} strokeWidth="1.5">
-                            <path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1V9z"/>
-                            <path d="M9 22V12h6v10"/>
-                          </svg>
-                          <span className="text-[10px]" style={{ color: C.border }}>Perspective</span>
-                        </div>
-                        <div className="absolute bottom-2 start-2 text-[9px] px-2 py-0.5 rounded-full" style={{ background: "rgba(28,32,16,0.5)", color: C.white }}>
-                          {lang === "ar" ? "المنظور الخارجي" : "Exterior perspective"}
-                        </div>
-                      </div>
+                      <PerspectiveCarousel devType={devType} className="rounded-xl"
+                        style={{ aspectRatio: "3/4", background: C.bg, border: `1px solid ${C.sand}` }} />
                     </div>
                   </div>
                 ) : (
@@ -584,21 +662,8 @@ function UnitDetail({ sel, lang, t, projectSpecs, onClose, onEnquire, wide = fal
                         {lang === "ar" ? FLOOR_LABELS[unit.floors[floorIdx]]?.ar : FLOOR_LABELS[unit.floors[floorIdx]]?.en}
                       </div>
                     </div>
-                    <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: "16/9", background: C.bg, border: `1px solid ${C.sand}` }}>
-                      <img src={perspectiveSrc(devType)} alt=""
-                        className="absolute inset-0 w-full h-full object-cover"
-                        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
-                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 pointer-events-none">
-                        <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke={C.border} strokeWidth="1.5">
-                          <path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1V9z"/>
-                          <path d="M9 22V12h6v10"/>
-                        </svg>
-                        <span className="text-[10px]" style={{ color: C.border }}>{lang === "ar" ? "المنظور" : "Perspective"}</span>
-                      </div>
-                      <div className="absolute bottom-2 start-2 text-[9px] px-2 py-0.5 rounded-full" style={{ background: "rgba(28,32,16,0.5)", color: C.white }}>
-                        {lang === "ar" ? "المنظور الخارجي" : "Exterior perspective"}
-                      </div>
-                    </div>
+                    <PerspectiveCarousel devType={devType} className="rounded-xl"
+                      style={{ aspectRatio: "16/9", background: C.bg, border: `1px solid ${C.sand}` }} />
                   </>
                 )}
               </>
@@ -723,11 +788,8 @@ function MapUnitList({
       </div>
 
       {/* Perspective */}
-      <div className="relative flex-shrink-0" style={{ height: "120px", backgroundColor: devCfg.color + "18" }}>
-        <img src={perspectiveSrc(devType)} alt=""
-          className="absolute inset-0 w-full h-full object-cover"
-          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
-      </div>
+      <PerspectiveCarousel devType={devType} compact className="flex-shrink-0"
+        style={{ height: "120px", backgroundColor: devCfg.color + "18" }} />
 
       {/* Instruction */}
       <div className="px-4 pt-3 pb-1 flex-shrink-0">
@@ -806,9 +868,10 @@ function CustomerPageInner() {
   const [enquireUnit,      setEnquireUnit]      = useState<SelectedUnit | null>(null);
 
   const [mounted, setMounted] = useState(false);
+  const [serverReady, setServerReady] = useState(false);
   useEffect(() => {
     setMounted(true);
-    initStateFromServer();
+    initStateFromServer().finally(() => setServerReady(true));
     // Inject fonts + utility CSS client-side to avoid SSR hydration mismatch
     const id = "dh-customer-styles";
     if (!document.getElementById(id)) {
@@ -1025,8 +1088,16 @@ function CustomerPageInner() {
       )}
 
       {/* ── Hero ── */}
-      <div style={{ background: "#1A3810" }}>
-        <div className="max-w-7xl mx-auto px-5 pt-5 pb-6 sm:pt-7 sm:pb-7">
+      <div className="relative overflow-hidden" style={{ background: "#1A3810" }}>
+        {/* Drone video background */}
+        <video
+          src="/videos/drone-dh.mp4"
+          autoPlay muted loop playsInline
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+          style={{ opacity: 0.35 }}
+        />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(to bottom, rgba(26,56,16,0.3) 0%, rgba(26,56,16,0.6) 100%)" }} />
+        <div className="relative z-10 max-w-7xl mx-auto px-5 pt-5 pb-6 sm:pt-7 sm:pb-7">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-4">
             <div className="flex-1 min-w-0">
               {/* Title */}
@@ -1060,7 +1131,7 @@ function CustomerPageInner() {
               <div className="flex items-start gap-4 md:gap-7 text-end">
                 <div>
                   <div className="dh-serif font-bold tabular-nums" style={{ fontSize: "clamp(1.4rem,4vw,2.25rem)", color: C.white }}>
-                    {mounted ? totalUnits : "—"}
+                    {serverReady ? totalUnits : "—"}
                   </div>
                   <div className="text-[9px] uppercase tracking-widest mt-0.5" style={{ color: "rgba(245,240,232,0.38)", fontFamily: "'DM Sans', system-ui, sans-serif" }}>
                     {lang === "ar" ? "الوحدات" : "Total Units"}
@@ -1068,7 +1139,7 @@ function CustomerPageInner() {
                 </div>
                 <div>
                   <div className="dh-serif font-bold tabular-nums" style={{ fontSize: "clamp(1.4rem,4vw,2.25rem)", color: "#4ade80" }}>
-                    {mounted ? totalAvailable : "—"}
+                    {serverReady ? totalAvailable : "—"}
                   </div>
                   <div className="text-[9px] uppercase tracking-widest mt-0.5" style={{ color: "rgba(245,240,232,0.38)", fontFamily: "'DM Sans', system-ui, sans-serif" }}>
                     {lang === "ar" ? "متاحة" : "Available"}
@@ -1081,7 +1152,7 @@ function CustomerPageInner() {
             <div className="flex sm:hidden items-center gap-5">
               <div>
                 <div className="dh-serif font-bold tabular-nums text-xl" style={{ color: C.white }}>
-                  {mounted ? totalUnits : "—"}
+                  {serverReady ? totalUnits : "—"}
                 </div>
                 <div className="text-[9px] uppercase tracking-widest" style={{ color: "rgba(245,240,232,0.38)", fontFamily: "'DM Sans', system-ui, sans-serif" }}>
                   {lang === "ar" ? "الوحدات" : "Total Units"}
@@ -1090,7 +1161,7 @@ function CustomerPageInner() {
               <div className="w-px h-8 bg-white/10" />
               <div>
                 <div className="dh-serif font-bold tabular-nums text-xl" style={{ color: "#4ade80" }}>
-                  {mounted ? totalAvailable : "—"}
+                  {serverReady ? totalAvailable : "—"}
                 </div>
                 <div className="text-[9px] uppercase tracking-widest" style={{ color: "rgba(245,240,232,0.38)", fontFamily: "'DM Sans', system-ui, sans-serif" }}>
                   {lang === "ar" ? "متاحة" : "Available"}
@@ -1110,7 +1181,7 @@ function CustomerPageInner() {
           <div className="flex items-center justify-between py-2.5">
             <div className="flex items-center gap-2">
               <span className="text-[11px]" style={{ color: C.muted, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
-                {mounted
+                {serverReady
                   ? lang === "ar"
                       ? `${lots.length} قطعة · ${totalUnits} وحدة`
                       : `${lots.length} lot${lots.length !== 1 ? "s" : ""} · ${totalUnits} unit${totalUnits !== 1 ? "s" : ""}`
@@ -1451,12 +1522,7 @@ function CustomerPageInner() {
                             >
                               {/* Image header */}
                               <div className="relative overflow-hidden" style={{ height: "82px", backgroundColor: devCfg.color + "18" }}>
-                                <img
-                                  src={perspectiveSrc(assignment.developmentType)}
-                                  alt=""
-                                  className="w-full h-full object-cover"
-                                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                                />
+                                <PerspectiveCarousel devType={assignment.developmentType} compact className="absolute inset-0" />
                                 {isUnavailable && (
                                   <div className="absolute inset-0 flex items-end pb-1.5 ps-2">
                                     <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full"
@@ -1637,14 +1703,9 @@ function CustomerPageInner() {
                   >
                     {/* Hero rendering image */}
                     <div className="relative overflow-hidden rounded-t-2xl" style={{ aspectRatio: "16/7" }}>
-                      <img
-                        src={perspectiveSrc(tp)}
-                        alt={meta?.headline_en ?? cfg.label}
-                        className="absolute inset-0 w-full h-full object-cover"
-                        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                      />
-                      <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 40%, rgba(28,32,16,0.55) 100%)" }} />
-                      <div className="absolute bottom-3 start-4 flex items-center gap-2">
+                      <PerspectiveCarousel devType={tp} heroMode className="absolute inset-0" />
+                      <div className="absolute inset-0 z-10 pointer-events-none" style={{ background: "linear-gradient(to bottom, transparent 40%, rgba(28,32,16,0.55) 100%)" }} />
+                      <div className="absolute bottom-3 start-4 z-20 pointer-events-none flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: cfg.color }} />
                         <h3 className="dh-serif font-bold text-sm leading-tight" style={{ color: "#fff", textShadow: "0 1px 4px rgba(0,0,0,0.4)" }}>
                           {lang === "ar" ? (meta?.headline_ar ?? cfg.label) : (meta?.headline_en ?? cfg.label)}

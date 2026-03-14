@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
   const accessCode = process.env.ACCESS_CODE ?? "open";
   const destination = invite.role === "investor" ? "/investor" : "/customer";
 
-  const res = NextResponse.json({ destination });
+  const res = NextResponse.json({ destination, label: invite.label ?? "", token: invite.token });
   const opts = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

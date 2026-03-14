@@ -13,6 +13,8 @@ export interface StoredEvent {
   ts: number;
   ip: string;
   ua: string;
+  inviteToken?: string;
+  inviteLabel?: string;
 }
 
 export async function POST(req: NextRequest) {
@@ -33,6 +35,8 @@ export async function POST(req: NextRequest) {
       ts: typeof body.ts === "number" ? body.ts : Date.now(),
       ip,
       ua,
+      ...(body.inviteToken ? { inviteToken: String(body.inviteToken) } : {}),
+      ...(body.inviteLabel ? { inviteLabel: String(body.inviteLabel) } : {}),
     };
 
     const events = await dbGet<StoredEvent[]>(KEY, []);

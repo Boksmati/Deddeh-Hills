@@ -507,7 +507,7 @@
     }
   ],
   "lotStatuses": [],
-  "investorSharePct": 10,
+  "investorSharePct": 20,
   "typeAssumptions": {
     "unassigned": {
       "constructionCostPerM": 0,

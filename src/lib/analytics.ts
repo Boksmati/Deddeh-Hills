@@ -20,6 +20,16 @@ function getSessionId(): string {
   return id;
 }
 
+function getInviteContext(): { inviteToken?: string; inviteLabel?: string } {
+  if (typeof sessionStorage === "undefined") return {};
+  const token = sessionStorage.getItem("dh_invite_token");
+  const label = sessionStorage.getItem("dh_invite_label");
+  return {
+    ...(token ? { inviteToken: token } : {}),
+    ...(label ? { inviteLabel: label } : {}),
+  };
+}
+
 function post(event: string, page: string, data?: Record<string, string | number | boolean>) {
   const payload = JSON.stringify({
     event,
@@ -27,6 +37,7 @@ function post(event: string, page: string, data?: Record<string, string | number
     sessionId: getSessionId(),
     data,
     ts: Date.now(),
+    ...getInviteContext(),
   });
   // sendBeacon is fire-and-forget; fall back to fetch
   if (typeof navigator !== "undefined" && navigator.sendBeacon) {
@@ -58,6 +69,7 @@ export function useTracking(page: string): TrackFn {
         page,
         sessionId: getSessionId(),
         ts: Date.now(),
+        ...getInviteContext(),
       }),
     }).catch(() => {});
 

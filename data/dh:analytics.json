@@ -599,5 +599,465 @@
     "ts": 1773488788569,
     "ip": "::ffff:127.0.0.1",
     "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "wni41dp6rgmmq9tj1w",
+    "event": "time_on_page",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "seconds": 651
+    },
+    "ts": 1773489436306,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "3v04mojbhlommq9tsrr",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "ts": 1773489448895,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "kka9bxc2agmmqae6dr",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "ts": 1773490399020,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "krww29c9jslmmqah4ls",
+    "event": "time_on_page",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "seconds": 138
+    },
+    "ts": 1773490537330,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "9y5mzejico4mmqah50f",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "ts": 1773490537853,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "moh4cvaiyshmmqaoud1",
+    "event": "time_on_page",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "seconds": 359
+    },
+    "ts": 1773490897307,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "hw3dnml1wkqmmqbqus3",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "ts": 1773492670382,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "yx436iw9xz8mmqbra92",
+    "event": "time_on_page",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "data": {
+      "seconds": 20
+    },
+    "ts": 1773492690824,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "hcg6e7fc9ypmmqbs1q2",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "verify-session",
+    "ts": 1773492726427,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "tok_test123",
+    "inviteLabel": "Verify Test"
+  },
+  {
+    "id": "o9bmmagmq39mmqbs4tu",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "ts": 1773492730457,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "sbis9acktummqbsn0k",
+    "event": "time_on_page",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "data": {
+      "seconds": 24
+    },
+    "ts": 1773492754019,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "ol5ehas01uhmmqbsuzk",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "ts": 1773492764365,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "gqhgdwtmd1ummqbu605",
+    "event": "time_on_page",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "data": {
+      "seconds": 61
+    },
+    "ts": 1773492825185,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "ga6xblnil2rmmqbuc91",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "ts": 1773492833359,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "eb25j5qkyz9mmqbue9m",
+    "event": "view_mode_change",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "data": {
+      "mode": "map"
+    },
+    "ts": 1773492836002,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "ebn6f6f3iiemmqbuf6i",
+    "event": "view_mode_change",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "data": {
+      "mode": "grid"
+    },
+    "ts": 1773492837202,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "wfdlrpqokommqbuvpw",
+    "event": "unit_open",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "data": {
+      "lotId": 7,
+      "devType": "villa_2f",
+      "unitId": "7"
+    },
+    "ts": 1773492858596,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "7zejgf6ckwmmqbxc17",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "ts": 1773492972374,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "283cnokejqcmmqbxik1",
+    "event": "time_on_page",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "data": {
+      "seconds": 9
+    },
+    "ts": 1773492981528,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "sdy0tz836hmmqbxivw",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "ts": 1773492981948,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "qooc6lcmy0hmmqby4ls",
+    "event": "view_mode_change",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "data": {
+      "mode": "grid"
+    },
+    "ts": 1773493010095,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "p57kiyuy4ummqbykcm",
+    "event": "time_on_page",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "data": {
+      "seconds": 49
+    },
+    "ts": 1773493030450,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "aeu9uuhp6hmmqbync8",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "ts": 1773493034391,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "wrhw39towdmmmqbynzf",
+    "event": "view_mode_change",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "data": {
+      "mode": "grid"
+    },
+    "ts": 1773493035235,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "34u62vd238ommqbypew",
+    "event": "view_mode_change",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "data": {
+      "mode": "map"
+    },
+    "ts": 1773493037086,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "2rcseync2z4mmqbyq0f",
+    "event": "view_mode_change",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "data": {
+      "mode": "typologies"
+    },
+    "ts": 1773493037860,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "wc3ndi58ivrmmqbyrnt",
+    "event": "typology_view",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "data": {
+      "type": "villa_3f"
+    },
+    "ts": 1773493039998,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "hph34gm6m2tmmqbysxp",
+    "event": "unit_open",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "data": {
+      "lotId": 32,
+      "devType": "villa_3f",
+      "unitId": "32"
+    },
+    "ts": 1773493041647,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "q4ar35he4lmmqbzxnu",
+    "event": "time_on_page",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "data": {
+      "seconds": 60
+    },
+    "ts": 1773493094404,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "muoyxhq4qxfmmqbzy0i",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "ts": 1773493094852,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "e97h5ulkthmmmqc0yqr",
+    "event": "time_on_page",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "data": {
+      "seconds": 48
+    },
+    "ts": 1773493142447,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "nynamle6oafmmqc0z4n",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "ts": 1773493142947,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "gql9hbwfkejmmqc1qqv",
+    "event": "time_on_page",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "data": {
+      "seconds": 36
+    },
+    "ts": 1773493178738,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "6zb7j7zmficmmqc1r8q",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "ts": 1773493179373,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "25s4ybkyeo7mmqc1r9a",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "ts": 1773493179377,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "8987um84najmmqc4g1l",
+    "event": "time_on_page",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "data": {
+      "seconds": 125
+    },
+    "ts": 1773493304288,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "mlhurz6zranmmqc4gsu",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "fy8gaik1rxammqbqugc",
+    "ts": 1773493305297,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
+    "inviteToken": "test123",
+    "inviteLabel": "Test Investor"
   }
 ]
