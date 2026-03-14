@@ -520,7 +520,7 @@ function UnitDetail({ sel, lang, t, projectSpecs, onClose, onEnquire, wide = fal
             {/* Specs grid */}
             <div className={`grid gap-2 ${wide ? "grid-cols-4" : "grid-cols-2"}`}>
               {[
-                { label: t("internal_area"), value: `${fmt(unit.areaSqm)} m²` },
+                { label: isLotSale ? (lang === "ar" ? "مساحة الأرض" : "Land Area") : t("internal_area"), value: `${fmt(unit.areaSqm)} m²` },
                 ...(unit.bedroomCount > 0 ? [{ label: t("bedrooms"), value: `${unit.bedroomCount}` }] : []),
                 ...(unit.gardenSqm > 0  ? [{ label: t("garden"),   value: `${fmt(unit.gardenSqm)} m²`  }] : []),
                 ...(unit.terraceSqm > 0 ? [{ label: t("terrace"),  value: `${fmt(unit.terraceSqm)} m²` }] : []),
@@ -815,10 +815,10 @@ function MapUnitList({
               )}
             </div>
             <div className="flex items-center gap-3 text-[10px] flex-wrap" style={{ color: C.muted }}>
-              <span dir="ltr">{fmt(unit.areaSqm)} m²</span>
-              {unit.bedroomCount > 0 && <span>{unit.bedroomCount} {lang === "ar" ? "غرف" : "br"}</span>}
-              {unit.gardenSqm > 0  && <span>{lang === "ar" ? "حديقة" : "Garden"} {fmt(unit.gardenSqm)}m²</span>}
-              {unit.terraceSqm > 0 && <span>{lang === "ar" ? "تراس"  : "Terrace"} {fmt(unit.terraceSqm)}m²</span>}
+              <span dir="ltr">{fmt(unit.areaSqm)} m² <span className="opacity-60">{devType === "lot_sale" ? (lang === "ar" ? "أرض" : "land") : (lang === "ar" ? "بناء" : "BUA")}</span></span>
+              {unit.bedroomCount > 0 && <span>{unit.bedroomCount} {lang === "ar" ? "غرف" : "beds"}</span>}
+              {unit.gardenSqm > 0  && <span>{lang === "ar" ? "حديقة" : "Garden"} {fmt(unit.gardenSqm)} m²</span>}
+              {unit.terraceSqm > 0 && <span>{lang === "ar" ? "تراس"  : "Terrace"} {fmt(unit.terraceSqm)} m²</span>}
               <span style={{ color: C.border }}>{unit.floors.map(f => FLOOR_LABELS[f]?.en).join(" · ")}</span>
             </div>
           </button>
@@ -1554,26 +1554,33 @@ function CustomerPageInner() {
                                       <svg className="w-3 h-3 flex-shrink-0 opacity-40" viewBox="0 0 16 16" fill="currentColor">
                                         <rect x="2" y="2" width="12" height="12" rx="1" fill="none" stroke="currentColor" strokeWidth="1.5"/>
                                       </svg>
-                                      {fmt(unit.areaSqm)} m²
+                                      {fmt(unit.areaSqm)} m²{" "}
+                                      <span className="opacity-60">
+                                        {assignment.developmentType === "lot_sale"
+                                          ? (lang === "ar" ? "أرض" : "land")
+                                          : (lang === "ar" ? "بناء" : "BUA")}
+                                      </span>
                                     </div>
                                     {unit.bedroomCount > 0 && (
                                       <div className="flex items-center gap-1.5 text-[10px]" style={{ color: C.muted }}>
                                         <svg className="w-3 h-3 flex-shrink-0 opacity-40" viewBox="0 0 16 16" fill="currentColor">
                                           <path d="M2 10V7a1 1 0 011-1h10a1 1 0 011 1v3M2 10h12M2 10v3h12v-3" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
                                         </svg>
-                                        {unit.bedroomCount} {lang === "ar" ? "غرف" : "br"}
+                                        {unit.bedroomCount} {lang === "ar" ? "غرف" : "beds"}
                                       </div>
                                     )}
                                     {unit.gardenSqm > 0 && (
                                       <div className="flex items-center gap-1.5 text-[10px]" style={{ color: C.muted }}>
                                         <span className="text-[10px]">🌿</span>
-                                        {fmt(unit.gardenSqm)}m²
+                                        {fmt(unit.gardenSqm)} m²{" "}
+                                        <span className="opacity-60">{lang === "ar" ? "حديقة" : "garden"}</span>
                                       </div>
                                     )}
                                     {unit.terraceSqm > 0 && (
                                       <div className="flex items-center gap-1.5 text-[10px]" style={{ color: C.muted }}>
                                         <span className="text-[10px]">☀️</span>
-                                        {fmt(unit.terraceSqm)}m²
+                                        {fmt(unit.terraceSqm)} m²{" "}
+                                        <span className="opacity-60">{lang === "ar" ? "تراس" : "terrace"}</span>
                                       </div>
                                     )}
                                     <div className="flex items-center gap-1 flex-wrap mt-1">

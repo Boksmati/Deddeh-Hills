@@ -1059,5 +1059,77 @@
     "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36",
     "inviteToken": "test123",
     "inviteLabel": "Test Investor"
+  },
+  {
+    "id": "6ix7073b5ycmmqck7k8",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "u2p0x6fa6drmmqck6hp",
+    "ts": 1773494039008,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "wwpx3c7n0wmmqckap3",
+    "event": "time_on_page",
+    "page": "/customer",
+    "sessionId": "u2p0x6fa6drmmqck6hp",
+    "data": {
+      "seconds": 5
+    },
+    "ts": 1773494044440,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "m5bm3ssd8xmmqcnq6l",
+    "event": "test_hardening",
+    "page": "/customer",
+    "sessionId": "test",
+    "ts": 1773494204445,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "df0er4eerlhmmqgzc5k",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "yswa2b1dz6lmmqgzc1b",
+    "ts": 1773501464497,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "wk3v0h1avgmmqgzn77",
+    "event": "time_on_page",
+    "page": "/customer",
+    "sessionId": "yswa2b1dz6lmmqgzc1b",
+    "data": {
+      "seconds": 14
+    },
+    "ts": 1773501478937,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "wkob2wpmrhmmqgznic",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "yswa2b1dz6lmmqgzc1b",
+    "ts": 1773501479346,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "7rzjc7uj0e8mmqh0203",
+    "event": "view_mode_change",
+    "page": "/customer",
+    "sessionId": "yswa2b1dz6lmmqgzc1b",
+    "data": {
+      "mode": "grid"
+    },
+    "ts": 1773501498089,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
   }
 ]
