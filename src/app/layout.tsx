@@ -3,9 +3,12 @@ import "./globals.css";
 import LanguageApplier from "@/components/ui/LanguageApplier";
 
 export const metadata: Metadata = {
-  title: "Deddeh Hills — Development Simulator",
+  title: {
+    template: "%s | Deddeh Hills",
+    default: "Deddeh Hills — North Lebanon",
+  },
   description:
-    "Interactive development simulator for Deddeh Hills gated community project in Koura, Lebanon",
+    "Deddeh Hills — a gated residential development in Koura, North Lebanon.",
 };
 
 export default function RootLayout({

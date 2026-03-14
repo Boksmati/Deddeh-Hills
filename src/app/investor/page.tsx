@@ -140,7 +140,7 @@ export default function InvestorPage() {
       const phase = summary.phaseBreakdown.find((p) => p.phase === phaseNum);
       if (!phase || phase.lotCount === 0) return null;
       return {
-        name: `Phase ${phaseNum}`,
+        name: lang === "ar" ? `مرحلة ${phaseNum}` : `Phase ${phaseNum}`,
         "Land Cost": phase.totalLandCost,
         Construction: phase.totalConstructionCost,
         Revenue: phase.totalRevenue,
@@ -343,12 +343,18 @@ export default function InvestorPage() {
           <div className="space-y-5">
             {/* Pitch hero */}
             <div className="bg-dh-dark text-white rounded-2xl p-5 sm:p-6">
-              <div className="text-[10px] uppercase tracking-widest text-white/50 mb-2">Your investment opportunity</div>
+              <div className="text-[10px] uppercase tracking-widest text-white/50 mb-2">
+                {lang === "ar" ? "فرصتك الاستثمارية" : "Your investment opportunity"}
+              </div>
               <h2 className="text-xl sm:text-2xl font-serif font-semibold leading-snug mb-3">
-                Invest from $300K. Earn {formatPct(waterfall.l2InvestorROI)} on cash — in under 3 years.
+                {lang === "ar"
+                  ? `استثمر من $300K. احصل على ${formatPct(waterfall.l2InvestorROI)} على رأس المال — في أقل من 3 سنوات.`
+                  : `Invest from $300K. Earn ${formatPct(waterfall.l2InvestorROI)} on cash — in under 3 years.`}
               </h2>
               <p className="text-sm text-gray-300 leading-relaxed">
-                You fund villa construction. Your capital is returned first when each villa sells — then you receive 50% of the remaining profit. No subordination. No long lock-ups.
+                {lang === "ar"
+                  ? "أنت تموّل بناء الفلل. يُعاد رأس مالك أولاً عند بيع كل فيلا — ثم تحصل على 50% من الربح المتبقي. بلا أولويات للآخرين. بلا تجميد طويل للأموال."
+                  : "You fund villa construction. Your capital is returned first when each villa sells — then you receive 50% of the remaining profit. No subordination. No long lock-ups."}
               </p>
             </div>
 
@@ -369,9 +375,13 @@ export default function InvestorPage() {
             {/* ── Layer 2: Villa Development ── */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-5">
               <div>
-                <div className="text-[10px] uppercase tracking-widest font-semibold text-[#E65100] mb-0.5">Layer 2 — Villa Development</div>
+                <div className="text-[10px] uppercase tracking-widest font-semibold text-[#E65100] mb-0.5">
+                  {lang === "ar" ? "الطبقة الثانية — تطوير الفلل" : "Layer 2 — Villa Development"}
+                </div>
                 <p className="text-xs text-gray-500 leading-relaxed">
-                  You fund construction. After the villa sells, your capital is returned first — then you receive <strong className="text-gray-700">50% of the remaining profit</strong>.
+                  {lang === "ar"
+                    ? <>أنت تموّل البناء. بعد بيع الفيلا، يُعاد رأس مالك أولاً — ثم تحصل على <strong className="text-gray-700">50% من الربح المتبقي</strong>.</>
+                    : <>You fund construction. After the villa sells, your capital is returned first — then you receive <strong className="text-gray-700">50% of the remaining profit</strong>.</>}
                 </p>
               </div>
 
@@ -384,22 +394,24 @@ export default function InvestorPage() {
                   const roi = ticketSize > 0 ? profit / ticketSize : 0;
                   return (
                     <div key={ticketSize} className="rounded-xl border border-dh-hills/40 bg-green-50/40 p-4 space-y-3">
-                      <div className="text-sm font-bold text-gray-900">{formatUSD(ticketSize)} ticket</div>
+                      <div className="text-sm font-bold text-gray-900">
+                        {lang === "ar" ? `${formatUSD(ticketSize)} استثمار` : `${formatUSD(ticketSize)} ticket`}
+                      </div>
                       <div className="space-y-1.5 text-xs">
                         <div className="flex justify-between">
-                          <span className="text-gray-500">Villas funded</span>
+                          <span className="text-gray-500">{lang === "ar" ? "فلل ممولة" : "Villas funded"}</span>
                           <span className="tabular-nums font-medium text-gray-800">{ratio.toFixed(1)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-500">Your profit (50%)</span>
+                          <span className="text-gray-500">{lang === "ar" ? "ربحك (50%)" : "Your profit (50%)"}</span>
                           <span className="tabular-nums font-bold text-emerald-700">{formatUSD(profit)}</span>
                         </div>
                         <div className="flex justify-between border-t border-dashed border-gray-200 pt-1.5">
-                          <span className="text-gray-700 font-semibold">Total return</span>
+                          <span className="text-gray-700 font-semibold">{lang === "ar" ? "إجمالي العائد" : "Total return"}</span>
                           <span className="tabular-nums font-bold text-dh-green">{formatUSD(total)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-500">ROI on cash</span>
+                          <span className="text-gray-500">{lang === "ar" ? "العائد على النقد" : "ROI on cash"}</span>
                           <span className="tabular-nums font-bold text-emerald-700">{formatPct(roi)}</span>
                         </div>
                       </div>
@@ -410,33 +422,35 @@ export default function InvestorPage() {
 
               {/* Per-villa breakdown confirming the 50% split */}
               <div className="border-t border-gray-100 pt-4">
-                <div className="text-[10px] uppercase tracking-widest text-gray-400 font-semibold mb-3">Per-villa profit breakdown</div>
+                <div className="text-[10px] uppercase tracking-widest text-gray-400 font-semibold mb-3">
+                  {lang === "ar" ? "تفاصيل ربح كل فيلا" : "Per-villa profit breakdown"}
+                </div>
                 <table className="w-full text-xs">
                   <tbody>
                     <tr>
-                      <td className="py-1.5 text-gray-600 font-medium">Villa sale price</td>
+                      <td className="py-1.5 text-gray-600 font-medium">{lang === "ar" ? "سعر بيع الفيلا" : "Villa sale price"}</td>
                       <td className="py-1.5 text-right tabular-nums text-dh-green font-bold">{formatUSD(activeWaterfall.revenue)}</td>
                     </tr>
                     <tr>
-                      <td className="py-1.5 text-gray-400 pl-3">− Return of capital</td>
+                      <td className="py-1.5 text-gray-400 pl-3">{lang === "ar" ? "− استرداد رأس المال" : "− Return of capital"}</td>
                       <td className="py-1.5 text-right tabular-nums text-gray-400">({formatUSD(activeWaterfall.l2InvestorCash)})</td>
                     </tr>
                     <tr>
-                      <td className="py-1.5 text-gray-400 pl-3">− Land cost</td>
+                      <td className="py-1.5 text-gray-400 pl-3">{lang === "ar" ? "− تكلفة الأرض" : "− Land cost"}</td>
                       <td className="py-1.5 text-right tabular-nums text-gray-400">({formatUSD(activeWaterfall.l1LandPayment + activeWaterfall.ownerLandEquity)})</td>
                     </tr>
                     {waterfallModel === "priority" && activeWaterfall.priorityAmount > 0 && (
                       <tr>
-                        <td className="py-1.5 text-emerald-600 pl-3">+ Priority return (10%)</td>
+                        <td className="py-1.5 text-emerald-600 pl-3">{lang === "ar" ? "+ عائد الأولوية (10%)" : "+ Priority return (10%)"}</td>
                         <td className="py-1.5 text-right tabular-nums text-emerald-600">{formatUSD(activeWaterfall.priorityAmount)}</td>
                       </tr>
                     )}
                     <tr className="border-t border-gray-200">
-                      <td className="py-1.5 text-gray-700 font-medium">Remaining for 50/50 split</td>
+                      <td className="py-1.5 text-gray-700 font-medium">{lang === "ar" ? "المتبقي للتقسيم 50/50" : "Remaining for 50/50 split"}</td>
                       <td className="py-1.5 text-right tabular-nums font-semibold text-gray-800">{formatUSD(activeWaterfall.remainingForSplit)}</td>
                     </tr>
                     <tr className="bg-emerald-50/70 rounded-lg">
-                      <td className="py-2 text-emerald-700 font-bold pl-1">✓ Your 50% share</td>
+                      <td className="py-2 text-emerald-700 font-bold pl-1">{lang === "ar" ? "✓ حصتك 50%" : "✓ Your 50% share"}</td>
                       <td className="py-2 text-right tabular-nums font-bold text-emerald-700">{formatUSD(activeWaterfall.l2InvestorProfit)}</td>
                     </tr>
                   </tbody>
@@ -463,22 +477,24 @@ export default function InvestorPage() {
                   const roi = ticketSize > 0 ? profit / ticketSize : 0;
                   return (
                     <div key={ticketSize} className="rounded-xl border border-blue-200/60 bg-blue-50/30 p-4 space-y-3">
-                      <div className="text-sm font-bold text-gray-900">{formatUSD(ticketSize)} ticket</div>
+                      <div className="text-sm font-bold text-gray-900">
+                        {lang === "ar" ? `${formatUSD(ticketSize)} استثمار` : `${formatUSD(ticketSize)} ticket`}
+                      </div>
                       <div className="space-y-1.5 text-xs">
                         <div className="flex justify-between">
-                          <span className="text-gray-500">Land acquired</span>
+                          <span className="text-gray-500">{lang === "ar" ? "أرض مكتسبة" : "Land acquired"}</span>
                           <span className="tabular-nums font-medium text-gray-800">{sqm.toLocaleString()} m²</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-500">Your profit</span>
+                          <span className="text-gray-500">{lang === "ar" ? "ربحك" : "Your profit"}</span>
                           <span className="tabular-nums font-bold text-[#1565C0]">{formatUSD(profit)}</span>
                         </div>
                         <div className="flex justify-between border-t border-dashed border-gray-200 pt-1.5">
-                          <span className="text-gray-700 font-semibold">Total return</span>
+                          <span className="text-gray-700 font-semibold">{lang === "ar" ? "إجمالي العائد" : "Total return"}</span>
                           <span className="tabular-nums font-bold text-[#1565C0]">{formatUSD(total)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-500">ROI</span>
+                          <span className="text-gray-500">{lang === "ar" ? "العائد على الاستثمار" : "ROI"}</span>
                           <span className="tabular-nums font-bold text-[#1565C0]">{formatPct(roi)}</span>
                         </div>
                       </div>
@@ -490,15 +506,15 @@ export default function InvestorPage() {
               {/* L1 mechanics strip */}
               <div className="border-t border-gray-100 pt-4 grid grid-cols-3 gap-3 text-center">
                 <div>
-                  <div className="text-[10px] text-gray-400 mb-1">Entry price</div>
+                  <div className="text-[10px] text-gray-400 mb-1">{lang === "ar" ? "سعر الدخول" : "Entry price"}</div>
                   <div className="text-sm font-bold text-gray-700">${config.l1EntryPrice}/m²</div>
                 </div>
                 <div>
-                  <div className="text-[10px] text-gray-400 mb-1">Exit cap</div>
+                  <div className="text-[10px] text-gray-400 mb-1">{lang === "ar" ? "سقف الخروج" : "Exit cap"}</div>
                   <div className="text-sm font-bold text-gray-700">${config.l1ExitPriceCap}/m²</div>
                 </div>
                 <div>
-                  <div className="text-[10px] text-gray-400 mb-1">Fund IRR</div>
+                  <div className="text-[10px] text-gray-400 mb-1">{lang === "ar" ? "معدل العائد الداخلي" : "Fund IRR"}</div>
                   <div className="text-sm font-bold text-[#1565C0]">{formatPct(l1Returns.irr)}</div>
                 </div>
               </div>
@@ -551,7 +567,7 @@ export default function InvestorPage() {
                   <Row label={t("construction_cost")} value={`$${config.constructionCostSqm}/m²`} />
                   <Row label={t("bua_per_villa") || "BUA/villa"} value={`${config.buaPerVilla} m²`} />
                   <Row label={t("soft_cost_pct")} value={formatPct(config.softCostPct)} />
-                  <Row label={t("cash_pct")} value={`${(config.cashPctOfConstruction * 100).toFixed(0)}% of construction`} />
+                  <Row label={t("cash_pct")} value={`${(config.cashPctOfConstruction * 100).toFixed(0)}% ${lang === "ar" ? "من التشييد" : "of construction"}`} />
                   <div className="h-px bg-gray-100" />
                   <Row label={t("inv_your_roi")} value={formatPct(waterfall.l2InvestorROI)} highlight />
                   <Row label={t("inv_your_profit")} value={formatUSD(waterfall.l2InvestorProfit)} highlight />
@@ -617,7 +633,7 @@ export default function InvestorPage() {
               <table className="w-full text-xs border-collapse">
                 <thead>
                   <tr className="bg-gray-50 border-b border-gray-100">
-                    <th className="text-left px-4 py-3 font-semibold text-gray-500">Phase</th>
+                    <th className="text-left px-4 py-3 font-semibold text-gray-500">{lang === "ar" ? "المرحلة" : "Phase"}</th>
                     <th className="text-center px-4 py-3 font-semibold text-gray-500">
                       {t("phase_avg_land_retail")}
                     </th>
@@ -635,11 +651,11 @@ export default function InvestorPage() {
                     return (
                       <tr key={p.phase} className="border-t border-gray-100">
                         <td className="px-4 py-3 font-medium text-gray-700">
-                          Phase {p.phase}
-                          {i === 0 && <span className="ml-2 px-1.5 py-0.5 bg-dh-green/10 text-dh-green rounded text-[9px] font-bold">BEST ENTRY</span>}
+                          {lang === "ar" ? `مرحلة ${p.phase}` : `Phase ${p.phase}`}
+                          {i === 0 && <span className="ml-2 px-1.5 py-0.5 bg-dh-green/10 text-dh-green rounded text-[9px] font-bold">{lang === "ar" ? "أفضل دخول" : "BEST ENTRY"}</span>}
                           {pm && (
                             <div className="text-[9px] text-gray-400 mt-0.5 font-normal">
-                              {pm.totalVillas} {lang === "ar" ? "فيلا" : "villas"} · {formatUSD(pm.totalCashNeeded)} total cash
+                              {pm.totalVillas} {lang === "ar" ? "فيلا" : "villas"} · {formatUSD(pm.totalCashNeeded)} {lang === "ar" ? "نقداً إجمالاً" : "total cash"}
                             </div>
                           )}
                         </td>
@@ -718,7 +734,7 @@ export default function InvestorPage() {
                     <div className="space-y-1">
                       {scenario.data.slice(0, 4).map((v, i) => (
                         <div key={i} className="flex justify-between">
-                          <span className="text-gray-400">Year {i + 1}</span>
+                          <span className="text-gray-400">{lang === "ar" ? `السنة ${i + 1}` : `Year ${i + 1}`}</span>
                           <span className={`font-medium tabular-nums ${v >= 0 ? "text-emerald-600" : "text-red-500"}`}>{formatUSD(v)}</span>
                         </div>
                       ))}
@@ -744,7 +760,7 @@ export default function InvestorPage() {
                   onChange={(v) => setConfig({ sellingPriceSqm: v })} suffix="" />
                 <SliderField label={`${t("cash_pct")} (%)`} value={+(config.cashPctOfConstruction * 100).toFixed(0)} min={20} max={100} step={5}
                   onChange={(v) => setConfig({ cashPctOfConstruction: v / 100 })} suffix="%" />
-                <SliderField label={`${t("land_transfer_price")} — Ph1 ($/m²)`} value={config.phaseLandPrices[0]?.pricePerSqm ?? 275} min={150} max={500} step={5}
+                <SliderField label={`${t("land_transfer_price")} — ${lang === "ar" ? "م1" : "Ph1"} ($/m²)`} value={config.phaseLandPrices[0]?.pricePerSqm ?? 275} min={150} max={500} step={5}
                   onChange={(v) => setConfig({ phaseLandPrices: config.phaseLandPrices.map((p, i) => i === 0 ? { ...p, pricePerSqm: v } : p) })} suffix="" />
                 <div className="flex items-center gap-2 pt-1">
                   <label className="text-xs text-gray-600 flex-1">{t("inv_priority_toggle")}</label>
@@ -1079,7 +1095,7 @@ function SensitivitySection({
               className="w-full accent-dh-green"
             />
             <div className="flex justify-between text-[9px] text-gray-300 mt-0.5">
-              <span>30%</span><span>50% (base)</span><span>100%</span>
+              <span>30%</span><span>50% ({isAr ? "أساس" : "base"})</span><span>100%</span>
             </div>
           </div>
 
@@ -1174,7 +1190,7 @@ function SensitivitySection({
                             }}
                             className="w-20 text-sm font-semibold text-gray-800 border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-dh-green"
                           />
-                          <span className="text-xs text-gray-400">/sqm</span>
+                          <span className="text-xs text-gray-400">{isAr ? "/م²" : "/sqm"}</span>
                         </div>
                       </td>
                       <td className="px-4 py-3 text-right tabular-nums font-semibold text-gray-800">

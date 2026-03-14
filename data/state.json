@@ -874,6 +874,9 @@
     "showModelB": false,
     "showSensitivity": true,
     "showTermSheet": true,
-    "showPhasedPricing": true
+    "showPhasedPricing": true,
+    "showPhaseBreakdown": false,
+    "showL1ExitMechanisms": false,
+    "showCashFlowHorizon": false
   }
 }
