@@ -11,6 +11,7 @@ import { ProjectSpecs } from "@/data/project-specs";
 import LanguageToggle from "@/components/ui/LanguageToggle";
 import AppHeader from "@/components/ui/AppHeader";
 import { useTranslations } from "@/i18n/useTranslations";
+import { useRole } from "@/hooks/useRole";
 import CustomerMap from "@/components/customer/CustomerMap";
 import type { LotPricing } from "@/lib/investment-layers";
 import LOT_PRICES_RAW from "@/data/lot-prices.json";
@@ -745,6 +746,8 @@ function CustomerPageInner() {
   const projectSpecs        = useSimulationStore((s) => s.projectSpecs);
   const initStateFromServer = useSimulationStore((s) => s.initStateFromServer);
   const { t, lang }         = useTranslations();
+  const role                = useRole();
+  const canSeeInvestor      = role === "investor" || role === "admin";
 
   // URL params — e.g. /customer?tab=typologies&type=villa_2f
   const searchParams = useSearchParams();
@@ -966,6 +969,30 @@ function CustomerPageInner() {
 
       {/* ── Shared nav header (role-aware — investor portal link only for investor/admin) ── */}
       <AppHeader currentPage="customer" />
+
+      {/* ── Investor breadcrumb — only visible to investor/admin roles ── */}
+      {canSeeInvestor && (
+        <div style={{ background: "#15330C", borderBottom: "1px solid rgba(120,191,66,0.18)" }}>
+          <div className="max-w-7xl mx-auto px-5 py-2 flex items-center gap-2">
+            <a
+              href="/investor"
+              className="flex items-center gap-1.5 text-xs font-medium transition-colors"
+              style={{ color: "#95CC58" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "#78BF42")}
+              onMouseLeave={e => (e.currentTarget.style.color = "#95CC58")}
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 11L5 7l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              {lang === "ar" ? "العودة إلى بوابة المستثمر" : "Back to Investor Portal"}
+            </a>
+            <span style={{ color: "rgba(149,204,88,0.35)" }}>·</span>
+            <span className="text-xs" style={{ color: "rgba(149,204,88,0.55)" }}>
+              {lang === "ar" ? "تصفح الوحدات" : "Browse Available Units"}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* ── Hero ── */}
       <div style={{ background: "#1A3810" }}>
