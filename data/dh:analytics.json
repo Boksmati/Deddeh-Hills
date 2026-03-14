@@ -1,0 +1,603 @@
+[
+  {
+    "id": "d6qiwhy3rc8mmq82nvn",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "1wci7y5x9ctmmq82nkh",
+    "ts": 1773486502867,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "fdntxua00ommq836ii",
+    "event": "view_mode_change",
+    "page": "/customer",
+    "sessionId": "1wci7y5x9ctmmq82nkh",
+    "data": {
+      "mode": "map"
+    },
+    "ts": 1773486527325,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "799n5iedt7dmmq83h48",
+    "event": "view_mode_change",
+    "page": "/customer",
+    "sessionId": "1wci7y5x9ctmmq82nkh",
+    "data": {
+      "mode": "grid"
+    },
+    "ts": 1773486541113,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "4d5gkbjnoswmmq83q73",
+    "event": "unit_open",
+    "page": "/customer",
+    "sessionId": "1wci7y5x9ctmmq82nkh",
+    "data": {
+      "lotId": 7,
+      "devType": "villa_2f",
+      "unitId": "7"
+    },
+    "ts": 1773486552904,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "ofk2rww0mynmmq845pi",
+    "event": "view_mode_change",
+    "page": "/customer",
+    "sessionId": "1wci7y5x9ctmmq82nkh",
+    "data": {
+      "mode": "typologies"
+    },
+    "ts": 1773486573020,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "9cx9u8x7ijtmmq8j4u3",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "ts": 1773487271530,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "hkh9sg64yh7mmq8jda3",
+    "event": "time_on_page",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "seconds": 11
+    },
+    "ts": 1773487282666,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "uuwj9d0rbnbmmq8jdkc",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "ts": 1773487283026,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "5pxxgrbjzs4mmq8jhwz",
+    "event": "typology_view",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "type": "apartments"
+    },
+    "ts": 1773487288672,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "6dxa9emedsmmq8jj3l",
+    "event": "unit_open",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "lotId": 85,
+      "devType": "apartments",
+      "unitId": "851B"
+    },
+    "ts": 1773487290216,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "51txhxqoqlfmmq8jqtq",
+    "event": "unit_open",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "lotId": 89,
+      "devType": "apartments",
+      "unitId": "891B"
+    },
+    "ts": 1773487300226,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "j5shbf3iommq8l7qk",
+    "event": "unit_open",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "lotId": 92,
+      "devType": "apartments",
+      "unitId": "92G"
+    },
+    "ts": 1773487368769,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "hs0lwbnrukwmmq8legi",
+    "event": "view_mode_change",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "mode": "typologies"
+    },
+    "ts": 1773487377510,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "rxs2goavgjmmq8nj19",
+    "event": "typology_view",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "type": "villa_2f"
+    },
+    "ts": 1773487476433,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "g5bnyk2hroommq8nlcz",
+    "event": "unit_open",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "lotId": 7,
+      "devType": "villa_2f",
+      "unitId": "7"
+    },
+    "ts": 1773487479768,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "zwonl0h2gd7mmq8od4r",
+    "event": "time_on_page",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "seconds": 233
+    },
+    "ts": 1773487515717,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "ic9shqiavw7mmq8oe8q",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "ts": 1773487516636,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "j1kk2bhctwjmmq8ok8y",
+    "event": "view_mode_change",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "mode": "grid"
+    },
+    "ts": 1773487524961,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "zmiunlqs45gmmq8p3f2",
+    "event": "unit_open",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "lotId": 46,
+      "devType": "villa_3f",
+      "unitId": "46"
+    },
+    "ts": 1773487549809,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "tkq1z8lpkmdmmq8pthv",
+    "event": "time_on_page",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "seconds": 67
+    },
+    "ts": 1773487583597,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "65nau4eor0mmmq8pty4",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "ts": 1773487584174,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "yesy0ihonlmmq8q5ut",
+    "event": "typology_view",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "type": "villa_3f"
+    },
+    "ts": 1773487599567,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "b7enl1tr2bmmq8r3e2",
+    "event": "view_mode_change",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "mode": "map"
+    },
+    "ts": 1773487643097,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "znglxdhlaormmq8rbff",
+    "event": "view_mode_change",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "mode": "grid"
+    },
+    "ts": 1773487653515,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "lc8d8ew9s0ammq8s17o",
+    "event": "time_on_page",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "seconds": 103
+    },
+    "ts": 1773487686915,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "ucb06mrdvsmmq8s1vc",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "ts": 1773487687485,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "7l563bv8j2kmmq8s4ub",
+    "event": "typology_view",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "type": "villa_3f"
+    },
+    "ts": 1773487691607,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "9di3nv6d51mmq8s9ip",
+    "event": "view_mode_change",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "mode": "grid"
+    },
+    "ts": 1773487697690,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "pya938ki8ammq8w7rr",
+    "event": "unit_open",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "lotId": 35,
+      "devType": "villa_3f",
+      "unitId": "35"
+    },
+    "ts": 1773487882023,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "n12jo602ikmmq8wae5",
+    "event": "view_mode_change",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "mode": "map"
+    },
+    "ts": 1773487885457,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "tgobl2a20psmmq8x06i",
+    "event": "time_on_page",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "seconds": 231
+    },
+    "ts": 1773487918856,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "fyssnkmmjllmmq8x0tz",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "ts": 1773487919314,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "vwa9fgsykzemmq8x4dt",
+    "event": "view_mode_change",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "mode": "grid"
+    },
+    "ts": 1773487924324,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "p2f26in1vzmmq90ol5",
+    "event": "time_on_page",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "seconds": 171
+    },
+    "ts": 1773488090237,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "xfs6den9fi9mmq90p5y",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "ts": 1773488090902,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "r3e68fh155mmq90r90",
+    "event": "time_on_page",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "seconds": 3
+    },
+    "ts": 1773488093927,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "wv0eir3rihmmq90rkd",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "ts": 1773488094292,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "uaz91laybcbmmq91e6v",
+    "event": "view_mode_change",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "mode": "grid"
+    },
+    "ts": 1773488123638,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "bjfs54r1jcgmmq9339x",
+    "event": "unit_open",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "lotId": 13,
+      "devType": "villa_2f",
+      "unitId": "13"
+    },
+    "ts": 1773488202817,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "jz171g6nuj9mmq94bk0",
+    "event": "view_mode_change",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "mode": "map"
+    },
+    "ts": 1773488260209,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "v3gcqlqv68emmq951uf",
+    "event": "view_mode_change",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "mode": "typologies"
+    },
+    "ts": 1773488294217,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "tgevqkpbn48mmq953g7",
+    "event": "typology_view",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "type": "apartments"
+    },
+    "ts": 1773488296360,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "2nzmsz4fz2qmmq95q2d",
+    "event": "time_on_page",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "seconds": 231
+    },
+    "ts": 1773488325653,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "76bmr2okw7emmq95qf6",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "ts": 1773488326128,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "wgpzho6pe5gmmq95ql7",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "ts": 1773488326130,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "647wl9ujz0fmmq95zi5",
+    "event": "view_mode_change",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "mode": "grid"
+    },
+    "ts": 1773488337895,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "6zvg16pealsmmq9bc3e",
+    "event": "time_on_page",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "seconds": 261
+    },
+    "ts": 1773488587279,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "170wvsoims1mmq9bck6",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "ts": 1773488587884,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "9e32bwbbm7rmmq9bew2",
+    "event": "view_mode_change",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "mode": "grid"
+    },
+    "ts": 1773488591129,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "hzp4rrpy2ucmmq9fk8z",
+    "event": "time_on_page",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "seconds": 197
+    },
+    "ts": 1773488784477,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "e8fthshtxgmmq9fkuj",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "ts": 1773488785146,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "50sc4jzs1sammq9fn8i",
+    "event": "view_mode_change",
+    "page": "/customer",
+    "sessionId": "q4ezs333h6mmq8j4oa",
+    "data": {
+      "mode": "grid"
+    },
+    "ts": 1773488788569,
+    "ip": "::ffff:127.0.0.1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  }
+]

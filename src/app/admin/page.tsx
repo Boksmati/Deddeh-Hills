@@ -36,13 +36,14 @@ function fmtUSD(n: number) {
 }
 
 // ── Tabs ──────────────────────────────────────────────────────────────────────
-type Tab = "crm" | "invites" | "specs" | "overview" | "settings";
+type Tab = "crm" | "invites" | "specs" | "overview" | "settings" | "analytics";
 const TABS: { id: Tab; label: string; icon: string }[] = [
-  { id: "crm",      label: "CRM",       icon: "👥" },
-  { id: "invites",  label: "Invites",   icon: "🔗" },
-  { id: "specs",    label: "Finishings",icon: "📋" },
-  { id: "overview", label: "Overview",  icon: "📊" },
-  { id: "settings", label: "Settings",  icon: "⚙️" },
+  { id: "crm",       label: "CRM",       icon: "👥" },
+  { id: "invites",   label: "Invites",   icon: "🔗" },
+  { id: "specs",     label: "Finishings",icon: "📋" },
+  { id: "overview",  label: "Overview",  icon: "📊" },
+  { id: "analytics", label: "Analytics", icon: "📈" },
+  { id: "settings",  label: "Settings",  icon: "⚙️" },
 ];
 
 // ── Invites Tab ───────────────────────────────────────────────────────────────
@@ -1636,6 +1637,294 @@ function SettingsTab() {
   );
 }
 
+// ── Analytics Tab ─────────────────────────────────────────────────────────────
+interface StoredEvent {
+  id: string;
+  event: string;
+  page: string;
+  sessionId: string;
+  data?: Record<string, unknown>;
+  ts: number;
+  ip: string;
+  ua: string;
+}
+
+const EVENT_COLORS: Record<string, string> = {
+  page_view:        "#3B82F6",
+  time_on_page:     "#8B5CF6",
+  typology_view:    "#10B981",
+  unit_open:        "#F59E0B",
+  enquire_open:     "#EF4444",
+  view_mode_change: "#6B7280",
+  tab_change:       "#6366F1",
+};
+
+function fmtTs(ts: number): string {
+  return new Date(ts).toLocaleString("en-GB", {
+    month: "short", day: "numeric",
+    hour: "2-digit", minute: "2-digit", second: "2-digit",
+  });
+}
+
+function fmtDuration(sec: number): string {
+  if (sec < 60) return `${sec}s`;
+  return `${Math.floor(sec / 60)}m ${sec % 60}s`;
+}
+
+function AnalyticsTab() {
+  const [events, setEvents] = useState<StoredEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<string>("all");
+  const [clearing, setClearing] = useState(false);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/analytics/events");
+      if (res.ok) setEvents(await res.json());
+    } catch {}
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  async function clearAll() {
+    if (!confirm("Clear all analytics events? This cannot be undone.")) return;
+    setClearing(true);
+    await fetch("/api/analytics/events", { method: "DELETE" });
+    setEvents([]);
+    setClearing(false);
+  }
+
+  // Derived stats
+  const sessions = useMemo(() => {
+    const map = new Map<string, StoredEvent[]>();
+    for (const e of events) {
+      if (!map.has(e.sessionId)) map.set(e.sessionId, []);
+      map.get(e.sessionId)!.push(e);
+    }
+    return map;
+  }, [events]);
+
+  const pageViews     = events.filter(e => e.event === "page_view").length;
+  const enquireOpens  = events.filter(e => e.event === "enquire_open").length;
+  const unitOpens     = events.filter(e => e.event === "unit_open").length;
+
+  const avgTime = useMemo(() => {
+    const times = events
+      .filter(e => e.event === "time_on_page" && typeof (e.data as Record<string,unknown>)?.seconds === "number")
+      .map(e => (e.data as Record<string,unknown>).seconds as number);
+    if (!times.length) return 0;
+    return Math.round(times.reduce((a, b) => a + b, 0) / times.length);
+  }, [events]);
+
+  // Unique IPs
+  const uniqueIPs = useMemo(() => new Set(events.map(e => e.ip)).size, [events]);
+
+  // Event-type breakdown
+  const eventCounts = useMemo(() => {
+    const m: Record<string, number> = {};
+    for (const e of events) m[e.event] = (m[e.event] ?? 0) + 1;
+    return Object.entries(m).sort((a, b) => b[1] - a[1]);
+  }, [events]);
+
+  const eventTypes = useMemo(() => ["all", ...Array.from(new Set(events.map(e => e.event)))], [events]);
+  const filtered = filter === "all" ? events : events.filter(e => e.event === filter);
+
+  // Top units opened
+  const topUnits = useMemo(() => {
+    const m: Record<string, number> = {};
+    for (const e of events.filter(e => e.event === "unit_open")) {
+      const key = `Lot ${(e.data as Record<string,unknown>)?.lotId} · ${(e.data as Record<string,unknown>)?.devType}`;
+      m[key] = (m[key] ?? 0) + 1;
+    }
+    return Object.entries(m).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  }, [events]);
+
+  if (loading) return (
+    <div style={{ textAlign: "center", padding: "60px 20px", color: C.muted, fontSize: 14 }}>
+      Loading analytics…
+    </div>
+  );
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div>
+          <h2 style={{ fontSize: 16, fontWeight: 700, color: C.ink, margin: 0 }}>Investor Analytics</h2>
+          <p style={{ fontSize: 12, color: C.muted, marginTop: 3 }}>
+            Tracks activity on /customer and /investor pages
+          </p>
+        </div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button onClick={load}
+            style={{ padding: "7px 14px", background: C.greenBg, color: C.green, border: "none", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+            Refresh
+          </button>
+          <button onClick={clearAll} disabled={clearing}
+            style={{ padding: "7px 14px", background: "#FEF2F2", color: C.red, border: "none", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+            Clear All
+          </button>
+        </div>
+      </div>
+
+      {/* KPI row */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(140px,1fr))", gap: 10 }}>
+        {[
+          { label: "Total Events",      val: String(events.length),       color: C.ink        },
+          { label: "Sessions",          val: String(sessions.size),       color: "#6366F1"    },
+          { label: "Unique IPs",        val: String(uniqueIPs),           color: "#6B7280"    },
+          { label: "Page Views",        val: String(pageViews),           color: "#3B82F6"    },
+          { label: "Units Opened",      val: String(unitOpens),           color: C.amber      },
+          { label: "Enquiries",         val: String(enquireOpens),        color: C.red        },
+          { label: "Avg Time on Page",  val: avgTime ? fmtDuration(avgTime) : "—", color: "#8B5CF6" },
+        ].map(({ label, val, color }) => (
+          <div key={label} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "12px 14px" }}>
+            <div style={{ fontSize: 9, fontWeight: 600, color: C.muted, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 4 }}>{label}</div>
+            <div style={{ fontSize: 20, fontWeight: 700, color }}>{val}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Two-column: event breakdown + top units */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        {/* Event type breakdown */}
+        <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: 16 }}>
+          <h3 style={{ fontSize: 13, fontWeight: 600, color: C.ink, marginBottom: 12 }}>Event Breakdown</h3>
+          {eventCounts.length === 0 ? (
+            <p style={{ fontSize: 12, color: C.muted }}>No events yet.</p>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {eventCounts.map(([ev, count]) => {
+                const pct = events.length > 0 ? Math.round((count / events.length) * 100) : 0;
+                const color = EVENT_COLORS[ev] ?? "#9CA3AF";
+                return (
+                  <div key={ev}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
+                      <span style={{ fontSize: 12, color: C.ink, fontWeight: 500 }}>{ev}</span>
+                      <span style={{ fontSize: 11, color: C.muted }}>{count} ({pct}%)</span>
+                    </div>
+                    <div style={{ height: 5, background: "#F3F4F6", borderRadius: 3, overflow: "hidden" }}>
+                      <div style={{ height: "100%", width: `${pct}%`, background: color, borderRadius: 3 }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Top units */}
+        <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: 16 }}>
+          <h3 style={{ fontSize: 13, fontWeight: 600, color: C.ink, marginBottom: 12 }}>Top Units Viewed</h3>
+          {topUnits.length === 0 ? (
+            <p style={{ fontSize: 12, color: C.muted }}>No unit opens yet.</p>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {topUnits.map(([key, count], i) => (
+                <div key={key} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: C.muted, width: 16, textAlign: "right" }}>#{i + 1}</span>
+                  <span style={{ fontSize: 12, color: C.ink, flex: 1 }}>{key}</span>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: C.amber }}>{count}×</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Sessions list */}
+      <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: 16 }}>
+        <h3 style={{ fontSize: 13, fontWeight: 600, color: C.ink, marginBottom: 12 }}>
+          Sessions ({sessions.size})
+        </h3>
+        {sessions.size === 0 ? (
+          <p style={{ fontSize: 12, color: C.muted }}>No sessions yet.</p>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: 320, overflowY: "auto" }}>
+            {Array.from(sessions.entries()).map(([sid, evs]) => {
+              const pv = evs.find((e: StoredEvent) => e.event === "page_view");
+              const top = evs.find((e: StoredEvent) => e.event === "time_on_page");
+              const secs = top ? (top.data as Record<string,unknown>)?.seconds as number : undefined;
+              const enquiries = evs.filter((e: StoredEvent) => e.event === "enquire_open").length;
+              const units = evs.filter((e: StoredEvent) => e.event === "unit_open").length;
+              const ip = evs[0]?.ip ?? "—";
+              return (
+                <div key={sid} style={{ padding: "10px 12px", background: "#F9FAFB", borderRadius: 8, border: `1px solid ${C.border}` }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 6 }}>
+                    <div>
+                      <span style={{ fontSize: 11, fontFamily: "monospace", color: C.muted }}>{ip}</span>
+                      <span style={{ fontSize: 10, color: C.muted, marginLeft: 8 }}>
+                        {pv ? fmtTs(pv.ts) : "—"}
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <span style={{ fontSize: 11, color: "#3B82F6" }}>{evs.length} events</span>
+                      {units > 0 && <span style={{ fontSize: 11, color: C.amber }}>{units} unit{units !== 1 ? "s" : ""}</span>}
+                      {enquiries > 0 && <span style={{ fontSize: 11, color: C.red, fontWeight: 600 }}>{enquiries} enquir{enquiries !== 1 ? "ies" : "y"}</span>}
+                      {secs && <span style={{ fontSize: 11, color: "#8B5CF6" }}>{fmtDuration(secs)}</span>}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Event feed */}
+      <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: 16 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
+          <h3 style={{ fontSize: 13, fontWeight: 600, color: C.ink, margin: 0 }}>Event Feed</h3>
+          <select
+            value={filter}
+            onChange={e => setFilter(e.target.value)}
+            style={{ fontSize: 12, padding: "5px 10px", border: `1px solid ${C.border}`, borderRadius: 6, background: C.white, color: C.ink, cursor: "pointer" }}
+          >
+            {eventTypes.map(t => (
+              <option key={t} value={t}>{t === "all" ? "All events" : t}</option>
+            ))}
+          </select>
+        </div>
+        {filtered.length === 0 ? (
+          <p style={{ fontSize: 12, color: C.muted }}>No events.</p>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 4, maxHeight: 400, overflowY: "auto" }}>
+            {filtered.slice(0, 200).map(ev => {
+              const color = EVENT_COLORS[ev.event] ?? "#9CA3AF";
+              return (
+                <div key={ev.id} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "7px 10px", background: "#F9FAFB", borderRadius: 7, borderLeft: `3px solid ${color}` }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                      <span style={{ fontSize: 12, fontWeight: 600, color }}>{ev.event}</span>
+                      <span style={{ fontSize: 11, color: C.muted }}>{ev.page}</span>
+                      {ev.data && Object.entries(ev.data).map(([k, v]) => (
+                        <span key={k} style={{ fontSize: 10, background: "#E5E7EB", color: "#374151", borderRadius: 4, padding: "1px 5px" }}>
+                          {k}: {String(v)}
+                        </span>
+                      ))}
+                    </div>
+                    <div style={{ display: "flex", gap: 10, marginTop: 2 }}>
+                      <span style={{ fontSize: 10, color: C.muted }}>{fmtTs(ev.ts)}</span>
+                      <span style={{ fontSize: 10, color: C.muted, fontFamily: "monospace" }}>{ev.ip}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+            {filtered.length > 200 && (
+              <p style={{ fontSize: 11, color: C.muted, textAlign: "center", padding: 8 }}>
+                Showing 200 of {filtered.length} events
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function AdminPage() {
   const [tab, setTab] = useState<Tab>("crm");
@@ -1683,8 +1972,9 @@ export default function AdminPage() {
             <ProjectSpecsEditor />
           </div>
         )}
-        {tab === "overview" && <OverviewTab />}
-        {tab === "settings" && <SettingsTab />}
+        {tab === "overview"  && <OverviewTab />}
+        {tab === "analytics" && <AnalyticsTab />}
+        {tab === "settings"  && <SettingsTab />}
       </main>
     </div>
   );

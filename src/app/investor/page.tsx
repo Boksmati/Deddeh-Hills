@@ -120,7 +120,7 @@ export default function InvestorPage() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
 
-  const [activeTab, setActiveTab] = useState<"returns" | "deal" | "simulate">("returns");
+  const [activeTab, setActiveTab] = useState<"returns" | "deal">("returns");
   const [waterfallModel, setWaterfallModel] = useState<"split" | "priority">("split");
 
   const summary = useMemo(() => {
@@ -210,7 +210,6 @@ export default function InvestorPage() {
   const TABS = [
     { id: "returns" as const, label: t("inv_tab_returns"), sub: t("inv_tab_sub_returns") },
     { id: "deal" as const, label: t("inv_tab_deal"), sub: t("inv_tab_sub_deal") },
-    { id: "simulate" as const, label: t("inv_tab_simulate"), sub: t("inv_tab_sub_simulate") },
   ];
 
   return (
@@ -279,7 +278,7 @@ export default function InvestorPage() {
       {/* KPI Grid — 4 key investor metrics */}
       <div className="max-w-6xl mx-auto px-4 sm:px-8 -mt-4 sm:-mt-6">
         <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-3">
-          {t("inv_kpi_intro")} — {lang === "ar" ? "لكل فيلا" : "per villa"}
+          {t("inv_kpi_intro")} — {lang === "ar" ? "الطبقة الثانية · تطوير الفلل" : "Layer 2 · Villa Development"}
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           <KPICard
@@ -290,33 +289,40 @@ export default function InvestorPage() {
           <KPICard
             label={t("inv_your_profit")}
             value={formatUSD(waterfall.l2InvestorProfit)}
-            sub={`${lang === "ar" ? "لكل فيلا" : "per villa"}`}
+            sub={lang === "ar" ? "لكل فيلا" : "per villa"}
             accent
           />
           <KPICard
             label={t("inv_your_roi")}
             value={formatPct(waterfall.l2InvestorROI)}
-            sub={`${lang === "ar" ? "عائد على النقد" : "return on cash"}`}
+            sub={lang === "ar" ? "عائد على النقد" : "return on cash"}
             accent
           />
-          <KPICard
-            label={t("layer1_short")}
-            value={formatPct(l1Returns.roi)}
-            sub={`${lang === "ar" ? "عائد الصندوق" : "fund ROI"} · IRR ${formatPct(l1Returns.irr)}`}
-          />
+          {/* Layer 1 — de-emphasised, secondary option */}
+          <div className="bg-blue-50 rounded-2xl p-4 border border-blue-100 flex flex-col justify-between">
+            <div className="text-[9px] font-semibold text-blue-400 uppercase tracking-wider mb-1">
+              {lang === "ar" ? "أيضاً متاح" : "Also available"}
+            </div>
+            <div className="text-xs font-bold text-blue-700 leading-snug mb-1">
+              {lang === "ar" ? "صندوق الأرض — الطبقة الأولى" : "Layer 1 · Land Fund"}
+            </div>
+            <div className="text-[10px] text-blue-500 tabular-nums">
+              {formatPct(l1Returns.roi)} ROI · IRR {formatPct(l1Returns.irr)}
+            </div>
+          </div>
         </div>
       </div>
 
       {/* ── 5-Tab Investment Walkthrough ── */}
       <div className="max-w-6xl mx-auto px-4 sm:px-8 mt-6 sm:mt-8">
         {/* Tab Navigation — walkthrough style with step numbers + subtitles */}
-        <div className="overflow-x-auto scrollbar-none mb-6">
-          <div className="flex gap-1 bg-white rounded-2xl shadow-sm border border-gray-100 p-1.5 min-w-max sm:min-w-0">
+        <div className="mb-6">
+          <div className="flex gap-1 bg-white rounded-2xl shadow-sm border border-gray-100 p-1.5">
             {TABS.map((tab, idx) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-2.5 px-3 sm:flex-1 rounded-xl text-left transition-all min-w-[72px] sm:min-w-0 ${
+                className={`flex-1 py-3 px-3 rounded-xl text-center transition-all ${
                   activeTab === tab.id
                     ? "bg-dh-dark text-white shadow-sm"
                     : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
@@ -747,48 +753,6 @@ export default function InvestorPage() {
           </div>
         )}
 
-        {/* ── Tab 3: Simulate ── */}
-        {activeTab === "simulate" && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
-            {/* Sliders */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-5">
-              <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide">{t("simulate_params")}</h3>
-              <div className="space-y-4">
-                <SliderField label={`${t("construction_cost")} ($/m²)`} value={config.constructionCostSqm} min={400} max={1200} step={25}
-                  onChange={(v) => setConfig({ constructionCostSqm: v })} suffix="" />
-                <SliderField label={`${t("selling_price")} ($/m²)`} value={config.sellingPriceSqm} min={800} max={2500} step={50}
-                  onChange={(v) => setConfig({ sellingPriceSqm: v })} suffix="" />
-                <SliderField label={`${t("cash_pct")} (%)`} value={+(config.cashPctOfConstruction * 100).toFixed(0)} min={20} max={100} step={5}
-                  onChange={(v) => setConfig({ cashPctOfConstruction: v / 100 })} suffix="%" />
-                <SliderField label={`${t("land_transfer_price")} — ${lang === "ar" ? "م1" : "Ph1"} ($/m²)`} value={config.phaseLandPrices[0]?.pricePerSqm ?? 275} min={150} max={500} step={5}
-                  onChange={(v) => setConfig({ phaseLandPrices: config.phaseLandPrices.map((p, i) => i === 0 ? { ...p, pricePerSqm: v } : p) })} suffix="" />
-                <div className="flex items-center gap-2 pt-1">
-                  <label className="text-xs text-gray-600 flex-1">{t("inv_priority_toggle")}</label>
-                  <input type="checkbox" checked={config.priorityEnabled}
-                    onChange={(e) => setConfig({ priorityEnabled: e.target.checked })}
-                    className="w-4 h-4 accent-dh-green" />
-                </div>
-              </div>
-            </div>
-
-            {/* Live Results */}
-            <div className="space-y-4">
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-4">
-                <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide">{lang === "ar" ? "النتائج الآنية — لكل فيلا" : "Live Results — per villa"}</h3>
-                <ResultBar label={t("inv_your_roi")} value={formatPct(waterfall.l2InvestorROI)} pct={Math.min(waterfall.l2InvestorROI, 1)} color="#059669" />
-                <ResultBar label={`${t("inv_l1_label")} ROI`} value={formatPct(l1Returns.roi)} pct={Math.min(l1Returns.roi, 1)} color="#1565C0" />
-              </div>
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                <div className="grid grid-cols-2 gap-3 text-xs">
-                  <MetricBox label={t("inv_your_cash")} value={formatUSD(waterfall.l2InvestorCash)} />
-                  <MetricBox label={t("inv_your_profit")} value={formatUSD(waterfall.l2InvestorProfit)} color="text-emerald-600" />
-                  <MetricBox label={t("inv_your_total")} value={formatUSD(waterfall.l2InvestorTotal)} color="text-dh-green" />
-                  <MetricBox label={t("revenue")} value={formatUSD(waterfall.revenue)} />
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* ── Sensitivity Analysis ── */}

@@ -201,7 +201,7 @@ export default function AppHeader({ currentPage }: AppHeaderProps) {
         </div>
 
         {/* ── Right side: lang toggle + hamburger ─────────────────── */}
-        <div className={`flex items-center gap-2 ${isRTL ? "me-auto" : "ms-auto"} flex-shrink-0`}>
+        <div className="flex items-center gap-2 ms-auto flex-shrink-0">
           <LanguageToggle />
           {/* Hamburger — always visible on mobile, hidden md+ */}
           <button

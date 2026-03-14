@@ -14,8 +14,10 @@ import { useTranslations } from "@/i18n/useTranslations";
 import { useRole } from "@/hooks/useRole";
 import CustomerMap from "@/components/customer/CustomerMap";
 import type { LotPricing } from "@/lib/investment-layers";
+import { useTracking } from "@/lib/analytics";
 import LOT_PRICES_RAW from "@/data/lot-prices.json";
 const LOT_PRICES = LOT_PRICES_RAW as LotPricing[];
+import { LOT_POLYGONS } from "@/data/lot-polygons";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const C = {
@@ -30,6 +32,32 @@ const C = {
   muted:  "#6A7B5F",                    // greenish-gray secondary text
   white:  "#FFFFFF",                    // pure white
 } as const;
+
+// ─── Lot Mini-Map ─────────────────────────────────────────────────────────────
+function LotMiniMap({ lotId, fillColor, compact = false }: { lotId: number; fillColor: string; compact?: boolean }) {
+  const poly = LOT_POLYGONS.find(p => p.id === lotId);
+  // Crop around the lot center; compact (2-col) uses a smaller render size
+  const W = 300, H = 238;
+  const cx = poly ? Math.max(W / 2, Math.min(1000 - W / 2, poly.center[0])) : 500;
+  const cy = poly ? Math.max(H / 2, Math.min(795 - H / 2, poly.center[1])) : 397;
+  const viewBox = `${cx - W / 2} ${cy - H / 2} ${W} ${H}`;
+  const [w, h] = compact ? [60, 48] : [88, 70];
+  return (
+    <svg viewBox={viewBox} width={w} height={h} style={{ display: "block" }} aria-hidden>
+      <image href="/master-plan.png" x="0" y="0" width="1000" height="795" />
+      {poly && (
+        <circle
+          cx={poly.center[0]}
+          cy={poly.center[1]}
+          r={compact ? 26 : 22}
+          fill={fillColor}
+          stroke="white"
+          strokeWidth={5}
+        />
+      )}
+    </svg>
+  );
+}
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
 function fmtUSD(n: number) {
@@ -748,6 +776,7 @@ function CustomerPageInner() {
   const { t, lang }         = useTranslations();
   const role                = useRole();
   const canSeeInvestor      = role === "investor" || role === "admin";
+  const track               = useTracking("/customer");
 
   // URL params — e.g. /customer?tab=typologies&type=villa_2f
   const searchParams = useSearchParams();
@@ -768,6 +797,7 @@ function CustomerPageInner() {
   const [filterAvail,  setFilterAvail]  = useState<"all" | LotStatus>("all");
   const [filterBudget, setFilterBudget] = useState<BudgetFilter>("all");
   const [viewMode,     setViewMode]     = useState<"map" | "grid" | "typologies">(initViewMode);
+  const [filtersOpen,  setFiltersOpen]  = useState(false);
 
   // Selection state
   const [selectedMapLotId, setSelectedMapLotId] = useState<number | null>(null);
@@ -1076,19 +1106,49 @@ function CustomerPageInner() {
         style={{ background: C.white, borderBottom: `1px solid ${C.sand}`, boxShadow: "0 1px 12px rgba(28,32,16,0.06)" }}>
         <div className="max-w-7xl mx-auto px-5">
 
-          {/* Sub-row: result count + view toggle */}
+          {/* Sub-row: result count + filter toggle (mobile) + view toggle */}
           <div className="flex items-center justify-between py-2.5">
-            <span className="text-[11px]" style={{ color: C.muted, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
-              {mounted
-                ? lang === "ar"
-                    ? `${lots.length} قطعة · ${totalUnits} وحدة`
-                    : `${lots.length} lot${lots.length !== 1 ? "s" : ""} · ${totalUnits} unit${totalUnits !== 1 ? "s" : ""}`
-                : ""}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px]" style={{ color: C.muted, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+                {mounted
+                  ? lang === "ar"
+                      ? `${lots.length} قطعة · ${totalUnits} وحدة`
+                      : `${lots.length} lot${lots.length !== 1 ? "s" : ""} · ${totalUnits} unit${totalUnits !== 1 ? "s" : ""}`
+                  : ""}
+              </span>
+              {/* Mobile-only filter toggle */}
+              {mounted && (() => {
+                const activeCount = (filterAvail !== "all" ? 1 : 0) + (filterPhase !== 0 ? 1 : 0) + (filterType !== "all" ? 1 : 0) + (filterBudget !== "all" ? 1 : 0);
+                return (
+                  <button
+                    className="md:hidden flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium transition-colors"
+                    style={{
+                      background: filtersOpen || activeCount > 0 ? C.gold + "18" : C.bg,
+                      color: filtersOpen || activeCount > 0 ? C.gold : C.muted,
+                      border: `1px solid ${filtersOpen || activeCount > 0 ? C.gold + "40" : C.sand}`,
+                      fontFamily: "'DM Sans', system-ui, sans-serif",
+                    }}
+                    onClick={() => setFiltersOpen(o => !o)}
+                  >
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M2 4h12M4 8h8M6 12h4"/>
+                      <path fillRule="evenodd" d="M1.5 3.5A.5.5 0 012 3h12a.5.5 0 01.354.854L9 9.207V13.5a.5.5 0 01-.276.447l-3 1.5A.5.5 0 015 15V9.207L1.146 3.854A.5.5 0 011.5 3z"/>
+                    </svg>
+                    {lang === "ar" ? "فلتر" : "Filter"}
+                    {activeCount > 0 && (
+                      <span className="w-4 h-4 rounded-full text-white text-[9px] flex items-center justify-center font-bold"
+                        style={{ background: C.gold }}>
+                        {activeCount}
+                      </span>
+                    )}
+                  </button>
+                );
+              })()}
+            </div>
             {/* View toggle */}
             <div className="flex items-center gap-0.5 rounded-lg p-0.5" style={{ background: C.bg }}>
               <button
-                onClick={() => setViewMode("map")}
+                onClick={() => { setViewMode("map"); track("view_mode_change", { mode: "map" }); }}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all"
                 style={{
                   background: viewMode === "map" ? C.white : "transparent",
@@ -1102,7 +1162,7 @@ function CustomerPageInner() {
                 {lang === "ar" ? "خريطة" : "Map"}
               </button>
               <button
-                onClick={() => { setViewMode("grid"); setSelectedUnit(null); }}
+                onClick={() => { setViewMode("grid"); setSelectedUnit(null); track("view_mode_change", { mode: "grid" }); }}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all"
                 style={{
                   background: viewMode === "grid" ? C.white : "transparent",
@@ -1117,7 +1177,7 @@ function CustomerPageInner() {
                 {lang === "ar" ? "قائمة" : "Browse"}
               </button>
               <button
-                onClick={() => { setViewMode("typologies"); setSelectedUnit(null); }}
+                onClick={() => { setViewMode("typologies"); setSelectedUnit(null); track("view_mode_change", { mode: "typologies" }); }}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all"
                 style={{
                   background: viewMode === "typologies" ? C.white : "transparent",
@@ -1134,7 +1194,7 @@ function CustomerPageInner() {
           </div>
 
           {/* Filter row 1: Status + Phase — wraps on narrow screens */}
-          <div className="flex flex-wrap gap-1.5 pb-2">
+          <div className={`${filtersOpen ? "flex" : "hidden"} md:flex flex-wrap gap-1.5 pb-2`}>
             {(["all", "available", "reserved", "under_contract", "sold"] as const).map((v) => (
               <Chip key={v} active={filterAvail === v} onClick={() => setFilterAvail(v)} dot={v !== "all" ? STATUS_DOTS[v] : undefined}>
                 {v === "all"
@@ -1151,7 +1211,7 @@ function CustomerPageInner() {
           </div>
 
           {/* Filter row 2: Typology + Budget — wraps on narrow screens */}
-          <div className="flex flex-wrap gap-1.5 pb-2.5">
+          <div className={`${filtersOpen ? "flex" : "hidden"} md:flex flex-wrap gap-1.5 pb-2.5`}>
             <Chip active={filterType === "all"} onClick={() => setFilterType("all")}>
               {lang === "ar" ? "جميع الأنواع" : "All Types"}
             </Chip>
@@ -1293,7 +1353,7 @@ function CustomerPageInner() {
                       setSelectedMapLotId(null);
                     }
                   }}
-                  onEnquire={() => setEnquireUnit(selectedUnit)}
+                  onEnquire={() => { setEnquireUnit(selectedUnit); if (selectedUnit) track("enquire_open", { devType: selectedUnit.devType, unitId: selectedUnit.unit.id }); }}
                 />
               )}
             </div>
@@ -1378,6 +1438,7 @@ function CustomerPageInner() {
                               onClick={() => {
                                 if (isSelected) { setSelectedUnit(null); return; }
                                 setSelectedUnit({ unit, devType: assignment.developmentType, status });
+                                track("unit_open", { lotId: lot.id, devType: assignment.developmentType, unitId: unit.id });
                               }}
                               className="text-start rounded-xl overflow-hidden transition-all"
                               style={{
@@ -1419,41 +1480,48 @@ function CustomerPageInner() {
                                     {fmtUSD(unit.price)}
                                   </div>
                                 )}
-                                {/* Specs */}
-                                <div className="space-y-0.5" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
-                                  <div className="flex items-center gap-1.5 text-[10px]" style={{ color: C.muted }}>
-                                    <svg className="w-3 h-3 flex-shrink-0 opacity-40" viewBox="0 0 16 16" fill="currentColor">
-                                      <rect x="2" y="2" width="12" height="12" rx="1" fill="none" stroke="currentColor" strokeWidth="1.5"/>
-                                    </svg>
-                                    {fmt(unit.areaSqm)} m²
-                                  </div>
-                                  {unit.bedroomCount > 0 && (
+                                {/* Specs + mini-map side by side */}
+                                <div className="flex gap-2 items-start">
+                                  {/* Left: specs */}
+                                  <div className="flex-1 space-y-0.5 min-w-0" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
                                     <div className="flex items-center gap-1.5 text-[10px]" style={{ color: C.muted }}>
                                       <svg className="w-3 h-3 flex-shrink-0 opacity-40" viewBox="0 0 16 16" fill="currentColor">
-                                        <path d="M2 10V7a1 1 0 011-1h10a1 1 0 011 1v3M2 10h12M2 10v3h12v-3" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                                        <rect x="2" y="2" width="12" height="12" rx="1" fill="none" stroke="currentColor" strokeWidth="1.5"/>
                                       </svg>
-                                      {unit.bedroomCount} {lang === "ar" ? "غرف" : "br"}
+                                      {fmt(unit.areaSqm)} m²
                                     </div>
-                                  )}
-                                  {unit.gardenSqm > 0 && (
-                                    <div className="flex items-center gap-1.5 text-[10px]" style={{ color: C.muted }}>
-                                      <span className="text-[10px]">🌿</span>
-                                      {fmt(unit.gardenSqm)}m²
+                                    {unit.bedroomCount > 0 && (
+                                      <div className="flex items-center gap-1.5 text-[10px]" style={{ color: C.muted }}>
+                                        <svg className="w-3 h-3 flex-shrink-0 opacity-40" viewBox="0 0 16 16" fill="currentColor">
+                                          <path d="M2 10V7a1 1 0 011-1h10a1 1 0 011 1v3M2 10h12M2 10v3h12v-3" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                                        </svg>
+                                        {unit.bedroomCount} {lang === "ar" ? "غرف" : "br"}
+                                      </div>
+                                    )}
+                                    {unit.gardenSqm > 0 && (
+                                      <div className="flex items-center gap-1.5 text-[10px]" style={{ color: C.muted }}>
+                                        <span className="text-[10px]">🌿</span>
+                                        {fmt(unit.gardenSqm)}m²
+                                      </div>
+                                    )}
+                                    {unit.terraceSqm > 0 && (
+                                      <div className="flex items-center gap-1.5 text-[10px]" style={{ color: C.muted }}>
+                                        <span className="text-[10px]">☀️</span>
+                                        {fmt(unit.terraceSqm)}m²
+                                      </div>
+                                    )}
+                                    <div className="flex items-center gap-1 flex-wrap mt-1">
+                                      {unit.floors.map(f => (
+                                        <span key={f} className="text-[9px] rounded px-1.5 py-0.5"
+                                          style={{ background: C.sand, color: C.muted }}>
+                                          {lang === "ar" ? FLOOR_LABELS[f]?.ar : FLOOR_LABELS[f]?.en}
+                                        </span>
+                                      ))}
                                     </div>
-                                  )}
-                                  {unit.terraceSqm > 0 && (
-                                    <div className="flex items-center gap-1.5 text-[10px]" style={{ color: C.muted }}>
-                                      <span className="text-[10px]">☀️</span>
-                                      {fmt(unit.terraceSqm)}m²
-                                    </div>
-                                  )}
-                                  <div className="flex items-center gap-1 flex-wrap mt-1">
-                                    {unit.floors.map(f => (
-                                      <span key={f} className="text-[9px] rounded px-1.5 py-0.5"
-                                        style={{ background: C.sand, color: C.muted }}>
-                                        {lang === "ar" ? FLOOR_LABELS[f]?.ar : FLOOR_LABELS[f]?.en}
-                                      </span>
-                                    ))}
+                                  </div>
+                                  {/* Right: site-plan thumbnail */}
+                                  <div className="flex-shrink-0 rounded-md overflow-hidden">
+                                    <LotMiniMap lotId={lot.id} fillColor={devCfg.color} compact={units.length > 1} />
                                   </div>
                                 </div>
                                 {!isUnavailable && !isSelected && (
@@ -1492,7 +1560,7 @@ function CustomerPageInner() {
                     t={t as (k: string) => string}
                     projectSpecs={projectSpecs}
                     onClose={() => setSelectedUnit(null)}
-                    onEnquire={() => setEnquireUnit(selectedUnit)}
+                    onEnquire={() => { setEnquireUnit(selectedUnit); if (selectedUnit) track("enquire_open", { devType: selectedUnit.devType, unitId: selectedUnit.unit.id }); }}
                   />
                 </div>
               )}
@@ -1541,11 +1609,30 @@ function CustomerPageInner() {
                 return (
                   <div
                     key={tp}
+                    role="button"
+                    tabIndex={0}
                     className="rounded-2xl overflow-hidden transition-all duration-200"
                     style={{
                       background: C.white,
                       border: `1px solid ${C.sand}`,
                       boxShadow: "0 2px 12px rgba(28,32,16,0.06)",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => {
+                      setFilterType(tp as DevelopmentType);
+                      setViewMode("grid");
+                      setSelectedUnit(null);
+                      setSelectedMapLotId(null);
+                      track("typology_view", { type: tp });
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        setFilterType(tp as DevelopmentType);
+                        setViewMode("grid");
+                        setSelectedUnit(null);
+                        setSelectedMapLotId(null);
+                        track("typology_view", { type: tp });
+                      }
                     }}
                   >
                     {/* Hero rendering image */}
@@ -1610,11 +1697,13 @@ function CustomerPageInner() {
 
                       {/* Browse CTA */}
                       <button
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation(); // already handled by outer card onClick
                           setFilterType(tp as DevelopmentType);
                           setViewMode("grid");
                           setSelectedUnit(null);
                           setSelectedMapLotId(null);
+                          track("typology_view", { type: tp, via: "button" });
                         }}
                         className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all"
                         style={{
@@ -1718,7 +1807,7 @@ function CustomerPageInner() {
                       if (viewMode === "map") setSelectedMapLotId(null);
                     }
                   }}
-                  onEnquire={() => setEnquireUnit(selectedUnit)}
+                  onEnquire={() => { setEnquireUnit(selectedUnit); if (selectedUnit) track("enquire_open", { devType: selectedUnit.devType, unitId: selectedUnit.unit.id }); }}
                 />
               )}
             </div>
