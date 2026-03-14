@@ -95,7 +95,9 @@ function InvitesTab() {
   }
 
   function copy(token: string) {
-    const url = `${origin}/invite/${token}`;
+    const inv = invites.find(i => i.token === token);
+    const label = inv?.label ? `?for=${encodeURIComponent(inv.label)}` : "";
+    const url = `${origin}/invite/${token}${label}`;
     navigator.clipboard.writeText(url).then(() => {
       setCopied(token);
       setTimeout(() => setCopied(null), 2000);
@@ -209,7 +211,7 @@ function InvitesTab() {
 function InviteRow({ invite, origin, copied, onCopy, onRevoke, disabled }: {
   invite: InviteToken; origin: string; copied: boolean; onCopy: () => void; onRevoke: () => void; disabled?: boolean;
 }) {
-  const url = `${origin}/invite/${invite.token}`;
+  const url = `${origin}/invite/${invite.token}?for=${encodeURIComponent(invite.label)}`;
   const roleBg = invite.role === "investor" ? "#EFF6FF" : C.greenBg;
   const roleColor = invite.role === "investor" ? "#1D4ED8" : C.green;
 

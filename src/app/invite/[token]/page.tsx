@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 
 export default function InvitePage() {
   const { token } = useParams<{ token: string }>();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const forName = searchParams.get("for") ?? "";
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
+  const [confirmedName, setConfirmedName] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
@@ -24,6 +27,7 @@ export default function InvitePage() {
             sessionStorage.setItem("dh_invite_token", d.token as string ?? token);
             sessionStorage.setItem("dh_invite_label", d.label as string ?? "");
           } catch {}
+          if (d.label) setConfirmedName(d.label as string);
           setStatus("success");
           setTimeout(() => router.replace(d.destination as string), 800);
         } else {
@@ -97,7 +101,7 @@ export default function InvitePage() {
         {status === "loading" && (
           <>
             <h1 style={{ color: "#F5F0E8", fontSize: 24, fontWeight: 600, marginBottom: 12 }}>
-              Verifying your invitation…
+              {forName ? `Welcome, ${forName}` : "Verifying your invitation…"}
             </h1>
             <p style={{ color: "rgba(245,240,232,0.45)", fontSize: 14, lineHeight: 1.6 }}>
               Just a moment while we set up your access.
@@ -122,7 +126,7 @@ export default function InvitePage() {
           <>
             <div style={{ fontSize: 40, marginBottom: 16 }}>✓</div>
             <h1 style={{ color: "#F5F0E8", fontSize: 24, fontWeight: 600, marginBottom: 12 }}>
-              Welcome to Deddeh Hills
+              {confirmedName ? `Welcome, ${confirmedName}` : "Welcome to Deddeh Hills"}
             </h1>
             <p style={{ color: "rgba(245,240,232,0.45)", fontSize: 14, lineHeight: 1.6 }}>
               Your access has been granted. Redirecting you now…
