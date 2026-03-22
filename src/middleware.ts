@@ -11,10 +11,9 @@ const PUBLIC_PREFIXES = [
   "/invite",
   "/api/invite",
   "/api/me",               // role endpoint — returns null for unauthenticated callers
-  "/api/state",            // lot/project data — needed by public customer page
+  "/api/state",            // lot/project data — needed by gate + customer page
   "/api/enquire",          // customer enquiry form — creates CRM lead, no auth needed
-  "/api/analytics/track",  // write-only event tracking — public so /customer visitors are recorded
-  "/customer",             // public browse experience
+  "/api/analytics/track",  // write-only event tracking — public so invite visitors are recorded
   "/_next",
   "/favicon.ico",
 ];
