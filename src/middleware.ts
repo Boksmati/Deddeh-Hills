@@ -41,7 +41,6 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // ── Always public ──────────────────────────────────────────────────────────
-  if (pathname === "/") return NextResponse.next();
   if (PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) {
     return NextResponse.next();
   }

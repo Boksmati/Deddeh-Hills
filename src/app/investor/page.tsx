@@ -393,9 +393,9 @@ export default function InvestorPage() {
                 </p>
               </div>
 
-              {/* $300K / $500K ticket cards */}
-              <div className="grid grid-cols-2 gap-4">
-                {([300_000, 500_000] as const).map((ticketSize) => {
+              {/* $350K / $450K / $550K ticket cards */}
+              <div className="grid grid-cols-3 gap-3">
+                {([350_000, 450_000, 550_000] as const).map((ticketSize) => {
                   const ratio = activeWaterfall.l2InvestorCash > 0 ? ticketSize / activeWaterfall.l2InvestorCash : 0;
                   const profit = Math.round(activeWaterfall.l2InvestorProfit * ratio);
                   const total = ticketSize + profit;
@@ -475,9 +475,9 @@ export default function InvestorPage() {
                 </p>
               </div>
 
-              {/* $300K / $500K ticket cards */}
-              <div className="grid grid-cols-2 gap-4">
-                {([300_000, 500_000] as const).map((ticketSize) => {
+              {/* $350K / $450K / $550K ticket cards */}
+              <div className="grid grid-cols-3 gap-3">
+                {([350_000, 450_000, 550_000] as const).map((ticketSize) => {
                   const pct = config.l1FundSize > 0 ? ticketSize / config.l1FundSize : 0;
                   const sqm = Math.floor(l1Returns.sqmAcquired * pct);
                   const profit = Math.round(l1Returns.profit * pct);
