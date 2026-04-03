@@ -13,6 +13,7 @@ import { computeWaterfall, computePhaseMetrics, type InvestmentConfig, type LotP
 import LOT_PRICES_RAW from "@/data/lot-prices.json";
 
 const LOT_PRICES = LOT_PRICES_RAW as LotPricing[];
+import CustomerMap from "@/components/customer/CustomerMap";
 import DhLogo from "@/components/ui/DhLogo";
 import AppHeader from "@/components/ui/AppHeader";
 import { useTranslations } from "@/i18n/useTranslations";
@@ -190,29 +191,73 @@ export default function InvestorPage() {
     return out;
   }, [lotPhases, config]);
 
-  // L1 ticket sizes
-  const L1_TICKETS = [100_000, 200_000, 300_000, 500_000, 1_000_000];
-  const l1TicketData = L1_TICKETS.map((amount) => {
-    const sqm = config.l1EntryPrice > 0 ? amount / config.l1EntryPrice : 0;
-    const exitValue = sqm * config.l1ExitPriceCap;
-    const profit = exitValue - amount;
-    const roi = amount > 0 ? profit / amount : 0;
-    return { amount, sqm, exitValue, profit, roi };
-  });
+  // ─── Per-typology profitability (reference lot = 1200 m²) ───
+  // Matches Excel model: footprint → floor stacking → +25% balconies → ÷ avg unit size
+  const REF_LAND = 1200;           // Reference lot area (m²)
+  const COMMON_AREA_PCT = 0.10;    // 10% common/facilities area deducted from land
+  const EXPLOIT_PCT = 0.20;        // 20% surface exploration (building footprint)
+  const BALCONY_PCT = 0.25;        // +25% balconies/terraces
+  const LAND_COST_SQM = 360;      // Land cost $/m²
+  const BUILD_COST = 600;          // Construction cost $/m²
+  const villaTypologyData = useMemo(() => {
+    // Each type has its own floor stacking: above-ground floors, jamalon%, underground%
+    const types = [
+      { key: "twin_villa",  label: "Twin Villa",  labelAr: "فيلا مزدوجة",  aboveFloors: 2, jamalonPct: 0, undergroundPct: 0,   avgUnitSize: 300, sell: 1400, color: "#1E88E5" },
+      { key: "villa_2f",    label: "Villa 2F",    labelAr: "فيلا طابقين",  aboveFloors: 2, jamalonPct: 0, undergroundPct: 0,   avgUnitSize: 600, sell: 1500, color: "#43A047" },
+      { key: "villa_3f",    label: "Villa 3F",    labelAr: "فيلا 3 طوابق", aboveFloors: 2, jamalonPct: 0, undergroundPct: 0.5, avgUnitSize: 600, sell: 1300, color: "#F4511E" },
+      { key: "apartments",  label: "Apartments",  labelAr: "شقق",          aboveFloors: 3, jamalonPct: 0, undergroundPct: 0,   avgUnitSize: 150, sell: 1100, color: "#FDD835" },
+    ] as const;
 
-  // L2 villa tickets
-  const L2_VILLA_COUNTS = [1, 2, 3, 5];
-  const l2TicketData = L2_VILLA_COUNTS.map((villas) => {
-    const totalCash = waterfall.l2InvestorCash * villas;
-    const totalProfit = waterfall.l2InvestorProfit * villas;
-    const roi = waterfall.l2InvestorROI;
-    return { villas, totalCash, totalProfit, roi };
-  });
+    // Excel formula flow:
+    // footprint = totalArea × 20%
+    // floorArea = footprint × aboveFloors + footprint × jamalonPct + footprint × undergroundPct
+    // totalSellable = floorArea × (1 + 25% balconies)
+    // units = totalSellable / avgUnitSize
+    const netLand = REF_LAND * (1 - COMMON_AREA_PCT);  // 1,080 m² net after common area
+    const footprint = REF_LAND * EXPLOIT_PCT;            // 240 m² building footprint
+
+    return types.map(t => {
+      const floorArea = footprint * t.aboveFloors + footprint * t.jamalonPct + footprint * t.undergroundPct;
+      const totalLotBUA = Math.round(floorArea * (1 + BALCONY_PCT));
+      const unitsPerLot = totalLotBUA / t.avgUnitSize;  // can be fractional (e.g. 1.25)
+      // Per-villa figures
+      const buaPerVilla = t.avgUnitSize;  // input — the target unit size
+      const landPerVilla = Math.round(netLand / unitsPerLot);
+      const buildCost = buaPerVilla * BUILD_COST;
+      const landCost = landPerVilla * LAND_COST_SQM;
+      const revenue = buaPerVilla * t.sell;
+      const profit = revenue - buildCost - landCost;
+      const margin = revenue > 0 ? profit / revenue : 0;
+      const garden = landPerVilla - Math.round(buaPerVilla / (t.aboveFloors + (t.undergroundPct > 0 ? 1 : 0)));
+      return { ...t, totalLotBUA, unitsPerLot, buaPerVilla, landPerVilla, buildCost, landCost, revenue, profit, margin, garden };
+    });
+  }, []);
 
   const TABS = [
     { id: "returns" as const, label: t("inv_tab_returns"), sub: t("inv_tab_sub_returns") },
     { id: "deal" as const, label: t("inv_tab_deal"), sub: t("inv_tab_sub_deal") },
   ];
+
+  // Mount guard: prevent hydration mismatch from Zustand store differences
+  if (!mounted) {
+    return (
+      <div className="min-h-screen" style={{ background: "#F4F9EF" }}>
+        <AppHeader currentPage="investor" />
+        <div className="bg-dh-dark text-white">
+          <div className="max-w-6xl mx-auto px-4 sm:px-8 py-8 sm:py-10">
+            <div className="flex-1">
+              <h1 className="text-xl font-serif font-semibold text-white mb-4 leading-snug">
+                {t("inv_hero_headline")}
+              </h1>
+            </div>
+          </div>
+        </div>
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 py-12 text-center text-gray-400 text-sm">
+          Loading…
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen" style={{ background: "#F4F9EF" }}>
@@ -356,8 +401,8 @@ export default function InvestorPage() {
               </div>
               <h2 className="text-xl sm:text-2xl font-serif font-semibold leading-snug mb-3">
                 {lang === "ar"
-                  ? `استثمر من $300K. احصل على ${formatPct(waterfall.l2InvestorROI)} على رأس المال — في أقل من 3 سنوات.`
-                  : `Invest from $300K. Earn ${formatPct(waterfall.l2InvestorROI)} on cash — in under 3 years.`}
+                  ? `استثمر من $350K. احصل على ${formatPct(waterfall.l2InvestorROI)} على رأس المال — في أقل من 3 سنوات.`
+                  : `Invest from $350K. Earn ${formatPct(waterfall.l2InvestorROI)} on cash — in under 3 years.`}
               </h2>
               <p className="text-sm text-gray-300 leading-relaxed">
                 {lang === "ar"
@@ -440,12 +485,12 @@ export default function InvestorPage() {
                       <td className="py-1.5 text-right tabular-nums text-dh-green font-bold">{formatUSD(activeWaterfall.revenue)}</td>
                     </tr>
                     <tr>
-                      <td className="py-1.5 text-gray-400 pl-3">{lang === "ar" ? "− استرداد رأس المال" : "− Return of capital"}</td>
-                      <td className="py-1.5 text-right tabular-nums text-gray-400">({formatUSD(activeWaterfall.l2InvestorCash)})</td>
+                      <td className="py-1.5 text-gray-400 pl-3">{lang === "ar" ? "− تكلفة البناء الكاملة" : "− Construction + soft costs"}</td>
+                      <td className="py-1.5 text-right tabular-nums text-gray-400">({formatUSD(activeWaterfall.totalConstructionCost)})</td>
                     </tr>
                     <tr>
                       <td className="py-1.5 text-gray-400 pl-3">{lang === "ar" ? "− تكلفة الأرض" : "− Land cost"}</td>
-                      <td className="py-1.5 text-right tabular-nums text-gray-400">({formatUSD(activeWaterfall.l1LandPayment + activeWaterfall.ownerLandEquity)})</td>
+                      <td className="py-1.5 text-right tabular-nums text-gray-400">({formatUSD(activeWaterfall.totalLandCost)})</td>
                     </tr>
                     {waterfallModel === "priority" && activeWaterfall.priorityAmount > 0 && (
                       <tr>
@@ -454,12 +499,87 @@ export default function InvestorPage() {
                       </tr>
                     )}
                     <tr className="border-t border-gray-200">
-                      <td className="py-1.5 text-gray-700 font-medium">{lang === "ar" ? "المتبقي للتقسيم 50/50" : "Remaining for 50/50 split"}</td>
+                      <td className="py-1.5 text-gray-700 font-medium">{lang === "ar" ? "صافي الربح (تقسيم 50/50)" : "Net profit (50/50 split)"}</td>
                       <td className="py-1.5 text-right tabular-nums font-semibold text-gray-800">{formatUSD(activeWaterfall.remainingForSplit)}</td>
+                    </tr>
+                    <tr>
+                      <td className="py-1.5 text-gray-400 pl-5 text-[10px]">{lang === "ar" ? "رأس مالك المسترد" : "Your capital returned"}</td>
+                      <td className="py-1.5 text-right tabular-nums text-gray-400 text-[10px]">{formatUSD(activeWaterfall.l2InvestorCash)}</td>
                     </tr>
                     <tr className="bg-emerald-50/70 rounded-lg">
                       <td className="py-2 text-emerald-700 font-bold pl-1">{lang === "ar" ? "✓ حصتك 50%" : "✓ Your 50% share"}</td>
                       <td className="py-2 text-right tabular-nums font-bold text-emerald-700">{formatUSD(activeWaterfall.l2InvestorProfit)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* ── Per-Typology Profitability ── */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-5">
+              <div>
+                <div className="text-[10px] uppercase tracking-widest font-semibold text-gray-500 mb-0.5">
+                  {lang === "ar" ? "ربحية كل فيلا حسب النوع" : "Per-Villa Profitability by Type"}
+                </div>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  {lang === "ar"
+                    ? <>قطعة <strong className="text-gray-700">{REF_LAND.toLocaleString()} م²</strong> · بناء <strong className="text-gray-700">${BUILD_COST}/م²</strong> · أرض <strong className="text-gray-700">${LAND_COST_SQM}/م²</strong> · استغلال <strong className="text-gray-700">{(EXPLOIT_PCT * 100).toFixed(0)}%</strong> · +<strong className="text-gray-700">{(BALCONY_PCT * 100).toFixed(0)}%</strong> شرفات</>
+                    : <>Lot <strong className="text-gray-700">{REF_LAND.toLocaleString()} m²</strong> · Build <strong className="text-gray-700">${BUILD_COST}/m²</strong> · Land <strong className="text-gray-700">${LAND_COST_SQM}/m²</strong> · Exploitation <strong className="text-gray-700">{(EXPLOIT_PCT * 100).toFixed(0)}%</strong> · +<strong className="text-gray-700">{(BALCONY_PCT * 100).toFixed(0)}%</strong> balconies</>}
+                </p>
+              </div>
+
+              <div className="overflow-x-auto -mx-2 px-2">
+                <table className="w-full text-xs border-collapse min-w-[540px]">
+                  <thead>
+                    <tr className="text-left text-gray-400 text-[10px] uppercase tracking-wider">
+                      <th className="pb-2 font-medium"></th>
+                      {villaTypologyData.map(t => (
+                        <th key={t.key} className="pb-2 font-semibold text-center" style={{ color: t.color }}>
+                          {lang === "ar" ? t.labelAr : t.label}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    <tr>
+                      <td className="py-1.5 text-gray-500">{lang === "ar" ? "مساحة بناء / قطعة" : "BUA / lot"}</td>
+                      {villaTypologyData.map(t => <td key={t.key} className="py-1.5 text-center tabular-nums font-medium text-gray-700">{t.totalLotBUA.toLocaleString()} m²</td>)}
+                    </tr>
+                    <tr>
+                      <td className="py-1.5 text-gray-500">{lang === "ar" ? "وحدات / قطعة" : "Units / lot"}</td>
+                      {villaTypologyData.map(t => <td key={t.key} className="py-1.5 text-center tabular-nums font-medium text-gray-700">{t.unitsPerLot % 1 === 0 ? t.unitsPerLot : t.unitsPerLot.toFixed(2)}</td>)}
+                    </tr>
+                    <tr className="bg-gray-50/30">
+                      <td className="py-1.5 text-gray-500 font-medium">{lang === "ar" ? "م² بناء / فيلا" : "BUA / villa"}</td>
+                      {villaTypologyData.map(t => <td key={t.key} className="py-1.5 text-center tabular-nums font-medium text-gray-700">{t.buaPerVilla.toLocaleString()} m²</td>)}
+                    </tr>
+                    <tr>
+                      <td className="py-1.5 text-gray-500">{lang === "ar" ? "أرض / فيلا" : "Land / villa"}</td>
+                      {villaTypologyData.map(t => <td key={t.key} className="py-1.5 text-center tabular-nums font-medium text-gray-700">{t.landPerVilla.toLocaleString()} m²</td>)}
+                    </tr>
+                    <tr>
+                      <td className="py-1.5 text-gray-500">{lang === "ar" ? "حديقة" : "Garden"}</td>
+                      {villaTypologyData.map(t => <td key={t.key} className="py-1.5 text-center tabular-nums font-medium text-emerald-600">{t.garden.toLocaleString()} m²</td>)}
+                    </tr>
+                    <tr className="bg-gray-50/50">
+                      <td className="py-1.5 text-gray-500 font-medium">{lang === "ar" ? "تكلفة البناء" : "Build cost"}</td>
+                      {villaTypologyData.map(t => <td key={t.key} className="py-1.5 text-center tabular-nums font-medium text-red-600">{formatUSD(t.buildCost)}</td>)}
+                    </tr>
+                    <tr>
+                      <td className="py-1.5 text-gray-500">{lang === "ar" ? "تكلفة الأرض" : "Land cost"}</td>
+                      {villaTypologyData.map(t => <td key={t.key} className="py-1.5 text-center tabular-nums text-gray-600">{formatUSD(t.landCost)}</td>)}
+                    </tr>
+                    <tr className="bg-gray-50/50">
+                      <td className="py-1.5 text-gray-500 font-medium">{lang === "ar" ? "إيرادات البيع" : "Revenue"}</td>
+                      {villaTypologyData.map(t => <td key={t.key} className="py-1.5 text-center tabular-nums font-bold text-dh-green">{formatUSD(t.revenue)}</td>)}
+                    </tr>
+                    <tr className="border-t-2 border-gray-200">
+                      <td className="py-2 text-gray-700 font-bold">{lang === "ar" ? "صافي الربح / فيلا" : "Profit / villa"}</td>
+                      {villaTypologyData.map(t => <td key={t.key} className="py-2 text-center tabular-nums font-bold text-emerald-700">{formatUSD(t.profit)}</td>)}
+                    </tr>
+                    <tr>
+                      <td className="py-1.5 text-gray-500">{lang === "ar" ? "هامش الربح" : "Margin"}</td>
+                      {villaTypologyData.map(t => <td key={t.key} className="py-1.5 text-center tabular-nums font-bold" style={{ color: t.color }}>{formatPct(t.margin)}</td>)}
                     </tr>
                   </tbody>
                 </table>
@@ -587,13 +707,15 @@ export default function InvestorPage() {
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
               <h3 className="text-xs font-semibold text-gray-700 mb-3">{lang === "ar" ? "هيكل رأس المال — لكل فيلا" : "Capital Stack — per villa"}</h3>
               {(() => {
-                const total = waterfall.l2InvestorCash + waterfall.l1LandPayment + waterfall.ownerLandEquity + waterfall.l2InvestorProfit;
+                const total = waterfall.revenue;
                 if (total <= 0) return null;
                 const segments = [
                   { label: lang === "ar" ? "نقد المستثمر ل2" : "L2 Cash", value: waterfall.l2InvestorCash, color: "#E65100" },
+                  ...(waterfall.unfundedConstruction > 0 ? [{ label: lang === "ar" ? "تمويل البناء" : "Constr. Finance", value: waterfall.unfundedConstruction, color: "#BF360C" }] : []),
                   { label: lang === "ar" ? "أرض ل1" : "L1 Land", value: waterfall.l1LandPayment, color: "#1565C0" },
                   { label: lang === "ar" ? "أرض المالك" : "Owner Land", value: waterfall.ownerLandEquity, color: "#78909C" },
                   { label: lang === "ar" ? "ربح ل2" : "L2 Profit", value: waterfall.l2InvestorProfit, color: "#059669" },
+                  { label: lang === "ar" ? "ربح المالك" : "Owner Profit", value: waterfall.ownerProfit, color: "#4CAF50" },
                 ];
                 return (
                   <div>
@@ -758,6 +880,9 @@ export default function InvestorPage() {
       </div>
 
       {/* ── Sensitivity Analysis ── */}
+      {/* ── Interactive Lot Map with L1/L2 Pricing ── */}
+      <InvestorMap lang={lang} assignments={assignments} />
+
       <SensitivitySection config={config} setConfig={setConfig} lang={lang} />
 
       {/* Phase Breakdown Charts — hidden by default, toggle in admin */}
@@ -858,6 +983,204 @@ export default function InvestorPage() {
   );
 }
 
+// ── Investor Map with L1/L2 Pricing ─────────────────────────────────────────
+
+const LOT_RETAIL_MAP = new Map(LOT_PRICES.map(lp => [lp.lot, lp.price_sqm]));
+const L1_DISCOUNT = 0.35;
+const L2_DISCOUNT_MAP = 0.25;
+
+function InvestorMap({ lang, assignments }: { lang: string; assignments: Map<number, any> }) {
+  const lotStatuses = useSimulationStore((s) => s.lotStatuses);
+  const [phaseFilter, setPhaseFilter] = useState<"all" | 1 | 2 | 3>("all");
+  const [selectedLotIds, setSelectedLotIds] = useState<Set<number>>(new Set());
+  const [lassoMode, setLassoMode] = useState(false);
+
+  // Filter lots by phase (include all for display, sold lots shown but dimmed)
+  const filteredLotIds = useMemo(() => {
+    const ids = new Set<number>();
+    for (const lot of LOTS) {
+      const a = assignments.get(lot.id);
+      if (!a || a.developmentType === "unassigned") continue;
+      if (phaseFilter === "all" || a.phase === phaseFilter) ids.add(lot.id);
+    }
+    return ids;
+  }, [assignments, phaseFilter]);
+
+  // Handle lot selection (toggle) — skip sold lots
+  const handleSelectLot = (lotId: number) => {
+    const status = lotStatuses.get(lotId);
+    if (status === "sold") return;
+    setSelectedLotIds(prev => {
+      const next = new Set(prev);
+      if (next.has(lotId)) next.delete(lotId);
+      else next.add(lotId);
+      return next;
+    });
+  };
+
+  // Lasso selection — replace current selection with lassoed lots (excl. sold)
+  const handleLassoSelect = (lotIds: number[]) => {
+    const selectable = lotIds.filter(id =>
+      filteredLotIds.has(id) && lotStatuses.get(id) !== "sold"
+    );
+    if (selectable.length > 0) setSelectedLotIds(new Set(selectable));
+  };
+
+  // Compute pricing for selected lots (exclude sold)
+  const selectionPricing = useMemo(() => {
+    const ids = selectedLotIds.size > 0 ? selectedLotIds : filteredLotIds;
+    const lots = LOTS.filter(l => ids.has(l.id) && lotStatuses.get(l.id) !== "sold");
+    if (lots.length === 0) return null;
+
+    const totalArea = lots.reduce((s, l) => s + l.area_sqm, 0);
+    const weightedRetail = lots.reduce((s, l) => {
+      const retail = LOT_RETAIL_MAP.get(l.id) ?? l.zone_price_retail;
+      return s + l.area_sqm * retail;
+    }, 0);
+    const avgRetail = weightedRetail / totalArea;
+
+    return {
+      count: lots.length,
+      totalArea,
+      avgRetail,
+      avgL1: avgRetail * (1 - L1_DISCOUNT),
+      avgL2: avgRetail * (1 - L2_DISCOUNT_MAP),
+      isSelection: selectedLotIds.size > 0,
+    };
+  }, [selectedLotIds, filteredLotIds, lotStatuses]);
+
+  const fmtP = (n: number) => `$${n.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 sm:px-8 mt-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        {/* Header + phase filters */}
+        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-semibold text-gray-900">
+              {lang === "ar" ? "خريطة الأراضي والتسعير" : "Land Map & Pricing"}
+            </h3>
+            <p className="text-[10px] text-gray-400 mt-0.5">
+              {lang === "ar" ? "اضغط على القطع لمعرفة الأسعار" : "Click lots to see pricing — multi-select supported"}
+            </p>
+          </div>
+          <div className="flex items-center gap-1.5">
+            {(["all", 1, 2, 3] as const).map(ph => (
+              <button
+                key={ph}
+                onClick={() => { setPhaseFilter(ph); setSelectedLotIds(new Set()); }}
+                className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${
+                  phaseFilter === ph
+                    ? "bg-dh-dark text-white"
+                    : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                }`}
+              >
+                {ph === "all" ? (lang === "ar" ? "الكل" : "All") : `${lang === "ar" ? "م" : "P"}${ph}`}
+              </button>
+            ))}
+            <div className="w-px h-5 bg-gray-200 mx-1" />
+            <button
+              onClick={() => setLassoMode(m => !m)}
+              title={lang === "ar" ? "وضع التحديد بالسحب" : "Lasso select mode"}
+              className={`px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-colors flex items-center gap-1 ${
+                lassoMode ? "bg-dh-hills text-white" : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+              }`}
+            >
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5">
+                <path d="M3 3 Q8 1 13 3 Q15 8 13 13 Q8 15 3 13 Q1 8 3 3Z" strokeDasharray="3 2"/>
+              </svg>
+              {lang === "ar" ? "تحديد" : "Lasso"}
+            </button>
+          </div>
+        </div>
+
+        <div className="flex flex-col lg:flex-row">
+          {/* Map */}
+          <div className="flex-1 h-[400px] relative overflow-hidden">
+            <CustomerMap
+              filteredLotIds={filteredLotIds}
+              assignments={assignments}
+              lotStatuses={lotStatuses}
+              onSelectLot={handleSelectLot}
+              selectedLotId={null}
+              selectedLotIds={selectedLotIds}
+              lang={lang}
+              hideLegend
+              lassoMode={lassoMode}
+              onLassoSelect={handleLassoSelect}
+            />
+          </div>
+
+          {/* Pricing sidebar */}
+          <div className="lg:w-[280px] flex-shrink-0 border-t lg:border-t-0 lg:border-l border-gray-100 p-4 space-y-4">
+            {/* Selection info */}
+            <div className="text-center">
+              <div className="text-[10px] uppercase tracking-widest font-semibold text-gray-400 mb-1">
+                {selectionPricing?.isSelection
+                  ? (lang === "ar" ? "القطع المحددة" : "Selected Lots")
+                  : (lang === "ar" ? "جميع القطع" : "All Lots")}
+              </div>
+              <div className="text-lg font-bold text-gray-800">
+                {selectionPricing?.count ?? 0} {lang === "ar" ? "قطعة" : "lots"}
+              </div>
+              <div className="text-[10px] text-gray-400">
+                {selectionPricing ? `${selectionPricing.totalArea.toLocaleString("en-US", { maximumFractionDigits: 0 })} m²` : "—"}
+              </div>
+            </div>
+
+            {selectionPricing && (
+              <div className="space-y-2">
+                {/* Retail */}
+                <div className="bg-gray-50 rounded-xl p-3 text-center">
+                  <div className="text-[9px] uppercase tracking-wider text-gray-400 mb-0.5">
+                    {lang === "ar" ? "سعر التجزئة" : "Retail Price"}
+                  </div>
+                  <div className="text-xl font-bold text-gray-800">{fmtP(selectionPricing.avgRetail)}/m²</div>
+                  <div className="text-[10px] text-gray-400 mt-0.5">
+                    {lang === "ar" ? "إجمالي" : "total"} {fmtP(selectionPricing.avgRetail * selectionPricing.totalArea)}
+                  </div>
+                </div>
+
+                {/* L1 */}
+                <div className="bg-blue-50 rounded-xl p-3 text-center border border-blue-100">
+                  <div className="text-[9px] uppercase tracking-wider text-blue-500 mb-0.5">
+                    Layer 1 (−35%)
+                  </div>
+                  <div className="text-xl font-bold text-blue-700">{fmtP(selectionPricing.avgL1)}/m²</div>
+                  <div className="text-[10px] text-blue-400 mt-0.5">
+                    {lang === "ar" ? "إجمالي" : "total"} {fmtP(selectionPricing.avgL1 * selectionPricing.totalArea)}
+                  </div>
+                </div>
+
+                {/* L2 */}
+                <div className="bg-emerald-50 rounded-xl p-3 text-center border border-emerald-100">
+                  <div className="text-[9px] uppercase tracking-wider text-emerald-500 mb-0.5">
+                    Layer 2 (−25%)
+                  </div>
+                  <div className="text-xl font-bold text-emerald-700">{fmtP(selectionPricing.avgL2)}/m²</div>
+                  <div className="text-[10px] text-emerald-400 mt-0.5">
+                    {lang === "ar" ? "إجمالي" : "total"} {fmtP(selectionPricing.avgL2 * selectionPricing.totalArea)}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Clear selection */}
+            {selectedLotIds.size > 0 && (
+              <button
+                onClick={() => setSelectedLotIds(new Set())}
+                className="w-full text-[11px] text-gray-400 hover:text-gray-600 py-1"
+              >
+                {lang === "ar" ? "مسح التحديد" : "Clear selection"}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Sensitivity Section ─────────────────────────────────────────────────────
 
 // Inline ROI computation for matrix cells (avoids calling computeWaterfall for every cell)
@@ -869,13 +1192,13 @@ function cellROI(
 ): number {
   const cp = cashPct ?? cfg.cashPctOfConstruction;
   const totalLand = cfg.landPerVilla * landSqm;
-  const l1Land = totalLand * cfg.l1InvestorShare;
-  const ownerLand = totalLand * cfg.ownerSharePerPlot;
   const construction = cfg.buaPerVilla * cfg.constructionCostSqm;
   const soft = construction * cfg.softCostPct;
+  const totalConstructionCost = construction + soft;
   const l2Cash = construction * cp + soft;
   const revenue = cfg.buaPerVilla * sellSqm;
-  const after = revenue - l2Cash - l1Land - ownerLand;
+  // Subtract ALL costs: full construction + full land
+  const after = revenue - totalConstructionCost - totalLand;
   const priority = cfg.priorityEnabled ? l2Cash * cfg.priorityReturnPct : 0;
   const remaining = after - priority;
   const profit = priority + remaining * cfg.profitSplitInvestor;
@@ -934,14 +1257,14 @@ function SensitivitySection({
   function phaseRow(phaseIdx: number) {
     const lp = phasePrices[phaseIdx] ?? baseLand;
     const totalLand = config.landPerVilla * lp;
-    const l1Land = totalLand * config.l1InvestorShare;
     const construction2 = config.buaPerVilla * config.constructionCostSqm;
     const soft2 = construction2 * config.softCostPct;
+    const totalConstructionCost = construction2 + soft2;
     const l2Cash2 = construction2 * config.cashPctOfConstruction + soft2;
     const villaCost = l2Cash2; // investor's out-of-pocket
     const revenue = config.buaPerVilla * config.sellingPriceSqm;
-    const ownerLand = totalLand * config.ownerSharePerPlot;
-    const after = revenue - l2Cash2 - l1Land - ownerLand;
+    // Subtract ALL costs: full construction + full land
+    const after = revenue - totalConstructionCost - totalLand;
     const priority = config.priorityEnabled ? l2Cash2 * config.priorityReturnPct : 0;
     const remaining = after - priority;
     const profit = priority + remaining * config.profitSplitInvestor;

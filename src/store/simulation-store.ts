@@ -687,9 +687,11 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
       }
 
       const defaultAssumptions = createDefaultTypeAssumptions();
-      const assignments = new Map<number, LotAssignment>(
-        (data.assignments ?? []).map((a) => [a.lotId, a])
-      );
+      // Start with defaults so newly-added lots always appear, then overlay server data
+      const assignments = createDefaultAssignments();
+      for (const a of data.assignments ?? []) {
+        assignments.set(a.lotId, a);
+      }
       const lotStatuses = new Map<number, LotStatus>(data.lotStatuses ?? []);
       const investorSharePct = data.investorSharePct ?? 20;
       const typeAssumptions: Record<DevelopmentType, TypeAssumption> = data.typeAssumptions

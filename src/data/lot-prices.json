@@ -814,5 +814,21 @@
     "view": "sea_view",
     "zone": "north",
     "villa_selling_sqm": 1250
+  },
+  {
+    "lot": 109,
+    "price_sqm": 220,
+    "status": "available",
+    "view": "mountain_view",
+    "zone": "east",
+    "villa_selling_sqm": 1300
+  },
+  {
+    "lot": 110,
+    "price_sqm": 220,
+    "status": "available",
+    "view": "mountain_view",
+    "zone": "east",
+    "villa_selling_sqm": 1300
   }
 ]

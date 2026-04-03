@@ -444,23 +444,29 @@ export interface InvestmentConfig {
 
 export interface WaterfallResult {
   revenue: number;
-  /** L2 investor's initial cash returned first */
+  /** Full construction + soft cost for the villa */
+  totalConstructionCost: number;
+  /** L2 investor's initial cash (their equity portion of construction) */
   l2InvestorCash: number;
+  /** Construction financing NOT funded by L2 investor (repaid from proceeds) */
+  unfundedConstruction: number;
+  /** Total land cost (L1 + owner shares combined) */
+  totalLandCost: number;
   /** L1 investor's land stake payment from sale proceeds */
   l1LandPayment: number;
   /** Owner's land equity from sale proceeds */
   ownerLandEquity: number;
   /** Priority return amount (0 if not enabled) */
   priorityAmount: number;
-  /** Remaining after all repayments and priority */
+  /** Remaining after ALL costs and priority — this is true project profit */
   remainingForSplit: number;
-  /** L2 investor's profit (priority + 50% of remaining) */
+  /** L2 investor's profit (priority + split share of remaining) */
   l2InvestorProfit: number;
   /** L2 investor's total received (cash + profit) */
   l2InvestorTotal: number;
   /** L2 investor's ROI on cash deployed */
   l2InvestorROI: number;
-  /** Owner's profit (50% of remaining) */
+  /** Owner's profit (split share of remaining) */
   ownerProfit: number;
   /** Owner's total (land equity + profit) — ADMIN ONLY */
   ownerTotal: number;
@@ -567,23 +573,31 @@ export function computeWaterfall(
   // Villa selling price: per-lot if available, else config default
   const sellingPriceSqm = lot ? lot.villa_selling_sqm : config.sellingPriceSqm;
 
-  const totalLand = config.landPerVilla * landPrice;
-  const l1LandPayment = totalLand * config.l1InvestorShare;
-  const ownerLandEquity = totalLand * config.ownerSharePerPlot;
+  // ── Land costs ──
+  const totalLandCost = config.landPerVilla * landPrice;
+  const l1LandPayment = totalLandCost * config.l1InvestorShare;
+  const ownerLandEquity = totalLandCost * config.ownerSharePerPlot;
 
+  // ── Construction costs ──
   const constructionCost = config.buaPerVilla * config.constructionCostSqm;
   const softCost = constructionCost * config.softCostPct;
+  const totalConstructionCost = constructionCost + softCost;
 
-  // CRITICAL: cash % applies to construction only, NOT to land transfer
+  // L2 investor's cash equity = their % of construction + all soft costs
   const l2InvestorCash = constructionCost * config.cashPctOfConstruction + softCost;
+  // Remaining construction NOT funded by L2 investor (financed, repaid from proceeds)
+  const unfundedConstruction = totalConstructionCost - l2InvestorCash;
 
+  // ── Revenue & profit ──
   const revenue = config.buaPerVilla * sellingPriceSqm;
-  const afterRepayments = revenue - l2InvestorCash - l1LandPayment - ownerLandEquity;
+
+  // Subtract ALL costs: investor cash + unfunded construction + land (L1 + owner)
+  const afterAllCosts = revenue - l2InvestorCash - unfundedConstruction - l1LandPayment - ownerLandEquity;
 
   const priorityAmount = config.priorityEnabled
     ? l2InvestorCash * config.priorityReturnPct
     : 0;
-  const remainingForSplit = afterRepayments - priorityAmount;
+  const remainingForSplit = afterAllCosts - priorityAmount;
 
   const l2InvestorProfit =
     priorityAmount + remainingForSplit * config.profitSplitInvestor;
@@ -596,7 +610,10 @@ export function computeWaterfall(
 
   return {
     revenue,
+    totalConstructionCost,
     l2InvestorCash,
+    unfundedConstruction,
+    totalLandCost,
     l1LandPayment,
     ownerLandEquity,
     priorityAmount,

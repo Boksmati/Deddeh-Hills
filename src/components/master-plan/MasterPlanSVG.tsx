@@ -169,7 +169,7 @@ export default function MasterPlanSVG() {
       )}
 
       {/* Zoom controls */}
-      <div className="absolute top-3 right-3 z-10 flex flex-col gap-1">
+      <div className="absolute bottom-3 right-3 z-10 flex flex-col gap-1">
         <button
           onClick={() => setZoom((z) => Math.min(5, z * 1.2))}
           className="w-8 h-8 bg-white rounded-lg shadow-md flex items-center justify-center text-gray-700 hover:bg-gray-50 font-bold"
@@ -195,7 +195,7 @@ export default function MasterPlanSVG() {
       </div>
 
       {/* Zoom level indicator */}
-      <div className="absolute bottom-3 right-3 z-10 bg-white/80 rounded px-2 py-1 text-xs text-gray-500">
+      <div className="absolute bottom-3 left-3 z-10 bg-white/80 rounded px-2 py-1 text-xs text-gray-500">
         {Math.round(zoom * 100)}%
       </div>
 

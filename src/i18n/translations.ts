@@ -464,8 +464,8 @@ const en = {
   inv_tab_simulate: "Simulate",
   inv_tab_sub_simulate: "Adjust the model",
   // hero narrative
-  inv_hero_headline: "Fund villa construction in North Lebanon. Tickets from $300K. Your capital back first — then 50% of the profit.",
-  inv_bullet_1: "Ticket-based entry — fund 1–5 villas, capital returned on each sale",
+  inv_hero_headline: "Fund villa construction in North Lebanon. Tickets from $350K. Your capital back first — then 50% of the profit.",
+  inv_bullet_1: "Ticket-based entry — $350K, $450K, or $550K — capital returned on each villa sale",
   inv_bullet_2: "Asset-backed — your investment secured against land titles",
   inv_bullet_3: "Clear exit — proceeds distributed within 2–3 years per villa",
   inv_browse_units: "Browse Available Units",
@@ -969,8 +969,8 @@ const ar: Record<TranslationKey, string> = {
   inv_tab_simulate: "محاكاة",
   inv_tab_sub_simulate: "تعديل النموذج",
   // hero narrative
-  inv_hero_headline: "موّل بناء فلل في شمال لبنان. تذاكر تبدأ من $300K. رأس مالك يُستردّ أولاً — ثم 50% من الأرباح.",
-  inv_bullet_1: "دخول بالتذاكر — موّل 1–5 فلل، رأس المال يُردّ عند كل عملية بيع",
+  inv_hero_headline: "موّل بناء فلل في شمال لبنان. تذاكر تبدأ من $350K. رأس مالك يُستردّ أولاً — ثم 50% من الأرباح.",
+  inv_bullet_1: "دخول بالتذاكر — $350K أو $450K أو $550K — رأس المال يُردّ عند كل عملية بيع",
   inv_bullet_2: "مدعوم بأصول — استثمارك مضمون بسندات الأرض",
   inv_bullet_3: "خروج واضح — توزيع العائدات خلال 2–3 سنوات لكل فيلا",
   inv_browse_units: "تصفح الوحدات المتاحة",

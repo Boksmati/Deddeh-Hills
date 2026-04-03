@@ -24,6 +24,7 @@ const ADMIN_ONLY_PREFIXES = [
   "/simulator",
   "/assumptions",
   "/status",
+  "/model",
 ];
 
 /** Routes that require dh_role === "investor" OR "admin". */
