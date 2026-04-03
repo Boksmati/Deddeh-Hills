@@ -762,6 +762,11 @@ export default function ModelPage() {
   const lotStatuses = useSimulationStore((s) => s.lotStatuses);
   const [mounted, setMounted] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
+  // Scenario management
+  type ScenarioKey = "working" | "default";
+  const [activeScenario, setActiveScenario] = useState<ScenarioKey>("working");
+  const [defaultInputs, setDefaultInputs] = useState<Record<1 | 2 | 3, Record<TypologyKey, TypologyInputs>> | null>(null);
+  const [defaultSaveStatus, setDefaultSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
 
   const defaultPhaseInputs = (): Record<1 | 2 | 3, Record<TypologyKey, TypologyInputs>> => {
     const copy = (): Record<TypologyKey, TypologyInputs> => ({
@@ -776,23 +781,33 @@ export default function ModelPage() {
   const [pricingMode, setPricingMode] = useState<PricingMode>("by_location");
   const [phaseInputs, setPhaseInputs] = useState<Record<1 | 2 | 3, Record<TypologyKey, TypologyInputs>>>(defaultPhaseInputs);
 
-  // Load saved inputs on mount
+  // Merge saved data with defaults (handles newly-added fields)
+  const mergeWithDefaults = (data: any) => {
+    const merged: Record<number, any> = {};
+    for (const phase of [1, 2, 3] as const) {
+      merged[phase] = {};
+      for (const k of TYPOLOGY_KEYS) {
+        merged[phase][k] = { ...DEFAULT_INPUTS[k], ...data[phase][k] };
+      }
+    }
+    return merged as Record<1 | 2 | 3, Record<TypologyKey, TypologyInputs>>;
+  };
+
+  // Load both working and default scenarios on mount
   useEffect(() => {
     setMounted(true);
+    // Working scenario
     fetch("/api/model-inputs")
       .then(r => r.json())
       .then(data => {
-        if (data && data[1] && data[2] && data[3]) {
-          // Merge with defaults so any new fields added after initial save are populated
-          const merged: typeof data = {};
-          for (const phase of [1, 2, 3] as const) {
-            merged[phase] = {} as any;
-            for (const k of TYPOLOGY_KEYS) {
-              merged[phase][k] = { ...DEFAULT_INPUTS[k], ...data[phase][k] };
-            }
-          }
-          setPhaseInputs(merged);
-        }
+        if (data && data[1] && data[2] && data[3]) setPhaseInputs(mergeWithDefaults(data));
+      })
+      .catch(() => {});
+    // Default scenario
+    fetch("/api/model-inputs?scenario=default")
+      .then(r => r.json())
+      .then(data => {
+        if (data && data[1] && data[2] && data[3]) setDefaultInputs(mergeWithDefaults(data));
       })
       .catch(() => {});
   }, []);
@@ -814,6 +829,26 @@ export default function ModelPage() {
     return () => clearTimeout(t);
   }, [phaseInputs, mounted]);
 
+  // Save current working inputs as the locked default baseline
+  const saveAsDefault = () => {
+    setDefaultSaveStatus("saving");
+    fetch("/api/model-inputs?scenario=default", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(phaseInputs),
+    }).then(() => {
+      setDefaultInputs(phaseInputs);
+      setDefaultSaveStatus("saved");
+      setTimeout(() => setDefaultSaveStatus("idle"), 2500);
+    }).catch(() => setDefaultSaveStatus("idle"));
+  };
+
+  // Reset working inputs back to the saved default
+  const resetToDefault = () => {
+    if (!defaultInputs) return;
+    setPhaseInputs(defaultInputs);
+  };
+
   const updateInput = (phase: 1 | 2 | 3, typ: TypologyKey, field: keyof TypologyInputs, value: number) => {
     setPhaseInputs(prev => ({
       ...prev,
@@ -834,11 +869,15 @@ export default function ModelPage() {
     return map;
   }, [assignments]);
 
+  // Inputs visible in phase cards — default scenario shows the locked baseline (read-only)
+  const visibleInputs = activeScenario === "default" && defaultInputs ? defaultInputs : phaseInputs;
+  const isReadOnly = activeScenario === "default";
+
   // Grand totals (computed from all phases)
   const grand = useMemo(() => {
     let plots = 0, area = 0, bua = 0, units = 0, revenue = 0, cost = 0, land = 0, net = 0;
     for (const ph of [1, 2, 3] as const) {
-      const phInputs = phaseInputs[ph];
+      const phInputs = visibleInputs[ph];
       const byType: Record<TypologyKey, typeof LOTS> = { twin_villa: [], villa_2f: [], villa_3f: [], apartments: [] };
       for (const lot of lotsByPhase[ph]) {
         const dt = assignments.get(lot.id)?.developmentType as TypologyKey;
@@ -857,7 +896,7 @@ export default function ModelPage() {
       }
     }
     return { plots, area, bua, units, revenue, cost, land, net };
-  }, [lotsByPhase, phaseInputs, assignments, pricingMode]);
+  }, [lotsByPhase, visibleInputs, assignments, pricingMode]);
 
   if (!mounted) {
     return (
@@ -874,42 +913,87 @@ export default function ModelPage() {
 
       {/* Hero */}
       <div className="bg-dh-dark text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-5 flex items-start justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-lg font-serif font-semibold">
-                {lang === "ar" ? "نموذج المحاكاة المالية" : "Financial Simulation Model"}
-              </h1>
-              {saveStatus === "saving" && <span className="text-[10px] text-white/40">Saving…</span>}
-              {saveStatus === "saved"  && <span className="text-[10px] text-dh-light">✓ Saved</span>}
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-5 space-y-3">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-3">
+                <h1 className="text-lg font-serif font-semibold">
+                  {lang === "ar" ? "نموذج المحاكاة المالية" : "Financial Simulation Model"}
+                </h1>
+                {activeScenario === "working" && saveStatus === "saving" && <span className="text-[10px] text-white/40">Saving…</span>}
+                {activeScenario === "working" && saveStatus === "saved"  && <span className="text-[10px] text-dh-light">✓ Saved</span>}
+              </div>
+              <p className="text-[11px] text-white/50 mt-0.5">
+                {lang === "ar" ? "تقسيم حسب المراحل — أرض بسعر مخفض 25% عن سعر التجزئة لكل قطعة" : "Phase-by-phase breakdown — land at L2 (25% off retail)"}
+              </p>
             </div>
-            <p className="text-[11px] text-white/50 mt-0.5">
-              {lang === "ar" ? "تقسيم حسب المراحل — أرض بسعر مخفض 25% عن سعر التجزئة لكل قطعة" : "Phase-by-phase breakdown — land at L2 (25% off retail)"}
-            </p>
+            {/* Pricing mode toggle */}
+            <div className="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2 flex-shrink-0">
+              <span className="text-[10px] text-white/60 whitespace-nowrap">Selling price:</span>
+              <button
+                onClick={() => setPricingMode("average")}
+                className={`px-2.5 py-1 rounded text-[10px] font-medium transition-colors ${
+                  pricingMode === "average" ? "bg-white text-dh-dark" : "text-white/70 hover:text-white hover:bg-white/10"
+                }`}
+              >
+                Average
+              </button>
+              <button
+                onClick={() => setPricingMode("by_location")}
+                className={`px-2.5 py-1 rounded text-[10px] font-medium transition-colors ${
+                  pricingMode === "by_location" ? "bg-white text-dh-dark" : "text-white/70 hover:text-white hover:bg-white/10"
+                }`}
+              >
+                By Location
+              </button>
+            </div>
           </div>
-          {/* Pricing mode toggle */}
-          <div className="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2 flex-shrink-0">
-            <span className="text-[10px] text-white/60 whitespace-nowrap">Selling price:</span>
-            <button
-              onClick={() => setPricingMode("average")}
-              className={`px-2.5 py-1 rounded text-[10px] font-medium transition-colors ${
-                pricingMode === "average"
-                  ? "bg-white text-dh-dark"
-                  : "text-white/70 hover:text-white hover:bg-white/10"
-              }`}
-            >
-              Average
-            </button>
-            <button
-              onClick={() => setPricingMode("by_location")}
-              className={`px-2.5 py-1 rounded text-[10px] font-medium transition-colors ${
-                pricingMode === "by_location"
-                  ? "bg-white text-dh-dark"
-                  : "text-white/70 hover:text-white hover:bg-white/10"
-              }`}
-            >
-              By Location
-            </button>
+
+          {/* Scenario bar */}
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* Scenario toggle */}
+            <div className="flex items-center bg-white/10 rounded-lg p-0.5">
+              <button
+                onClick={() => setActiveScenario("working")}
+                className={`px-3 py-1.5 rounded-md text-[11px] font-medium transition-colors ${
+                  activeScenario === "working" ? "bg-white text-dh-dark" : "text-white/70 hover:text-white"
+                }`}
+              >
+                ✏️ Working
+              </button>
+              <button
+                onClick={() => { if (defaultInputs) setActiveScenario("default"); }}
+                disabled={!defaultInputs}
+                className={`px-3 py-1.5 rounded-md text-[11px] font-medium transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${
+                  activeScenario === "default" ? "bg-amber-400 text-dh-dark" : "text-white/70 hover:text-white"
+                }`}
+              >
+                🔒 Default {!defaultInputs && "(not set)"}
+              </button>
+            </div>
+
+            {/* Default scenario actions */}
+            {activeScenario === "working" && (
+              <>
+                {defaultInputs && (
+                  <button
+                    onClick={resetToDefault}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] text-white/80 hover:text-white transition-colors"
+                  >
+                    ↩ Reset to Default
+                  </button>
+                )}
+                <button
+                  onClick={saveAsDefault}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-400/20 hover:bg-amber-400/30 border border-amber-400/40 text-[11px] text-amber-300 hover:text-amber-200 transition-colors"
+                >
+                  {defaultSaveStatus === "saving" ? "Saving…" : defaultSaveStatus === "saved" ? "✓ Default Saved" : "💾 Save as Default"}
+                </button>
+              </>
+            )}
+            {activeScenario === "default" && (
+              <span className="text-[11px] text-amber-300/80 italic">Viewing locked baseline — switch to Working to edit</span>
+            )}
           </div>
         </div>
       </div>
@@ -945,8 +1029,8 @@ export default function ModelPage() {
             key={ph}
             phaseNum={ph}
             lots={lotsByPhase[ph]}
-            inputs={phaseInputs[ph]}
-            onInputChange={(typ, f, v) => updateInput(ph, typ, f, v)}
+            inputs={visibleInputs[ph]}
+            onInputChange={isReadOnly ? () => {} : (typ, f, v) => updateInput(ph, typ, f, v)}
             assignments={assignments}
             lotStatuses={lotStatuses}
             lang={lang}
@@ -957,6 +1041,7 @@ export default function ModelPage() {
     </div>
   );
 }
+
 
 
 
