@@ -119,7 +119,7 @@ const DEFAULT_INPUTS: Record<TypologyKey, TypologyInputs> = {
    CALCULATION ENGINE
    ──────────────────────────────────────────────────────────── */
 
-const L2_DISCOUNT = 0.25; // Layer 2: 25% off retail
+const L2_DISCOUNT = 0.20; // Layer 2: 20% off retail
 const L1_DISCOUNT = 0.35; // Layer 1: 35% off retail
 
 type PricingMode = "average" | "by_location";
@@ -130,7 +130,7 @@ function calculateTypology(inputs: TypologyInputs, lots: typeof LOTS, pricingMod
   // Retail price from lot-prices.json (per-lot actual market price)
   const retailLandCost = lots.reduce((s, l) => s + l.area_sqm * (LOT_RETAIL_MAP.get(l.id) ?? l.zone_price_retail), 0);
   const avgRetailLandSqm = totalArea > 0 ? retailLandCost / totalArea : 0;
-  // Land cost at L2 (−25% off retail)
+  // Land cost at L2 (−20% off retail)
   const landCost = retailLandCost * (1 - L2_DISCOUNT);
   const avgLandPriceSqm = totalArea > 0 ? landCost / totalArea : 0;
   // Land cost at L1 (−35% off retail) — early investor scenario
@@ -449,14 +449,25 @@ function TypologySection({
             <div className="space-y-2">
               <div className="text-[9px] uppercase tracking-widest font-semibold text-gray-400">Totals &amp; P&amp;L</div>
               <div className="bg-gray-50/60 rounded-lg p-2 space-y-0.5">
-                <Row label="Sellable area" value={`${fmtN(result.totalSellableArea, 0)} m²`} tip={`Total units × unit size (${fmtU(result.totalUnits)} × ${inputs.avgUnitSize} m² = ${fmtN(result.totalSellableArea,0)} m²)`} />
+                <Row label="Sellable area" value={`${fmtN(result.totalSellableArea, 0)} m²`} tip={`Total units × unit size (${result.totalUnits.toFixed(2)} × ${inputs.avgUnitSize} m² = ${fmtN(result.totalSellableArea,0)} m²)`} />
                 <Row label="Construction" value={fmt(result.totalConstructionCost)} color="#E53E3E" tip={`Sellable area × construction $/m² (${fmtN(result.totalSellableArea,0)} × $${inputs.constructionCost} = ${fmt(result.totalConstructionCost)})`} />
                 <Row label="Total sales" value={fmt(result.totalSales)} bold tip={`Sellable area × avg selling $/m² (${fmtN(result.totalSellableArea,0)} × $${fmtN(result.effectiveSellingPrice,0)} = ${fmt(result.totalSales)})`} />
                 <Row label="Gross profit" value={fmt(result.grossProfit)} tip={`Total sales − construction (${fmt(result.totalSales)} − ${fmt(result.totalConstructionCost)} = ${fmt(result.grossProfit)})`} />
-                <Row label={`Land cost`} value={fmt(result.landCost)} color="#E53E3E" tip={`Sum of (lot area × retail $/m²) × (1 − 25% L2 discount) = ${fmt(result.landCost)}`} />
+                <Row label={`Land cost`} value={fmt(result.landCost)} color="#E53E3E" tip={`Sum of (lot area × retail $/m²) × (1 − 20% L2 discount) = ${fmt(result.landCost)}`} />
               </div>
+              {/* Per Villa breakdown */}
+              {result.totalUnits > 0 && (
+                <div className="bg-blue-50/60 rounded-lg p-2 space-y-0.5">
+                  <div className="text-[9px] uppercase tracking-widest font-semibold text-blue-400 mb-0.5">Per Villa</div>
+                  <Row label="BUA" value={`${inputs.avgUnitSize} m²`} tip={`Unit size input`} />
+                  <Row label="Land cost" value={fmt(result.landCost / result.totalUnits)} color="#E53E3E" tip={`Total land ÷ units (${fmt(result.landCost)} ÷ ${result.totalUnits.toFixed(2)} = ${fmt(result.landCost / result.totalUnits)})`} />
+                  <Row label="Construction" value={fmt(result.totalConstructionCost / result.totalUnits)} color="#E53E3E" tip={`Unit size × build $/m² (${inputs.avgUnitSize} × $${inputs.constructionCost} = ${fmt(inputs.avgUnitSize * inputs.constructionCost)})`} />
+                  <Row label="Sale price" value={fmt(result.totalSales / result.totalUnits)} bold tip={`Total sales ÷ units (${fmt(result.totalSales)} ÷ ${result.totalUnits.toFixed(2)} = ${fmt(result.totalSales / result.totalUnits)})`} />
+                  <Row label="Net profit" value={fmt(result.netProfit / result.totalUnits)} bold color={result.netProfit >= 0 ? "#00B050" : "#E53E3E"} tip={`Total net profit ÷ units (${fmt(result.netProfit)} ÷ ${result.totalUnits.toFixed(2)} = ${fmt(result.netProfit / result.totalUnits)})`} />
+                </div>
+              )}
               <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-2 space-y-0.5">
-                <div className="text-[9px] uppercase tracking-widest font-semibold text-gray-400 mb-0.5">At L2 (−25%)</div>
+                <div className="text-[9px] uppercase tracking-widest font-semibold text-gray-400 mb-0.5">At L2 (−20%)</div>
                 <Row label="Net profit" value={fmt(result.netProfit)} bold color={result.netProfit >= 0 ? "#00B050" : "#E53E3E"} tip={`Gross profit − land cost L2 (${fmt(result.grossProfit)} − ${fmt(result.landCost)} = ${fmt(result.netProfit)})`} />
                 <Row label="Margin" value={`${result.totalSales > 0 ? ((result.netProfit / result.totalSales) * 100).toFixed(1) : 0}%`} color={result.netProfit >= 0 ? "#00B050" : "#E53E3E"} tip={`Net profit ÷ total sales (${fmt(result.netProfit)} ÷ ${fmt(result.totalSales)} = ${result.totalSales > 0 ? ((result.netProfit / result.totalSales) * 100).toFixed(1) : 0}%)`} />
                 <Row label={`ROI on ${(inputs.equityPct*100).toFixed(0)}% equity`} value={`${result.roiOnEquityL2.toFixed(1)}%`} bold color={result.roiOnEquityL2 >= 0 ? "#00B050" : "#E53E3E"} tip={`Net profit ÷ cash equity (${fmt(result.netProfit)} ÷ ${fmt(result.cashEquityL2)} = ${result.roiOnEquityL2.toFixed(1)}%) — equity = ${(inputs.equityPct*100).toFixed(0)}% × (land ${fmt(result.landCost)} + construction ${fmt(result.totalConstructionCost)}) = ${fmt(result.cashEquityL2)}`} />
@@ -924,7 +935,7 @@ export default function ModelPage() {
                 {activeScenario === "working" && saveStatus === "saved"  && <span className="text-[10px] text-dh-light">✓ Saved</span>}
               </div>
               <p className="text-[11px] text-white/50 mt-0.5">
-                {lang === "ar" ? "تقسيم حسب المراحل — أرض بسعر مخفض 25% عن سعر التجزئة لكل قطعة" : "Phase-by-phase breakdown — land at L2 (25% off retail)"}
+                {lang === "ar" ? "تقسيم حسب المراحل — أرض بسعر مخفض 25% عن سعر التجزئة لكل قطعة" : "Phase-by-phase breakdown — land at L2 (20% off retail)"}
               </p>
             </div>
             {/* Pricing mode toggle */}
