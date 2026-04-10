@@ -157,6 +157,7 @@ export default function AppHeader({ currentPage }: AppHeaderProps) {
             <>
               <NavLink href="/simulator"   page="simulator"   variant="ghost">{t("nav_simulator")}</NavLink>
               <NavLink href="/assumptions" page="assumptions" variant="ghost">{t("nav_assumptions")}</NavLink>
+              <NavLink href="/model"       page="model"       variant="ghost">{lang === "ar" ? "النموذج" : "Model"}</NavLink>
               <NavLink href="/status"      page="status"      variant="ghost">{t("nav_status")}</NavLink>
               <Divider />
               <NavLink href="/investor"    page="investor"    variant="green">{t("nav_investor")}</NavLink>
@@ -236,6 +237,7 @@ export default function AppHeader({ currentPage }: AppHeaderProps) {
             <>
               <MobileItem href="/simulator"            label={t("nav_simulator")}    active={currentPage === "simulator"} />
               <MobileItem href="/assumptions"          label={t("nav_assumptions")}  active={currentPage === "assumptions"} />
+              <MobileItem href="/model"                label={lang === "ar" ? "النموذج" : "Model"} active={currentPage === "model"} />
               <MobileItem href="/status"               label={t("nav_status")}       active={currentPage === "status"} />
               <MobileItem href="/investor"             label={t("nav_investor")}     active={currentPage === "investor"}   accent />
               <MobileItem href="/customer"             label={lang === "ar" ? "تصفح المشروع" : "Browse Project"} active={currentPage === "customer"} />

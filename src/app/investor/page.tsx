@@ -297,7 +297,7 @@ export default function InvestorPage() {
             {/* Right side — quick project stats */}
             <div className="hidden md:flex flex-col gap-3 flex-shrink-0 text-right" dir="ltr">
               {[
-                { val: serverReady ? summary.totalLots : "—", unit: "lots", label: lang === "ar" ? "قطعة أرض" : "in 3 phases" },
+                { val: serverReady ? summary.phaseBreakdown.filter(p => [1,2,3].includes(p.phase)).reduce((s, p) => s + p.lotCount, 0) || "—" : "—", unit: "lots", label: lang === "ar" ? "قطعة أرض" : "in 3 phases" },
                 { val: "80,000", unit: "m²", label: lang === "ar" ? "مساحة إجمالية" : "total land area" },
                 { val: serverReady ? formatPct(waterfall.l2InvestorROI) : "—", unit: "", label: lang === "ar" ? "عائد على النقد" : "projected ROI on cash" },
               ].map((s, i) => (
@@ -322,8 +322,59 @@ export default function InvestorPage() {
         </div>
       </div>
 
+      {/* Assumption knobs strip */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-8 mt-4 mb-1">
+        <div className="flex flex-wrap items-center gap-4 bg-white rounded-2xl px-5 py-3 shadow-sm border border-gray-100 text-xs">
+          <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">{lang === "ar" ? "الافتراضات" : "Assumptions"}</span>
+          {/* Cash % of construction */}
+          <label className="flex items-center gap-2 text-gray-500">
+            {lang === "ar" ? "نقد من التشييد" : "Cash % of construction"}
+            <div className="flex items-center gap-1">
+              <input
+                type="number"
+                min={10} max={100} step={5}
+                value={Math.round(config.cashPctOfConstruction * 100)}
+                onChange={(e) => setConfig({ cashPctOfConstruction: Math.min(1, Math.max(0.1, Number(e.target.value) / 100)) })}
+                className="w-14 text-right border border-gray-200 rounded-lg px-2 py-1 text-xs font-semibold text-dh-green focus:outline-none focus:ring-1 focus:ring-dh-hills"
+              />
+              <span className="text-gray-400">%</span>
+            </div>
+          </label>
+          {/* Selling price */}
+          <label className="flex items-center gap-2 text-gray-500">
+            {lang === "ar" ? "سعر البيع" : "Sell price"}
+            <div className="flex items-center gap-1">
+              <span className="text-gray-400">$</span>
+              <input
+                type="number"
+                min={800} max={3000} step={50}
+                value={config.sellingPriceSqm}
+                onChange={(e) => setConfig({ sellingPriceSqm: Number(e.target.value) })}
+                className="w-16 text-right border border-gray-200 rounded-lg px-2 py-1 text-xs font-semibold text-dh-green focus:outline-none focus:ring-1 focus:ring-dh-hills"
+              />
+              <span className="text-gray-400">/m²</span>
+            </div>
+          </label>
+          {/* Construction cost */}
+          <label className="flex items-center gap-2 text-gray-500">
+            {lang === "ar" ? "تكلفة البناء" : "Construction"}
+            <div className="flex items-center gap-1">
+              <span className="text-gray-400">$</span>
+              <input
+                type="number"
+                min={300} max={1200} step={50}
+                value={config.constructionCostSqm}
+                onChange={(e) => setConfig({ constructionCostSqm: Number(e.target.value) })}
+                className="w-16 text-right border border-gray-200 rounded-lg px-2 py-1 text-xs font-semibold text-dh-green focus:outline-none focus:ring-1 focus:ring-dh-hills"
+              />
+              <span className="text-gray-400">/m²</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
       {/* KPI Grid — 4 key investor metrics */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-8 -mt-4 sm:-mt-6">
+      <div className="max-w-6xl mx-auto px-4 sm:px-8 mt-4">
         <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-3">
           {t("inv_kpi_intro")} — {lang === "ar" ? "الطبقة الثانية · تطوير الفلل" : "Layer 2 · Villa Development"}
         </p>
@@ -883,7 +934,7 @@ export default function InvestorPage() {
       {/* ── Interactive Lot Map with L1/L2 Pricing ── */}
       <InvestorMap lang={lang} assignments={assignments} />
 
-      <SensitivitySection config={config} setConfig={setConfig} lang={lang} />
+      {/* <SensitivitySection config={config} setConfig={setConfig} lang={lang} /> */}
 
       {/* Phase Breakdown Charts — hidden by default, toggle in admin */}
       {mounted && investorFeatureFlags.showPhaseBreakdown && (
@@ -987,7 +1038,7 @@ export default function InvestorPage() {
 
 const LOT_RETAIL_MAP = new Map(LOT_PRICES.map(lp => [lp.lot, lp.price_sqm]));
 const L1_DISCOUNT = 0.35;
-const L2_DISCOUNT_MAP = 0.25;
+const L2_DISCOUNT_MAP = 0.20;
 
 function InvestorMap({ lang, assignments }: { lang: string; assignments: Map<number, any> }) {
   const lotStatuses = useSimulationStore((s) => s.lotStatuses);
@@ -1155,7 +1206,7 @@ function InvestorMap({ lang, assignments }: { lang: string; assignments: Map<num
                 {/* L2 */}
                 <div className="bg-emerald-50 rounded-xl p-3 text-center border border-emerald-100">
                   <div className="text-[9px] uppercase tracking-wider text-emerald-500 mb-0.5">
-                    Layer 2 (−25%)
+                    Layer 2 (−20%)
                   </div>
                   <div className="text-xl font-bold text-emerald-700">{fmtP(selectionPricing.avgL2)}/m²</div>
                   <div className="text-[10px] text-emerald-400 mt-0.5">
@@ -1414,6 +1465,30 @@ function SensitivitySection({
                 {isAr ? "فلل ممولة بمليون $" : "Villas / $1M"}
               </div>
               <div className="text-xl font-bold tabular-nums text-blue-700">{villasPerMillion_B}</div>
+            </div>
+          </div>
+
+          {/* IRR by holding period */}
+          <div className="mb-5">
+            <div className="text-[10px] text-gray-400 uppercase tracking-wider mb-2">
+              {isAr ? "العائد الداخلي السنوي على النقد المستثمر" : "Annualised IRR on Cash Invested"}
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              {[2, 3, 4].map((yrs) => {
+                const irr = Math.pow(1 + roi_B, 1 / yrs) - 1;
+                const good = irr >= 0.12;
+                const ok   = irr >= 0.08;
+                return (
+                  <div key={yrs} className={`rounded-xl p-3 text-center ${good ? "bg-emerald-50 border border-emerald-100" : ok ? "bg-amber-50 border border-amber-100" : "bg-red-50 border border-red-100"}`}>
+                    <div className="text-[9px] uppercase tracking-wider text-gray-400 mb-0.5">
+                      {yrs} {isAr ? "سنوات" : "yr IRR"}
+                    </div>
+                    <div className={`text-lg font-bold tabular-nums ${good ? "text-emerald-700" : ok ? "text-amber-700" : "text-red-600"}`}>
+                      {(irr * 100).toFixed(1)}%
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 

@@ -1,0 +1,41 @@
+{
+  "ownerSharePerPlot": 0.885,
+  "l1InvestorShare": 0.115,
+  "l1FundSize": 2300000,
+  "l1EntryPrice": 225,
+  "l1ExitPriceCap": 275,
+  "l1Timeline": 2,
+  "l1ExitCapYears": 3,
+  "plots": 5,
+  "villasPerPlot": 2,
+  "buaPerVilla": 98,
+  "landPerVilla": 189,
+  "constructionCostSqm": 600,
+  "sellingPriceSqm": 1350,
+  "softCostPct": 0.1,
+  "l2Timeline": 3,
+  "cashPctOfConstruction": 0.5,
+  "investorFundedVillas": 10,
+  "minVillasToBuild": 5,
+  "phaseLandPrices": [
+    {
+      "phase": 1,
+      "pricePerSqm": 275
+    },
+    {
+      "phase": 2,
+      "pricePerSqm": 312
+    },
+    {
+      "phase": 3,
+      "pricePerSqm": 350
+    }
+  ],
+  "profitSplitInvestor": 0.5,
+  "profitSplitOwner": 0.5,
+  "priorityReturnPct": 0.1,
+  "priorityEnabled": false,
+  "landTransferMode": "discount",
+  "landTransferFlat": 275,
+  "landTransferDiscount": 100
+}

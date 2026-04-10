@@ -38,7 +38,7 @@
       "undergroundPct": 1,
       "balconyPct": 0.25,
       "maxUnitsPerPlot": 2,
-      "avgUnitSize": 400,
+      "avgUnitSize": 600,
       "constructionCost": 600,
       "sellingPrice": 1300,
       "profitMargin": 450,

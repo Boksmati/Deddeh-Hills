@@ -78,6 +78,19 @@ export default function AssumptionsPage() {
   const lotGroups = useSimulationStore((s) => s.lotGroups);
   const { t } = useTranslations();
 
+  // Total land area of lots assigned to phases 1, 2, 3 (excludes sold/unassigned)
+  const phasedLandAreaSqm = useMemo(() => {
+    const lotMap = new Map(LOTS.map(l => [l.id, l]));
+    let total = 0;
+    for (const [lotId, a] of assignments) {
+      if (a.phase === 1 || a.phase === 2 || a.phase === 3) {
+        const lot = lotMap.get(lotId);
+        if (lot) total += lot.area_sqm;
+      }
+    }
+    return total;
+  }, [assignments]);
+
   // ── Three-Party Investment Config
   const { config, setConfig, saveConfig, l1Returns, waterfall, phasedPricing, isLoading: configLoading } = useInvestmentConfig();
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
@@ -620,26 +633,31 @@ export default function AssumptionsPage() {
           ) : (
             <div className="p-6 space-y-8">
 
-              {/* Ownership */}
+              {/* Ownership — derived from L1 fund size ÷ (total land × entry price) */}
               <section>
                 <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3">{t("inv_config_ownership")}</h3>
-                <div className="grid grid-cols-2 gap-4 max-w-sm">
-                  <ConfigField
-                    label={t("inv_config_owner_share")} unit="%"
-                    value={+(config.ownerSharePerPlot * 100).toFixed(2)}
-                    step={0.5} min={50} max={99}
-                    onChange={(v) => setConfig({ ownerSharePerPlot: +(v / 100).toFixed(4), l1InvestorShare: +(1 - v / 100).toFixed(4) })}
-                  />
-                  <ConfigField
-                    label={t("inv_config_l1_share")} unit="%"
-                    value={+(config.l1InvestorShare * 100).toFixed(2)}
-                    step={0.5} min={1} max={50}
-                    onChange={(v) => setConfig({ l1InvestorShare: +(v / 100).toFixed(4), ownerSharePerPlot: +(1 - v / 100).toFixed(4) })}
-                  />
-                </div>
-                {Math.abs(config.ownerSharePerPlot + config.l1InvestorShare - 1) > 0.001 && (
-                  <p className="mt-2 text-xs text-red-500">⚠ Ownership shares must sum to 100%</p>
-                )}
+                {(() => {
+                  const derivedL1 = phasedLandAreaSqm > 0 && config.l1EntryPrice > 0
+                    ? Math.min(1, config.l1FundSize / (phasedLandAreaSqm * config.l1EntryPrice))
+                    : config.l1InvestorShare;
+                  const derivedOwner = 1 - derivedL1;
+                  return (
+                    <div className="flex gap-6">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[10px] text-gray-500 font-medium">{t("inv_config_owner_share")}</span>
+                        <span className="text-xl font-bold text-gray-800 tabular-nums">{(derivedOwner * 100).toFixed(1)}%</span>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[10px] text-gray-500 font-medium">{t("inv_config_l1_share")}</span>
+                        <span className="text-xl font-bold text-dh-green tabular-nums">{(derivedL1 * 100).toFixed(1)}%</span>
+                      </div>
+                      <div className="flex flex-col justify-end pb-0.5">
+                        <span className="text-[9px] text-gray-400 italic">= fund size ÷ (total land × entry price)</span>
+                        <span className="text-[9px] text-gray-400">${(config.l1FundSize / 1000).toFixed(0)}K ÷ ({Math.round(phasedLandAreaSqm).toLocaleString()} m² × ${config.l1EntryPrice}/m²)</span>
+                      </div>
+                    </div>
+                  );
+                })()}
               </section>
 
               {/* Layer 1 */}
@@ -647,9 +665,15 @@ export default function AssumptionsPage() {
                 <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3">{t("inv_config_l1_section")}</h3>
                 <div className="grid grid-cols-3 gap-4 max-w-2xl">
                   <ConfigField label={t("inv_config_l1_fund_size")} unit="$" value={config.l1FundSize} step={100000} min={0} max={20000000}
-                    onChange={(v) => setConfig({ l1FundSize: v })} />
+                    onChange={(v) => {
+                      const l1 = phasedLandAreaSqm > 0 && config.l1EntryPrice > 0 ? Math.min(1, v / (phasedLandAreaSqm * config.l1EntryPrice)) : config.l1InvestorShare;
+                      setConfig({ l1FundSize: v, l1InvestorShare: +l1.toFixed(4), ownerSharePerPlot: +(1 - l1).toFixed(4) });
+                    }} />
                   <ConfigField label={t("inv_config_l1_entry")} unit="$/m²" value={config.l1EntryPrice} step={5} min={100} max={500}
-                    onChange={(v) => setConfig({ l1EntryPrice: v })} />
+                    onChange={(v) => {
+                      const l1 = phasedLandAreaSqm > 0 && v > 0 ? Math.min(1, config.l1FundSize / (phasedLandAreaSqm * v)) : config.l1InvestorShare;
+                      setConfig({ l1EntryPrice: v, l1InvestorShare: +l1.toFixed(4), ownerSharePerPlot: +(1 - l1).toFixed(4) });
+                    }} />
                   <ConfigField label={t("inv_config_l1_exit_cap")} unit="$/m²" value={config.l1ExitPriceCap} step={5} min={100} max={600}
                     onChange={(v) => setConfig({ l1ExitPriceCap: v })} />
                   <ConfigField label={t("inv_config_l1_timeline")} unit="yrs" value={config.l1Timeline} step={0.5} min={1} max={10}
