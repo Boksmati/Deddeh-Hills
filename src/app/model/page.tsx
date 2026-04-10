@@ -344,7 +344,7 @@ function TypologySection({
           <span className="text-[10px] text-gray-400">{result.numPlots} plots · {fmtN(result.totalArea, 0)} m²</span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-[10px] tabular-nums text-gray-500">{fmtU(result.totalUnits)} units</span>
+          <span className="text-[10px] tabular-nums text-gray-500">{result.totalUnits.toFixed(2)} units</span>
           <span className="text-[10px] tabular-nums font-semibold text-dh-green">{fmt(result.totalSales)}</span>
           <span className={`text-[10px] tabular-nums font-bold ${result.netProfit >= 0 ? "text-emerald-600" : "text-red-600"}`}>
             {fmt(result.netProfit)}
@@ -400,6 +400,7 @@ function TypologySection({
               <div className="text-[9px] uppercase tracking-widest font-semibold text-gray-400">Unit Geometry</div>
               <div className="bg-gray-50/60 rounded-lg p-2 space-y-0.5">
                 <Row label="Total units" value={fmtU(result.totalUnits)} bold tip={`BUA ÷ unit size (${fmtN(result.totalBuiltArea, 0)} ÷ ${inputs.avgUnitSize} = ${fmtU(result.totalUnits)} units)`} />
+                <Row label="Sellable area / unit" value={`${inputs.avgUnitSize} m²`} tip={`Unit size input — each villa's sellable built-up area`} />
                 <Row label="Units / plot" value={fmtN(result.unitsPerPlot, 2)} tip={`Total units ÷ number of plots (${fmtN(result.totalUnits,1)} ÷ ${result.numPlots} = ${fmtN(result.unitsPerPlot,2)})`} />
                 <Row label="Villa footprint" value={`${fmtN(result.villaFootprint, 0)} m²`} tip={`Unit size ÷ (floors × (1 + balcony%)) = ${inputs.avgUnitSize} ÷ (${inputs.floors} × ${(1+inputs.balconyPct).toFixed(2)}) = ${fmtN(result.villaFootprint,0)} m²`} />
                 <Row label="Lot / villa" value={`${fmtN(result.lotPerVilla, 0)} m²`} tip={`Net area ÷ total units (${fmtN(result.netArea,0)} ÷ ${fmtN(result.totalUnits,1)} = ${fmtN(result.lotPerVilla,0)} m²)`} />
