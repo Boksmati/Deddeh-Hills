@@ -668,85 +668,91 @@ function PhaseCard({
         </div>
       </div>
 
-      {/* Mini map + typology mix */}
-      <div className="flex flex-col lg:flex-row">
-        {/* Map + pricing sidebar */}
-        <div className="lg:w-[340px] flex-shrink-0 border-b lg:border-b-0 lg:border-r border-gray-100 bg-gray-50/30">
-          <div className="h-[280px] relative overflow-hidden rounded-lg m-2">
-            <CustomerMap
-              filteredLotIds={phaseLotIds}
-              assignments={assignments}
-              lotStatuses={lotStatuses}
-              onSelectLot={handleSelectLot}
-              selectedLotId={null}
-              selectedLotIds={selectedLotIds}
-              onLassoSelect={handleLassoSelect}
-              lang={lang}
-              compact
-              hideLegend
-            />
+      {/* Map + Pricing + Typology breakdowns */}
+      <div className="flex flex-col">
+        {/* Map + Pricing row */}
+        <div className="flex flex-col lg:flex-row border-b border-gray-100">
+          {/* Map section */}
+          <div className="lg:w-[320px] flex-shrink-0 bg-gray-50/30 p-2">
+            <div className="h-[280px] relative overflow-hidden rounded-lg">
+              <CustomerMap
+                filteredLotIds={phaseLotIds}
+                assignments={assignments}
+                lotStatuses={lotStatuses}
+                onSelectLot={handleSelectLot}
+                selectedLotId={null}
+                selectedLotIds={selectedLotIds}
+                onLassoSelect={handleLassoSelect}
+                lang={lang}
+                compact
+                hideLegend
+              />
+            </div>
           </div>
 
-          {/* Selected lot pricing cards */}
-          {hasSelection && selectedLotIds.size <= 3 && (
-            <div className="px-3 pb-1 space-y-1">
-              {Array.from(selectedLotIds).map(id => (
-                <LotPricingCard key={id} lotId={id} lang={lang} />
-              ))}
-            </div>
-          )}
+          {/* Pricing section - to the right of map */}
+          <div className="flex-1 flex flex-col gap-4 p-4">
+            {/* Selected lot pricing cards */}
+            {hasSelection && selectedLotIds.size <= 3 && (
+              <div className="space-y-2">
+                {Array.from(selectedLotIds).map(id => (
+                  <LotPricingCard key={id} lotId={id} lang={lang} />
+                ))}
+              </div>
+            )}
 
-          {/* Land pricing under map */}
-          <div className="px-3 py-2.5 border-t border-gray-100 space-y-2">
-            {/* Avg land prices */}
-            <div className="space-y-1.5">
-              <div className="text-[9px] uppercase tracking-widest font-semibold text-gray-400">
-                Avg Land Price / m²
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                <div className="bg-gray-50 rounded-lg p-2 text-center">
-                  <div className="text-[9px] text-gray-400">Retail</div>
-                  <div className="text-xs font-bold text-gray-700">${fmtN(landPricing.avgRetail, 0)}</div>
+            {/* Avg land prices + Typology mix in two columns on larger screens */}
+            <div className="flex flex-col lg:flex-row gap-4">
+              {/* Avg land prices */}
+              <div className="flex-1 space-y-1.5">
+                <div className="text-[9px] uppercase tracking-widest font-semibold text-gray-400">
+                  Avg Land Price / m²
                 </div>
-                <div className="bg-blue-50 rounded-lg p-2 text-center border border-blue-100">
-                  <div className="text-[9px] text-blue-500">L1 (−35%)</div>
-                  <div className="text-xs font-bold text-blue-700">${fmtN(landPricing.avgL1, 0)}</div>
-                </div>
-                <div className="bg-emerald-50 rounded-lg p-2 text-center border border-emerald-100">
-                  <div className="text-[9px] text-emerald-500">L2 (−25%)</div>
-                  <div className="text-xs font-bold text-emerald-700">${fmtN(landPricing.avgL2, 0)}</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Typology mix */}
-            <div className="space-y-1">
-              <div className="text-[9px] uppercase tracking-widest font-semibold text-gray-400">
-                Typology Mix
-              </div>
-              {totals.typBreakdown.map(tb => {
-                const meta = TYPOLOGY_META[tb.key];
-                const pct = totals.units > 0 ? (tb.totalUnits / totals.units * 100) : 0;
-                return (
-                  <div key={tb.key} className="flex items-center justify-between text-[10px]">
-                    <div className="flex items-center gap-1.5">
-                      <div className="w-2 h-2 rounded-full" style={{ background: meta.color }} />
-                      <span className="text-gray-600">{meta.label}</span>
-                    </div>
-                    <div className="flex items-center gap-2 tabular-nums text-gray-500">
-                      <span>{tb.numPlots} plots</span>
-                      <span>{fmtU(tb.totalUnits)} units</span>
-                      <span className="font-medium text-gray-700">{pct.toFixed(0)}%</span>
-                    </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="bg-gray-50 rounded-lg p-2 text-center">
+                    <div className="text-[9px] text-gray-400">Retail</div>
+                    <div className="text-xs font-bold text-gray-700">${fmtN(landPricing.avgRetail, 0)}</div>
                   </div>
-                );
-              })}
+                  <div className="bg-blue-50 rounded-lg p-2 text-center border border-blue-100">
+                    <div className="text-[9px] text-blue-500">L1 (−35%)</div>
+                    <div className="text-xs font-bold text-blue-700">${fmtN(landPricing.avgL1, 0)}</div>
+                  </div>
+                  <div className="bg-emerald-50 rounded-lg p-2 text-center border border-emerald-100">
+                    <div className="text-[9px] text-emerald-500">L2 (−25%)</div>
+                    <div className="text-xs font-bold text-emerald-700">${fmtN(landPricing.avgL2, 0)}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Typology mix */}
+              <div className="flex-1 space-y-1">
+                <div className="text-[9px] uppercase tracking-widest font-semibold text-gray-400">
+                  Typology Mix
+                </div>
+                {totals.typBreakdown.map(tb => {
+                  const meta = TYPOLOGY_META[tb.key];
+                  const pct = totals.units > 0 ? (tb.totalUnits / totals.units * 100) : 0;
+                  return (
+                    <div key={tb.key} className="flex items-center justify-between text-[10px]">
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-2 h-2 rounded-full" style={{ background: meta.color }} />
+                        <span className="text-gray-600">{meta.label}</span>
+                      </div>
+                      <div className="flex items-center gap-2 tabular-nums text-gray-500">
+                        <span>{tb.numPlots} plots</span>
+                        <span>{fmtU(tb.totalUnits)} units</span>
+                        <span className="font-medium text-gray-700">{pct.toFixed(0)}%</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Typology breakdowns */}
-        <div className="flex-1 p-4 space-y-2">
+        {/* Typology breakdowns below */}
+        <div className="p-4 space-y-2">
           {TYPOLOGY_KEYS.map(k => (
             <TypologySection
               key={k}
