@@ -374,44 +374,6 @@ export default function InvestorPage() {
         </div>
       </div>
 
-      {/* KPI Grid — 4 key investor metrics */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-8 mt-4">
-        <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-3">
-          {t("inv_kpi_intro")} — {lang === "ar" ? "الطبقة الثانية · تطوير الفلل" : "Layer 2 · Villa Development"}
-        </p>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-          <KPICard
-            label={t("inv_your_cash")}
-            value={formatUSD(waterfall.l2InvestorCash)}
-            sub={lang === "ar" ? "لكل فيلا" : "per villa"}
-          />
-          <KPICard
-            label={t("inv_your_profit")}
-            value={formatUSD(waterfall.l2InvestorProfit)}
-            sub={lang === "ar" ? "لكل فيلا" : "per villa"}
-            accent
-          />
-          <KPICard
-            label={t("inv_your_roi")}
-            value={formatPct(waterfall.l2InvestorROI)}
-            sub={lang === "ar" ? "عائد على النقد" : "return on cash"}
-            accent
-          />
-          {/* Layer 1 — de-emphasised, secondary option */}
-          <div className="bg-blue-50 rounded-2xl p-4 border border-blue-100 flex flex-col justify-between">
-            <div className="text-[9px] font-semibold text-blue-400 uppercase tracking-wider mb-1">
-              {lang === "ar" ? "أيضاً متاح" : "Also available"}
-            </div>
-            <div className="text-xs font-bold text-blue-700 leading-snug mb-1">
-              {lang === "ar" ? "صندوق الأرض — الطبقة الأولى" : "Layer 1 · Land Fund"}
-            </div>
-            <div className="text-[10px] text-blue-500 tabular-nums">
-              {formatPct(l1Returns.roi)} ROI · IRR {formatPct(l1Returns.irr)}
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* ── 5-Tab Investment Walkthrough ── */}
       <div className="max-w-6xl mx-auto px-4 sm:px-8 mt-6 sm:mt-8">
         {/* Tab Navigation — walkthrough style with step numbers + subtitles */}
@@ -1150,7 +1112,7 @@ function InvestorMap({ lang, assignments }: { lang: string; assignments: Map<num
 
         <div className="flex flex-col lg:flex-row">
           {/* Map */}
-          <div className="flex-1 h-[520px] relative overflow-hidden">
+          <div className="flex-1 h-[580px] relative overflow-hidden">
             <CustomerMap
               filteredLotIds={filteredLotIds}
               assignments={assignments}
