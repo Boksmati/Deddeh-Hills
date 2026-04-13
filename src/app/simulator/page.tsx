@@ -10,6 +10,7 @@ import Toolbar from "@/components/ui/Toolbar";
 import SelectionToolbar from "@/components/ui/SelectionToolbar";
 import PhaseManager from "@/components/phases/PhaseManager";
 import AppHeader from "@/components/ui/AppHeader";
+import AppFooter from "@/components/ui/AppFooter";
 import { useSimulationStore } from "@/store/simulation-store";
 import { useTranslations } from "@/i18n/useTranslations";
 import ProjectSpecsEditor from "@/components/admin/ProjectSpecsEditor";
@@ -102,6 +103,7 @@ export default function Home() {
           {isAdmin && <ProjectSpecsEditor />}
         </div>
       </div>
+      <AppFooter />
     </div>
   );
 }

@@ -10,6 +10,7 @@ import { Unit, generateUnitsForLot } from "@/data/units";
 import { ProjectSpecs } from "@/data/project-specs";
 import LanguageToggle from "@/components/ui/LanguageToggle";
 import AppHeader from "@/components/ui/AppHeader";
+import AppFooter from "@/components/ui/AppFooter";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useRole } from "@/hooks/useRole";
 import CustomerMap from "@/components/customer/CustomerMap";

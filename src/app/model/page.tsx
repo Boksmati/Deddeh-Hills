@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect, useCallback } from "react";
 import { useSimulationStore } from "@/store/simulation-store";
 import { LOTS } from "@/data/lots";
 import AppHeader from "@/components/ui/AppHeader";
+import AppFooter from "@/components/ui/AppFooter";
 import CustomerMap from "@/components/customer/CustomerMap";
 import { useTranslations } from "@/i18n/useTranslations";
 import type { DevelopmentType, Phase, LotAssignment } from "@/types";
@@ -1050,6 +1051,7 @@ export default function ModelPage() {
           />
         ))}
       </div>
+      <AppFooter />
     </div>
   );
 }

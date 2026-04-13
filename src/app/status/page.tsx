@@ -7,6 +7,7 @@ import { DEVELOPMENT_TYPES, PHASE_COLORS, PHASE_LABELS } from "@/data/developmen
 import { calculateLotFinancials } from "@/engine/financial-engine";
 import { DevelopmentType, LotStatus, Phase } from "@/types";
 import AppHeader from "@/components/ui/AppHeader";
+import AppFooter from "@/components/ui/AppFooter";
 import { useTranslations } from "@/i18n/useTranslations";
 
 function fmtUSD(n: number): string {
@@ -444,6 +445,7 @@ export default function StatusPage() {
         )}
 
       </main>
+      <AppFooter />
     </div>
   );
 }

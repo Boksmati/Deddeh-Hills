@@ -7,6 +7,7 @@ import { DEVELOPMENT_TYPES, PHASE_COLORS } from "@/data/development-types";
 import { DevelopmentType, TypeAssumption } from "@/types";
 import { calculateSimulationSummary, calculateLotFinancials } from "@/engine/financial-engine";
 import AppHeader from "@/components/ui/AppHeader";
+import AppFooter from "@/components/ui/AppFooter";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useInvestmentConfig } from "@/hooks/useInvestmentConfig";
 import { computeContinuationCost, computeWaterfall, computePhaseMetrics, type LotPricing } from "@/lib/investment-layers";
@@ -1000,6 +1001,7 @@ export default function AssumptionsPage() {
         </div>
 
       </div>
+      <AppFooter />
     </div>
   );
 }

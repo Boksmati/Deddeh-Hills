@@ -16,6 +16,7 @@ const LOT_PRICES = LOT_PRICES_RAW as LotPricing[];
 import CustomerMap from "@/components/customer/CustomerMap";
 import DhLogo from "@/components/ui/DhLogo";
 import AppHeader from "@/components/ui/AppHeader";
+import AppFooter from "@/components/ui/AppFooter";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useRole } from "@/hooks/useRole";
 import {
@@ -936,6 +937,8 @@ export default function InvestorPage() {
 
       {/* <SensitivitySection config={config} setConfig={setConfig} lang={lang} /> */}
 
+      <AppFooter />
+
       {/* Phase Breakdown Charts — hidden by default, toggle in admin */}
       {mounted && investorFeatureFlags.showPhaseBreakdown && (
       <div className="max-w-6xl mx-auto px-4 sm:px-8 mt-6 sm:mt-8">
@@ -1147,7 +1150,7 @@ function InvestorMap({ lang, assignments }: { lang: string; assignments: Map<num
 
         <div className="flex flex-col lg:flex-row">
           {/* Map */}
-          <div className="flex-1 h-[400px] relative overflow-hidden">
+          <div className="flex-1 h-[520px] relative overflow-hidden">
             <CustomerMap
               filteredLotIds={filteredLotIds}
               assignments={assignments}
