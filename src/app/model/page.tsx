@@ -491,6 +491,19 @@ function TypologySection({
                     tip={`Per-lot selling price range driven by location-based land cost: $${fmtN(result.sellingPriceMin,0)} – $${fmtN(result.sellingPriceMax,0)}/m²`}
                   />
                 )}
+                {/* L1 sell price: same margin/construction, but land cheaper → lower cost-plus price */}
+                {pricingMode === "by_location" && result.totalSellableArea > 0 && avgL2Sqm > 0 && (() => {
+                  const landRatio = result.totalArea / result.totalSellableArea;
+                  const sellAtL1 = result.effectiveSellingPrice + (avgL1Sqm - avgL2Sqm) * landRatio;
+                  return (
+                    <Row
+                      label="→ Sell $/m² at L1"
+                      value={`$${fmtN(sellAtL1, 0)}`}
+                      color="#3B82F6"
+                      tip={`At L1 land ($${fmtN(avgL1Sqm,0)}/m²): land cost/BUA = $${fmtN(avgL1Sqm * landRatio,0)}/m² vs L2 $${fmtN(avgL2Sqm * landRatio,0)}/m² → sell at $${fmtN(sellAtL1,0)}/m² (same $${inputs.profitMargin} margin)`}
+                    />
+                  );
+                })()}
                 {/* Per-unit P&L */}
                 {(() => {
                   const revenuePerUnit = result.avgUnitPrice;
