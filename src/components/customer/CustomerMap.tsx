@@ -277,15 +277,13 @@ export default function CustomerMap({
               onMouseLeave={() => setHoveredId(null)}
               style={{ cursor: isSold ? "not-allowed" : inFilter ? "pointer" : "default" }}
             >
-              {/* Selection halo — solid black ring */}
+              {/* Selection halo — solid black ring (thicker in compact mode so it stays visible at small scale) */}
               {isSelected && (
-                <circle
-                  cx={cx} cy={cy}
-                  r={r + 5}
-                  fill="none"
-                  stroke="rgba(0,0,0,0.85)"
-                  strokeWidth={3}
-                />
+                <>
+                  {/* White backing ring so the black ring pops on any background */}
+                  <circle cx={cx} cy={cy} r={r + (compact ? 9 : 6)} fill="none" stroke="white" strokeWidth={compact ? 10 : 5} />
+                  <circle cx={cx} cy={cy} r={r + (compact ? 9 : 6)} fill="none" stroke="rgba(0,0,0,0.85)" strokeWidth={compact ? 6 : 3} />
+                </>
               )}
               {/* Glow for hover */}
               {isHovered && !isSelected && (
