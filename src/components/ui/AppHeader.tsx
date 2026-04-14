@@ -13,10 +13,14 @@ export type AppPage =
   | "investor"
   | "term-sheet"
   | "admin"
-  | "customer";
+  | "customer"
+  | "model";
 
 interface AppHeaderProps {
   currentPage: AppPage;
+  /** When true, hides all nav links — shows only logo and language toggle.
+   *  Use on pages shared via direct link (investor portal, model embed). */
+  hideNav?: boolean;
 }
 
 /**
@@ -27,7 +31,7 @@ interface AppHeaderProps {
  * - Admin/Investor role → sees Investor Portal link
  * - Customer / unauthenticated → Investor Portal link hidden
  */
-export default function AppHeader({ currentPage }: AppHeaderProps) {
+export default function AppHeader({ currentPage, hideNav = false }: AppHeaderProps) {
   const role = useRole();
   const { t, lang } = useTranslations();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -147,8 +151,8 @@ export default function AppHeader({ currentPage }: AppHeaderProps) {
           style={{ flexShrink: 0 }}
         />
 
-        {/* ── Desktop nav links — hidden on mobile ────────────────── */}
-        <div
+        {/* ── Desktop nav links — hidden on mobile or when hideNav ── */}
+        {!hideNav && <div
           className={`hidden md:flex items-center gap-1.5 ${isRTL ? "flex-row-reverse" : ""} min-w-0 overflow-x-auto`}
           style={{ scrollbarWidth: "none" } as React.CSSProperties}
         >
@@ -199,28 +203,30 @@ export default function AppHeader({ currentPage }: AppHeaderProps) {
               {lang === "ar" ? "عرض فقط" : "Read-only"}
             </span>
           )}
-        </div>
+        </div>}
 
         {/* ── Right side: lang toggle + hamburger ─────────────────── */}
         <div className="flex items-center gap-2 ms-auto flex-shrink-0">
           <LanguageToggle />
-          {/* Hamburger — always visible on mobile, hidden md+ */}
-          <button
-            className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg border-none cursor-pointer transition-colors"
-            style={{ background: menuOpen ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.10)" }}
-            onClick={() => setMenuOpen(o => !o)}
-            aria-label="Toggle menu"
-          >
-            {menuOpen
-              ? <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="2" y1="2" x2="14" y2="14" stroke="white" strokeWidth="2" strokeLinecap="round"/><line x1="14" y1="2" x2="2" y2="14" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>
-              : <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="2" y1="4" x2="14" y2="4" stroke="white" strokeWidth="2" strokeLinecap="round"/><line x1="2" y1="8" x2="14" y2="8" stroke="white" strokeWidth="2" strokeLinecap="round"/><line x1="2" y1="12" x2="14" y2="12" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>
-            }
-          </button>
+          {/* Hamburger — only shown when nav is visible */}
+          {!hideNav && (
+            <button
+              className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg border-none cursor-pointer transition-colors"
+              style={{ background: menuOpen ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.10)" }}
+              onClick={() => setMenuOpen(o => !o)}
+              aria-label="Toggle menu"
+            >
+              {menuOpen
+                ? <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="2" y1="2" x2="14" y2="14" stroke="white" strokeWidth="2" strokeLinecap="round"/><line x1="14" y1="2" x2="2" y2="14" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>
+                : <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="2" y1="4" x2="14" y2="4" stroke="white" strokeWidth="2" strokeLinecap="round"/><line x1="2" y1="8" x2="14" y2="8" stroke="white" strokeWidth="2" strokeLinecap="round"/><line x1="2" y1="12" x2="14" y2="12" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>
+              }
+            </button>
+          )}
         </div>
       </header>
 
       {/* ── Mobile dropdown ───────────────────────────────────────────── */}
-      {menuOpen && (
+      {!hideNav && menuOpen && (
         <div
           className="md:hidden absolute top-full left-0 right-0"
           style={{

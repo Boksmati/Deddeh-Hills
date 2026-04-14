@@ -50,6 +50,8 @@ interface Props {
   lotGroups?: LotGroup[];
   lassoMode?: boolean;
   onLassoSelect?: (lotIds: number[]) => void;
+  initialZoom?: number;
+  height?: string;
 }
 
 // Pre-build a centroid lookup for fast access
@@ -68,11 +70,13 @@ export default function CustomerMap({
   lotGroups = [],
   lassoMode = false,
   onLassoSelect,
+  initialZoom = 1.2,
+  height,
 }: Props) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
-  const [zoom, setZoom] = useState(1.2);
+  const [zoom, setZoom] = useState(initialZoom);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const isPanningRef = useRef(false);
   const panStart = useRef({ x: 0, y: 0 });
@@ -156,15 +160,15 @@ export default function CustomerMap({
   }, [lassoMode, onLassoSelect, screenToSvg]);
 
   const resetView = useCallback(() => {
-    setZoom(1.2);
+    setZoom(initialZoom);
     setPan({ x: 0, y: 0 });
-  }, []);
+  }, [initialZoom]);
 
   return (
     <div
       ref={containerRef}
       className="relative w-full overflow-hidden rounded-2xl border border-stone-200 bg-stone-50 select-none transition-all duration-300"
-      style={{ height: compact ? "300px" : "580px", cursor: lassoMode ? "crosshair" : "grab" }}
+      style={{ height: height ?? (compact ? "300px" : "580px"), cursor: lassoMode ? "crosshair" : "grab" }}
       onWheel={handleWheel}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}

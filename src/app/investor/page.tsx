@@ -19,6 +19,7 @@ import AppHeader from "@/components/ui/AppHeader";
 import AppFooter from "@/components/ui/AppFooter";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useRole } from "@/hooks/useRole";
+import { ModelContent } from "@/components/model/ModelContent";
 import {
   BarChart,
   Bar,
@@ -124,7 +125,7 @@ export default function InvestorPage() {
   const [serverReady, setServerReady] = useState(false);
   useEffect(() => { setMounted(true); initStateFromServer().finally(() => setServerReady(true)); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const [activeTab, setActiveTab] = useState<"returns" | "deal">("returns");
+  const [activeTab, setActiveTab] = useState<"returns" | "deal" | "model">("returns");
   const [waterfallModel, setWaterfallModel] = useState<"split" | "priority">("split");
 
   const summary = useMemo(() => {
@@ -198,7 +199,7 @@ export default function InvestorPage() {
   const COMMON_AREA_PCT = 0.10;    // 10% common/facilities area deducted from land
   const EXPLOIT_PCT = 0.20;        // 20% surface exploration (building footprint)
   const BALCONY_PCT = 0.25;        // +25% balconies/terraces
-  const LAND_COST_SQM = 360;      // Land cost $/m²
+  const [LAND_COST_SQM, setLandCostSqm] = useState(360);  // Land cost $/m²
   const BUILD_COST = 600;          // Construction cost $/m²
   const villaTypologyData = useMemo(() => {
     // Each type has its own floor stacking: above-ground floors, jamalon%, underground%
@@ -232,18 +233,19 @@ export default function InvestorPage() {
       const garden = landPerVilla - Math.round(buaPerVilla / (t.aboveFloors + (t.undergroundPct > 0 ? 1 : 0)));
       return { ...t, totalLotBUA, unitsPerLot, buaPerVilla, landPerVilla, buildCost, landCost, revenue, profit, margin, garden };
     });
-  }, []);
+  }, [LAND_COST_SQM]);
 
   const TABS = [
     { id: "returns" as const, label: t("inv_tab_returns"), sub: t("inv_tab_sub_returns") },
     { id: "deal" as const, label: t("inv_tab_deal"), sub: t("inv_tab_sub_deal") },
+    { id: "model" as const, label: lang === "ar" ? "النموذج المالي" : "Financial Model", sub: lang === "ar" ? "محاكاة مرحلة بمرحلة" : "Phase-by-phase simulation" },
   ];
 
   // Mount guard: prevent hydration mismatch from Zustand store differences
   if (!mounted) {
     return (
       <div className="min-h-screen" style={{ background: "#F4F9EF" }}>
-        <AppHeader currentPage="investor" />
+        <AppHeader currentPage="investor" hideNav />
         <div className="bg-dh-dark text-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-8 py-8 sm:py-10">
             <div className="flex-1">
@@ -263,7 +265,7 @@ export default function InvestorPage() {
   return (
     <div className="min-h-screen" style={{ background: "#F4F9EF" }}>
       {/* Shared Navigation Header */}
-      <AppHeader currentPage="investor" />
+      <AppHeader currentPage="investor" hideNav />
 
       {/* Hero — Investment Narrative */}
       <div className="bg-dh-dark text-white">
@@ -497,8 +499,8 @@ export default function InvestorPage() {
                 </div>
                 <p className="text-xs text-gray-500 leading-relaxed">
                   {lang === "ar"
-                    ? <>قطعة <strong className="text-gray-700">{REF_LAND.toLocaleString()} م²</strong> · بناء <strong className="text-gray-700">${BUILD_COST}/م²</strong> · أرض <strong className="text-gray-700">${LAND_COST_SQM}/م²</strong> · استغلال <strong className="text-gray-700">{(EXPLOIT_PCT * 100).toFixed(0)}%</strong> · +<strong className="text-gray-700">{(BALCONY_PCT * 100).toFixed(0)}%</strong> شرفات</>
-                    : <>Lot <strong className="text-gray-700">{REF_LAND.toLocaleString()} m²</strong> · Build <strong className="text-gray-700">${BUILD_COST}/m²</strong> · Land <strong className="text-gray-700">${LAND_COST_SQM}/m²</strong> · Exploitation <strong className="text-gray-700">{(EXPLOIT_PCT * 100).toFixed(0)}%</strong> · +<strong className="text-gray-700">{(BALCONY_PCT * 100).toFixed(0)}%</strong> balconies</>}
+                    ? <>قطعة <strong className="text-gray-700">{REF_LAND.toLocaleString()} م²</strong> · بناء <strong className="text-gray-700">${BUILD_COST}/م²</strong> · أرض $<input type="number" value={LAND_COST_SQM} onChange={e => setLandCostSqm(Math.max(0, Number(e.target.value)))} className="inline-block w-14 text-center font-semibold text-gray-700 bg-transparent border-0 border-b border-dashed border-gray-400 focus:border-dh-hills focus:outline-none text-xs" style={{ appearance: "textfield" }} />/م² · استغلال <strong className="text-gray-700">{(EXPLOIT_PCT * 100).toFixed(0)}%</strong> · +<strong className="text-gray-700">{(BALCONY_PCT * 100).toFixed(0)}%</strong> شرفات</>
+                    : <>Lot <strong className="text-gray-700">{REF_LAND.toLocaleString()} m²</strong> · Build <strong className="text-gray-700">${BUILD_COST}/m²</strong> · Land $<input type="number" value={LAND_COST_SQM} onChange={e => setLandCostSqm(Math.max(0, Number(e.target.value)))} className="inline-block w-14 text-center font-semibold text-gray-700 bg-transparent border-0 border-b border-dashed border-gray-400 focus:border-dh-hills focus:outline-none text-xs" style={{ appearance: "textfield" }} />/m² · Exploitation <strong className="text-gray-700">{(EXPLOIT_PCT * 100).toFixed(0)}%</strong> · +<strong className="text-gray-700">{(BALCONY_PCT * 100).toFixed(0)}%</strong> balconies</>}
                 </p>
               </div>
 
@@ -853,11 +855,15 @@ export default function InvestorPage() {
 
       </div>
 
-      {/* ── Sensitivity Analysis ── */}
-      {/* ── Interactive Lot Map with L1/L2 Pricing ── */}
-      <InvestorMap lang={lang} assignments={assignments} />
+      {/* ── Interactive Lot Map with L1/L2 Pricing — shown on returns + deal tabs ── */}
+      {activeTab !== "model" && <InvestorMap lang={lang} assignments={assignments} />}
 
-      {/* <SensitivitySection config={config} setConfig={setConfig} lang={lang} /> */}
+      {/* ── Financial Model tab ── */}
+      {activeTab === "model" && (
+        <div className="max-w-7xl mx-auto">
+          <ModelContent />
+        </div>
+      )}
 
       <AppFooter />
 
@@ -1072,7 +1078,7 @@ function InvestorMap({ lang, assignments }: { lang: string; assignments: Map<num
 
         <div className="flex flex-col lg:flex-row">
           {/* Map */}
-          <div className="flex-1 h-[580px] relative overflow-hidden">
+          <div className="flex-1 h-[464px] relative overflow-hidden">
             <CustomerMap
               filteredLotIds={filteredLotIds}
               assignments={assignments}
@@ -1084,6 +1090,8 @@ function InvestorMap({ lang, assignments }: { lang: string; assignments: Map<num
               hideLegend
               lassoMode={lassoMode}
               onLassoSelect={handleLassoSelect}
+              initialZoom={0.96}
+              height="100%"
             />
           </div>
 

@@ -24,11 +24,10 @@ const ADMIN_ONLY_PREFIXES = [
   "/simulator",
   "/assumptions",
   "/status",
-  "/model",
 ];
 
 /** Routes that require dh_role === "investor" OR "admin". */
-const INVESTOR_PREFIXES = ["/investor"];
+const INVESTOR_PREFIXES = ["/investor", "/model"];
 
 function redirectToGate(request: NextRequest, from?: string) {
   const gateUrl = request.nextUrl.clone();
