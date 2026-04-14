@@ -48,32 +48,32 @@ export default function Home() {
 
       {/* Toolbar — admin only */}
       {isAdmin && (
-        <div className="px-6 py-2.5 border-b border-gray-200 flex-shrink-0" style={{ background: "#fff" }}>
+        <div className="px-3 sm:px-6 py-2 sm:py-2.5 border-b border-gray-200 flex-shrink-0 overflow-x-auto" style={{ background: "#fff" }}>
           <Toolbar />
         </div>
       )}
 
       {/* Selection Toolbar — admin only */}
       {isAdmin && selectedLotIds.size > 0 && (
-        <div className="px-6 py-2 flex-shrink-0">
+        <div className="px-3 sm:px-6 py-2 flex-shrink-0">
           <SelectionToolbar />
         </div>
       )}
 
       {/* Financial Summary Bar */}
-      <div className="px-6 py-3 flex-shrink-0">
+      <div className="px-3 sm:px-6 py-3 flex-shrink-0">
         <SimulationSummaryBar />
       </div>
 
-      {/* Main Content — map drives the height via its natural aspect ratio */}
-      <div className="flex px-6 pb-4 gap-4 items-start">
-        {/* Master Plan Map — sized to its natural 1000:795 aspect ratio */}
-        <div className="flex-1 min-w-0" style={{ aspectRatio: "1000 / 795" }}>
+      {/* Main Content — stacked on mobile, side-by-side on desktop */}
+      <div className="flex flex-col lg:flex-row px-3 sm:px-6 pb-4 gap-4 lg:items-start">
+        {/* Master Plan Map — full width on mobile, natural aspect ratio */}
+        <div className="w-full lg:flex-1 lg:min-w-0" style={{ aspectRatio: "1000 / 795" }}>
           <MasterPlanSVG />
         </div>
 
-        {/* Right Sidebar — matches map height via align-items stretch on parent */}
-        <div ref={sidebarRef} className="w-80 flex-shrink-0 flex flex-col gap-4 overflow-y-auto" style={{ alignSelf: "stretch" }}>
+        {/* Right Sidebar — full width below map on mobile, fixed 320px on desktop */}
+        <div ref={sidebarRef} className="w-full lg:w-80 lg:flex-shrink-0 flex flex-col gap-4 lg:overflow-y-auto" style={{ alignSelf: "stretch" }}>
           {/* Lot Configuration Panel — admin only */}
           {isAdmin && (
             <div className="bg-white rounded-xl shadow-sm border border-gray-100">
