@@ -83,7 +83,7 @@ export default function AssumptionsPage() {
   const phasedLandAreaSqm = useMemo(() => {
     const lotMap = new Map(LOTS.map(l => [l.id, l]));
     let total = 0;
-    for (const [lotId, a] of assignments) {
+    for (const [lotId, a] of Array.from(assignments)) {
       if (a.phase === 1 || a.phase === 2 || a.phase === 3) {
         const lot = lotMap.get(lotId);
         if (lot) total += lot.area_sqm;

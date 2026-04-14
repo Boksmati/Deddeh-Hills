@@ -80,7 +80,6 @@ export default function Home() {
         {isAdmin && (
           <div
             ref={leftPanelRef}
-            className="flex flex-col gap-3 order-2 xl:order-1 xl:overflow-y-auto"
             className="flex flex-col gap-3 order-2 xl:order-1 xl:overflow-y-auto xl:max-h-[72vh]"
           >
             {/* Panel label */}
