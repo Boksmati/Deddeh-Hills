@@ -1407,9 +1407,6 @@ export function ModelContent() {
           </div>
         </div>
 
-        {/* Land Map & Pricing */}
-        <LandMapPricing lang={lang} assignments={assignments} lotStatuses={lotStatuses} />
-
         {/* Phase 1, 2, 3 */}
         {([1, 2, 3] as const).map(ph => (
           <PhaseCard
@@ -1428,6 +1425,9 @@ export function ModelContent() {
             onL2PriceChange={setL2Price}
           />
         ))}
+
+        {/* Land Map & Pricing */}
+        <LandMapPricing lang={lang} assignments={assignments} lotStatuses={lotStatuses} />
 
         {/* ── Full-Project Aggregate by Typology ── (hidden for now) */}
         {false && (() => {
