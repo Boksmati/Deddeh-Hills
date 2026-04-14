@@ -1002,7 +1002,7 @@ export default function InvestorPage() {
 // ── Investor Map with L1/L2 Pricing ─────────────────────────────────────────
 
 const LOT_RETAIL_MAP = new Map(LOT_PRICES.map(lp => [lp.lot, lp.price_sqm]));
-const L1_DISCOUNT = 0.35;
+const L1_DISCOUNT = 0.33;
 const L2_DISCOUNT_MAP = 0.20;
 
 function InvestorMap({ lang, assignments }: { lang: string; assignments: Map<number, any> }) {
@@ -1160,7 +1160,7 @@ function InvestorMap({ lang, assignments }: { lang: string; assignments: Map<num
                 {/* L1 */}
                 <div className="bg-blue-50 rounded-xl p-3 text-center border border-blue-100">
                   <div className="text-[9px] uppercase tracking-wider text-blue-500 mb-0.5">
-                    Layer 1 (−35%)
+                    Layer 1 (−33%)
                   </div>
                   <div className="text-xl font-bold text-blue-700">{fmtP(selectionPricing.avgL1)}/m²</div>
                   <div className="text-[10px] text-blue-400 mt-0.5">
