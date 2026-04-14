@@ -159,7 +159,7 @@ export default function MasterPlanSVG() {
       className={`relative w-full h-full overflow-hidden rounded-xl ${
         calibrationMode ? "bg-amber-50 ring-2 ring-amber-400" : "bg-gray-100"
       }`}
-      onWheel={handleWheel}
+      {/* onWheel zoom disabled — zoom locked at 100% */}
     >
       {/* Calibration mode indicator */}
       {calibrationMode && (
@@ -168,35 +168,15 @@ export default function MasterPlanSVG() {
         </div>
       )}
 
-      {/* Zoom controls */}
-      <div className="absolute bottom-3 right-3 z-10 flex flex-col gap-1">
+      {/* Reset pan button only — zoom locked */}
+      <div className="absolute bottom-3 right-3 z-10">
         <button
-          onClick={() => setZoom((z) => Math.min(5, z * 1.2))}
-          className="w-8 h-8 bg-white rounded-lg shadow-md flex items-center justify-center text-gray-700 hover:bg-gray-50 font-bold"
-        >
-          +
-        </button>
-        <button
-          onClick={() => setZoom((z) => Math.max(0.5, z * 0.8))}
-          className="w-8 h-8 bg-white rounded-lg shadow-md flex items-center justify-center text-gray-700 hover:bg-gray-50 font-bold"
-        >
-          -
-        </button>
-        <button
-          onClick={() => {
-            setZoom(1);
-            setPan({ x: 0, y: 0 });
-          }}
+          onClick={() => setPan({ x: 0, y: 0 })}
           className="w-8 h-8 bg-white rounded-lg shadow-md flex items-center justify-center text-gray-500 hover:bg-gray-50 text-xs"
-          title="Reset view"
+          title="Reset pan"
         >
           R
         </button>
-      </div>
-
-      {/* Zoom level indicator */}
-      <div className="absolute bottom-3 left-3 z-10 bg-white/80 rounded px-2 py-1 text-xs text-gray-500">
-        {Math.round(zoom * 100)}%
       </div>
 
       <SvgRefContext.Provider value={svgRef}>
