@@ -42,7 +42,7 @@ export default function Home() {
   }, [selectedLotIds]);
 
   return (
-    <div className="h-screen flex flex-col" style={{ background: "#F4F9EF" }}>
+    <div className="flex flex-col" style={{ background: "#F4F9EF", height: "200vh" }}>
       {/* Shared navigation header */}
       <AppHeader currentPage="simulator" />
 
