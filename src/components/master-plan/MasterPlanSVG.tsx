@@ -159,7 +159,6 @@ export default function MasterPlanSVG() {
       className={`relative w-full h-full overflow-hidden rounded-xl ${
         calibrationMode ? "bg-amber-50 ring-2 ring-amber-400" : "bg-gray-100"
       }`}
-      {/* onWheel zoom disabled — zoom locked at 100% */}
     >
       {/* Calibration mode indicator */}
       {calibrationMode && (
