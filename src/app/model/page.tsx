@@ -57,6 +57,8 @@ interface TypologyResult {
   grossCostPerSqm: number;
   netProfitPerSqm: number;
   totalSellableArea: number;
+  /** Total BUA per unit including underground share */
+  sellableAreaPerUnit: number;
   totalConstructionCost: number;
   totalSales: number;
   grossProfit: number;
@@ -120,22 +122,22 @@ const DEFAULT_INPUTS: Record<TypologyKey, TypologyInputs> = {
    CALCULATION ENGINE
    ──────────────────────────────────────────────────────────── */
 
-const L2_DISCOUNT = 0.20; // Layer 2: 20% off retail
-const L1_DISCOUNT = 0.35; // Layer 1: 35% off retail
+const DEFAULT_L2_DISCOUNT = 0.20;
+const DEFAULT_L1_DISCOUNT = 0.35;
 
 type PricingMode = "average" | "by_location";
 
-function calculateTypology(inputs: TypologyInputs, lots: typeof LOTS, pricingMode: PricingMode): TypologyResult {
+function calculateTypology(inputs: TypologyInputs, lots: typeof LOTS, pricingMode: PricingMode, l1Discount = DEFAULT_L1_DISCOUNT, l2Discount = DEFAULT_L2_DISCOUNT): TypologyResult {
   const numPlots = lots.length;
   const totalArea = lots.reduce((s, l) => s + l.area_sqm, 0);
   // Retail price from lot-prices.json (per-lot actual market price)
   const retailLandCost = lots.reduce((s, l) => s + l.area_sqm * (LOT_RETAIL_MAP.get(l.id) ?? l.zone_price_retail), 0);
   const avgRetailLandSqm = totalArea > 0 ? retailLandCost / totalArea : 0;
-  // Land cost at L2 (−20% off retail)
-  const landCost = retailLandCost * (1 - L2_DISCOUNT);
+  // Land cost at L2 (off retail)
+  const landCost = retailLandCost * (1 - l2Discount);
   const avgLandPriceSqm = totalArea > 0 ? landCost / totalArea : 0;
-  // Land cost at L1 (−35% off retail) — early investor scenario
-  const landCostL1 = retailLandCost * (1 - L1_DISCOUNT);
+  // Land cost at L1 (early investor) — off retail
+  const landCostL1 = retailLandCost * (1 - l1Discount);
 
   const commonArea = totalArea * inputs.commonAreaPct;
   const netArea = totalArea - commonArea;
@@ -146,15 +148,19 @@ function calculateTypology(inputs: TypologyInputs, lots: typeof LOTS, pricingMod
   const regularFloorArea = footprint * inputs.floors;
   const jamalonArea = footprint * inputs.jamalonPct;
   const undergroundArea = footprint * inputs.undergroundPct;
-  // BUG FIX: balconies only on above-ground area, not underground
+  // Balconies only on above-ground area, not underground
   const aboveGroundArea = regularFloorArea + jamalonArea;
-  const totalBuiltArea = aboveGroundArea * (1 + inputs.balconyPct) + undergroundArea;
+  const aboveGroundBUA = aboveGroundArea * (1 + inputs.balconyPct);
+  const totalBuiltArea = aboveGroundBUA + undergroundArea;
 
+  // Units = total BUA allowed (above-ground + underground) ÷ unit size
   const rawUnitsExact = inputs.avgUnitSize > 0 ? totalBuiltArea / inputs.avgUnitSize : 0;
   const totalUnits = rawUnitsExact;
+  // Per-unit BUA = total BUA allowed ÷ units (= avgUnitSize when no underground, larger when underground present)
+  const sellableAreaPerUnit = totalUnits > 0 ? totalBuiltArea / totalUnits : 0;
   const unitsPerPlot = numPlots > 0 ? totalUnits / numPlots : 0;
   // Villa footprint = actual building ground area per unit
-  // Unit size includes balconies, so strip them out, then divide by floors
+  // Unit size (above-ground portion) includes balconies, so strip them out, then divide by floors
   const villaFootprint = inputs.floors > 0
     ? inputs.avgUnitSize / ((1 + inputs.balconyPct) * inputs.floors)
     : 0;
@@ -169,7 +175,7 @@ function calculateTypology(inputs: TypologyInputs, lots: typeof LOTS, pricingMod
       regularFloorArea, jamalonArea, undergroundArea, totalBuiltArea,
       totalUnits: 0, unitsPerPlot: 0, villaFootprint: 0, lotPerVilla: 0, garden: 0,
       avgUnitPrice: 0, grossProfitPerSqm: 0, avgLandPriceSqm, landCost,
-      grossCostPerSqm: 0, netProfitPerSqm: 0, totalSellableArea: 0,
+      grossCostPerSqm: 0, netProfitPerSqm: 0, totalSellableArea: 0, sellableAreaPerUnit: inputs.avgUnitSize,
       totalConstructionCost: 0, totalSales: 0, grossProfit: 0, netProfit: -landCost,
       effectiveSellingPrice: inputs.sellingPrice, sellingPriceMin: inputs.sellingPrice, sellingPriceMax: inputs.sellingPrice,
       landCostL1, netProfitL1: -landCostL1,
@@ -177,8 +183,8 @@ function calculateTypology(inputs: TypologyInputs, lots: typeof LOTS, pricingMod
     };
   }
 
-  // Sellable area = what's actually built (capped by max units)
-  const totalSellableArea = totalUnits * inputs.avgUnitSize;
+  // Sellable area = total BUA allowed (above-ground + underground), priced per m²
+  const totalSellableArea = totalBuiltArea; // = totalUnits × sellableAreaPerUnit
 
   // ── Selling price: average vs by-location (cost-plus) ──
   //
@@ -203,7 +209,7 @@ function calculateTypology(inputs: TypologyInputs, lots: typeof LOTS, pricingMod
     sellingPriceMax = -Infinity;
     let weightedPriceSum = 0;
     for (const lot of lots) {
-      const l2Sqm = (LOT_RETAIL_MAP.get(lot.id) ?? lot.zone_price_retail) * (1 - L2_DISCOUNT);
+      const l2Sqm = (LOT_RETAIL_MAP.get(lot.id) ?? lot.zone_price_retail) * (1 - l2Discount);
       // Land cost per sellable m² = (l2_price_sqm × lot_area) / sellable area per plot
       const landCostPerSqm = (l2Sqm * lot.area_sqm) / sellableAreaPerPlot;
       const lotSellingPrice = landCostPerSqm + inputs.constructionCost + inputs.profitMargin;
@@ -221,10 +227,10 @@ function calculateTypology(inputs: TypologyInputs, lots: typeof LOTS, pricingMod
     totalSales = totalSellableArea * inputs.sellingPrice;
   }
 
-  // Construction cost always uses actual sellable area (units × unit size)
+  // Construction cost uses total BUA (sellable area per unit × units)
   const costBasis = totalSellableArea;
 
-  const avgUnitPrice = inputs.avgUnitSize * effectiveSellingPrice;
+  const avgUnitPrice = sellableAreaPerUnit * effectiveSellingPrice;
   const grossProfitPerSqm = effectiveSellingPrice - inputs.constructionCost;
   const grossCostPerSqm = inputs.constructionCost + (costBasis > 0 ? landCost / costBasis : 0);
   const netProfitPerSqm = effectiveSellingPrice - grossCostPerSqm;
@@ -248,7 +254,7 @@ function calculateTypology(inputs: TypologyInputs, lots: typeof LOTS, pricingMod
     regularFloorArea, jamalonArea, undergroundArea, totalBuiltArea,
     totalUnits, unitsPerPlot, villaFootprint, lotPerVilla, garden,
     avgUnitPrice, grossProfitPerSqm, avgLandPriceSqm, landCost,
-    grossCostPerSqm, netProfitPerSqm, totalSellableArea,
+    grossCostPerSqm, netProfitPerSqm, totalSellableArea, sellableAreaPerUnit,
     totalConstructionCost, totalSales, grossProfit, netProfit,
     effectiveSellingPrice, sellingPriceMin, sellingPriceMax,
     landCostL1, netProfitL1,
@@ -271,6 +277,32 @@ const fmtU = (n: number) => Number.isInteger(n)
   : n.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
 const PHASE_COLORS: Record<number, string> = { 1: "#2563eb", 2: "#7c3aed", 3: "#ea580c" };
+
+/** Input that commits only on blur/Enter to avoid value getting clobbered mid-type */
+function CommitInput({ value, onChange, className, min, max, step }: {
+  value: number; onChange: (v: number) => void;
+  className?: string; min?: number; max?: number; step?: number;
+}) {
+  const [local, setLocal] = useState(String(value));
+  const [focused, setFocused] = useState(false);
+  // Sync external value when not focused
+  useEffect(() => { if (!focused) setLocal(String(value)); }, [value, focused]);
+  const commit = () => {
+    const n = parseFloat(local);
+    if (!isNaN(n)) onChange(n);
+  };
+  return (
+    <input
+      type="number" min={min} max={max} step={step}
+      className={className}
+      value={local}
+      onChange={e => setLocal(e.target.value)}
+      onFocus={() => setFocused(true)}
+      onBlur={() => { setFocused(false); commit(); }}
+      onKeyDown={e => { if (e.key === "Enter") { commit(); (e.target as HTMLInputElement).blur(); } }}
+    />
+  );
+}
 
 /* ────────────────────────────────────────────────────────────
    SMALL COMPONENTS
@@ -339,17 +371,49 @@ function TypologySection({
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between px-4 py-2.5 bg-gray-50/80 hover:bg-gray-100/80 transition-colors"
       >
-        <div className="flex items-center gap-2">
-          <div className="w-2.5 h-2.5 rounded-full" style={{ background: meta.color }} />
-          <span className="text-xs font-semibold text-gray-800">{lang === "ar" ? meta.labelAr : meta.label}</span>
-          <span className="text-[10px] text-gray-400">{result.numPlots} plots · {fmtN(result.totalArea, 0)} m²</span>
+        {/* Left: identity + land context */}
+        <div className="flex items-center gap-4 min-w-0">
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            <div className="w-2.5 h-2.5 rounded-full" style={{ background: meta.color }} />
+            <span className="text-xs font-semibold text-gray-800">{lang === "ar" ? meta.labelAr : meta.label}</span>
+          </div>
+          <div className="flex items-center gap-3 text-[10px] text-gray-400 flex-wrap">
+            <span><span className="text-gray-300 mr-0.5">plots</span>{result.numPlots}</span>
+            <span><span className="text-gray-300 mr-0.5">area</span>{fmtN(result.totalArea, 0)} m²</span>
+            <span title="Avg land price per m² of land area at L2 discount">
+              <span className="text-gray-300 mr-0.5">L2</span>${fmtN(result.avgLandPriceSqm, 0)}/m²
+            </span>
+            <span className="text-blue-300" title="Avg land price per m² of land area at L1 discount">
+              <span className="mr-0.5">L1</span>${fmtN(result.totalArea > 0 ? result.landCostL1 / result.totalArea : 0, 0)}/m²
+            </span>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-[10px] tabular-nums text-gray-500">{result.totalUnits.toFixed(2)} units</span>
-          <span className="text-[10px] tabular-nums font-semibold text-dh-green">{fmt(result.totalSales)}</span>
-          <span className={`text-[10px] tabular-nums font-bold ${result.netProfit >= 0 ? "text-emerald-600" : "text-red-600"}`}>
-            {fmt(result.netProfit)}
-          </span>
+        {/* Right: unit economics */}
+        <div className="flex items-center gap-4 flex-shrink-0">
+          <div className="text-right">
+            <div className="text-[9px] text-gray-300 leading-none mb-0.5">units</div>
+            <div className="text-[10px] tabular-nums text-gray-500">{fmtU(result.totalUnits)}</div>
+          </div>
+          <div className="text-right">
+            <div className="text-[9px] text-gray-300 leading-none mb-0.5">BUA</div>
+            <div className="text-[10px] tabular-nums text-gray-500">{fmtN(result.totalSellableArea, 0)} m²</div>
+          </div>
+          <div className="text-right">
+            <div className="text-[9px] text-gray-300 leading-none mb-0.5">revenue</div>
+            <div className="text-[10px] tabular-nums font-semibold text-dh-green">{fmt(result.totalSales)}</div>
+          </div>
+          <div className="text-right">
+            <div className="text-[9px] text-gray-300 leading-none mb-0.5">net profit</div>
+            <div className={`text-[10px] tabular-nums font-bold ${result.netProfit >= 0 ? "text-emerald-600" : "text-red-600"}`}>
+              {fmt(result.netProfit)}
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="text-[9px] text-gray-300 leading-none mb-0.5">margin</div>
+            <div className={`text-[10px] tabular-nums ${result.netProfit >= 0 ? "text-emerald-500" : "text-red-400"}`}>
+              {result.totalSales > 0 ? ((result.netProfit / result.totalSales) * 100).toFixed(0) : 0}%
+            </div>
+          </div>
           <span className="text-gray-400 text-xs">{open ? "▼" : "▶"}</span>
         </div>
       </button>
@@ -392,7 +456,7 @@ function TypologySection({
                 {inputs.undergroundPct > 0 && (
                   <Row label={`+ Underground (${(inputs.undergroundPct*100).toFixed(0)}%)`} value={`${fmtN(result.undergroundArea, 0)} m²`} indent tip={`Footprint × ${(inputs.undergroundPct*100).toFixed(0)}% (${fmtN(result.footprint,0)} × ${(inputs.undergroundPct*100).toFixed(0)}% = ${fmtN(result.undergroundArea,0)} m²)`} />
                 )}
-                <Row label={`+ ${(inputs.balconyPct*100).toFixed(0)}% balconies`} value={`${fmtN(result.totalBuiltArea, 0)} m²`} bold tip={`(Floor area + jamalon) × (1 + ${(inputs.balconyPct*100).toFixed(0)}% balconies) + underground (${fmtN(result.regularFloorArea + result.jamalonArea,0)} × ${(1+inputs.balconyPct).toFixed(2)} + ${fmtN(result.undergroundArea,0)} = ${fmtN(result.totalBuiltArea,0)} m²)`} />
+                <Row label="= Total BUA allowed" value={`${fmtN(result.totalBuiltArea, 0)} m²`} bold tip={`(Floor area + jamalon) × (1 + ${(inputs.balconyPct*100).toFixed(0)}% balconies) + underground (${fmtN(result.regularFloorArea + result.jamalonArea,0)} × ${(1+inputs.balconyPct).toFixed(2)} + ${fmtN(result.undergroundArea,0)} = ${fmtN(result.totalBuiltArea,0)} m²)`} />
               </div>
             </div>
 
@@ -400,8 +464,8 @@ function TypologySection({
             <div className="space-y-2">
               <div className="text-[9px] uppercase tracking-widest font-semibold text-gray-400">Unit Geometry</div>
               <div className="bg-gray-50/60 rounded-lg p-2 space-y-0.5">
-                <Row label="Total units" value={fmtU(result.totalUnits)} bold tip={`BUA ÷ unit size (${fmtN(result.totalBuiltArea, 0)} ÷ ${inputs.avgUnitSize} = ${fmtU(result.totalUnits)} units)`} />
-                <Row label="Sellable area / unit" value={`${inputs.avgUnitSize} m²`} tip={`Unit size input — each villa's sellable built-up area`} />
+                <Row label="Total units" value={fmtU(result.totalUnits)} bold tip={`Total BUA allowed ÷ unit size (${fmtN(result.totalBuiltArea, 0)} ÷ ${inputs.avgUnitSize} = ${fmtU(result.totalUnits)} units)`} />
+                <Row label="Total BUA / unit" value={`${fmtN(result.sellableAreaPerUnit, 0)} m²`} tip={`Total BUA allowed ÷ units (${fmtN(result.totalBuiltArea,0)} ÷ ${fmtN(result.totalUnits,2)} = ${fmtN(result.sellableAreaPerUnit,0)} m²)`} />
                 <Row label="Units / plot" value={fmtN(result.unitsPerPlot, 2)} tip={`Total units ÷ number of plots (${fmtN(result.totalUnits,1)} ÷ ${result.numPlots} = ${fmtN(result.unitsPerPlot,2)})`} />
                 <Row label="Villa footprint" value={`${fmtN(result.villaFootprint, 0)} m²`} tip={`Unit size ÷ (floors × (1 + balcony%)) = ${inputs.avgUnitSize} ÷ (${inputs.floors} × ${(1+inputs.balconyPct).toFixed(2)}) = ${fmtN(result.villaFootprint,0)} m²`} />
                 <Row label="Lot / villa" value={`${fmtN(result.lotPerVilla, 0)} m²`} tip={`Net area ÷ total units (${fmtN(result.netArea,0)} ÷ ${fmtN(result.totalUnits,1)} = ${fmtN(result.lotPerVilla,0)} m²)`} />
@@ -428,15 +492,15 @@ function TypologySection({
                 {/* Per-unit P&L */}
                 {(() => {
                   const revenuePerUnit = result.avgUnitPrice;
-                  const constructionPerUnit = inputs.constructionCost * inputs.avgUnitSize;
+                  const constructionPerUnit = inputs.constructionCost * result.sellableAreaPerUnit;
                   const landPerUnit = result.totalUnits > 0 ? result.landCost / result.totalUnits : 0;
                   const grossPerUnit = revenuePerUnit - constructionPerUnit;
                   const netPerUnit = grossPerUnit - landPerUnit;
                   return (
                     <>
                       <div className="border-t border-gray-200 my-0.5" />
-                      <Row label="Revenue/unit" value={fmt(revenuePerUnit)} bold tip={`Sell $/m² × unit size (${fmtN(result.effectiveSellingPrice,0)} × ${inputs.avgUnitSize} m² = ${fmt(revenuePerUnit)})`} />
-                      <Row label="Construction/unit" value={`−${fmt(constructionPerUnit)}`} color="#E53E3E" tip={`Build $/m² × unit size ($${inputs.constructionCost} × ${inputs.avgUnitSize} m² = ${fmt(constructionPerUnit)})`} />
+                      <Row label="Revenue/unit" value={fmt(revenuePerUnit)} bold tip={`Sell $/m² × total BUA/unit (${fmtN(result.effectiveSellingPrice,0)} × ${fmtN(result.sellableAreaPerUnit,0)} m² = ${fmt(revenuePerUnit)})`} />
+                      <Row label="Construction/unit" value={`−${fmt(constructionPerUnit)}`} color="#E53E3E" tip={`Build $/m² × total BUA/unit ($${inputs.constructionCost} × ${fmtN(result.sellableAreaPerUnit,0)} m² = ${fmt(constructionPerUnit)})`} />
                       <Row label="Land/unit" value={`−${fmt(landPerUnit)}`} color="#E53E3E" tip={`Total land cost ÷ units (${fmt(result.landCost)} ÷ ${fmtN(result.totalUnits,0)} = ${fmt(landPerUnit)})`} />
                       <div className="border-t border-gray-200 my-0.5" />
                       <Row label="Net profit/unit" value={fmt(netPerUnit)} bold color={netPerUnit >= 0 ? "#00B050" : "#E53E3E"} tip={`Revenue − construction − land (${fmt(revenuePerUnit)} − ${fmt(constructionPerUnit)} − ${fmt(landPerUnit)} = ${fmt(netPerUnit)})`} />
@@ -451,17 +515,18 @@ function TypologySection({
             <div className="space-y-2">
               <div className="text-[9px] uppercase tracking-widest font-semibold text-gray-400">Totals &amp; P&amp;L</div>
               <div className="bg-gray-50/60 rounded-lg p-2 space-y-0.5">
-                <Row label="Sellable area" value={`${fmtN(result.totalSellableArea, 0)} m²`} tip={`Total units × unit size (${result.totalUnits.toFixed(2)} × ${inputs.avgUnitSize} m² = ${fmtN(result.totalSellableArea,0)} m²)`} />
-                <Row label="Construction" value={fmt(result.totalConstructionCost)} color="#E53E3E" tip={`Sellable area × construction $/m² (${fmtN(result.totalSellableArea,0)} × $${inputs.constructionCost} = ${fmt(result.totalConstructionCost)})`} />
-                <Row label="Total sales" value={fmt(result.totalSales)} bold tip={`Sellable area × avg selling $/m² (${fmtN(result.totalSellableArea,0)} × $${fmtN(result.effectiveSellingPrice,0)} = ${fmt(result.totalSales)})`} />
+                <Row label="Sellable area" value={`${fmtN(result.totalSellableArea, 0)} m²`} tip={`Total BUA allowed = units × BUA/unit (${result.totalUnits.toFixed(2)} × ${fmtN(result.sellableAreaPerUnit,0)} m² = ${fmtN(result.totalSellableArea,0)} m²)`} />
+                <Row label="Construction" value={fmt(result.totalConstructionCost)} color="#E53E3E" tip={`Total BUA × construction $/m² (${fmtN(result.totalSellableArea,0)} × $${inputs.constructionCost} = ${fmt(result.totalConstructionCost)})`} />
+                <Row label="Total sales" value={fmt(result.totalSales)} bold tip={`Total BUA × avg selling $/m² (${fmtN(result.totalSellableArea,0)} × $${fmtN(result.effectiveSellingPrice,0)} = ${fmt(result.totalSales)})`} />
                 <Row label="Gross profit" value={fmt(result.grossProfit)} tip={`Total sales − construction (${fmt(result.totalSales)} − ${fmt(result.totalConstructionCost)} = ${fmt(result.grossProfit)})`} />
-                <Row label={`Land cost`} value={fmt(result.landCost)} color="#E53E3E" tip={`Sum of (lot area × retail $/m²) × (1 − 20% L2 discount) = ${fmt(result.landCost)}`} />
+                <Row label="Land cost (L2 −20%)" value={fmt(result.landCost)} color="#E53E3E" tip={`Sum of (lot area × retail $/m²) × (1 − 20%) = ${fmt(result.landCost)}`} />
+                <Row label="Land cost (L1 −35%)" value={fmt(result.landCostL1)} color="#C05621" indent tip={`Sum of (lot area × retail $/m²) × (1 − 35%) = ${fmt(result.landCostL1)}`} />
               </div>
               {/* Per Villa breakdown */}
               {result.totalUnits > 0 && (
                 <div className="bg-blue-50/60 rounded-lg p-2 space-y-0.5">
                   <div className="text-[9px] uppercase tracking-widest font-semibold text-blue-400 mb-0.5">Per Villa</div>
-                  <Row label="BUA" value={`${inputs.avgUnitSize} m²`} tip={`Unit size input`} />
+                  <Row label="BUA" value={`${fmtN(result.sellableAreaPerUnit, 0)} m²`} tip={`Total BUA allowed ÷ units (${fmtN(result.totalBuiltArea,0)} ÷ ${fmtN(result.totalUnits,2)} = ${fmtN(result.sellableAreaPerUnit,0)} m²)`} />
                   <Row label="Land cost" value={fmt(result.landCost / result.totalUnits)} color="#E53E3E" tip={`Total land ÷ units (${fmt(result.landCost)} ÷ ${result.totalUnits.toFixed(2)} = ${fmt(result.landCost / result.totalUnits)})`} />
                   <Row label="Construction" value={fmt(result.totalConstructionCost / result.totalUnits)} color="#E53E3E" tip={`Unit size × build $/m² (${inputs.avgUnitSize} × $${inputs.constructionCost} = ${fmt(inputs.avgUnitSize * inputs.constructionCost)})`} />
                   <Row label="Sale price" value={fmt(result.totalSales / result.totalUnits)} bold tip={`Total sales ÷ units (${fmt(result.totalSales)} ÷ ${result.totalUnits.toFixed(2)} = ${fmt(result.totalSales / result.totalUnits)})`} />
@@ -495,8 +560,8 @@ function LotPricingCard({ lotId, lang }: { lotId: number; lang: string }) {
   const lot = LOTS.find(l => l.id === lotId);
   if (!lot) return null;
   const retailSqm = LOT_RETAIL_MAP.get(lotId) ?? lot.zone_price_retail;
-  const l1Sqm = retailSqm * (1 - L1_DISCOUNT);
-  const l2Sqm = retailSqm * (1 - L2_DISCOUNT);
+  const l1Sqm = retailSqm * (1 - DEFAULT_L1_DISCOUNT);
+  const l2Sqm = retailSqm * (1 - DEFAULT_L2_DISCOUNT);
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-2.5 space-y-1.5">
       <div className="flex items-center justify-between">
@@ -526,6 +591,7 @@ function LotPricingCard({ lotId, lang }: { lotId: number; lang: string }) {
 
 function PhaseCard({
   phaseNum, lots, inputs, onInputChange, assignments, lotStatuses, lang, pricingMode,
+  l1Price, l2Price, onL1PriceChange, onL2PriceChange,
 }: {
   phaseNum: 1 | 2 | 3;
   lots: typeof LOTS;
@@ -535,8 +601,13 @@ function PhaseCard({
   lotStatuses: Map<number, any>;
   lang: string;
   pricingMode: PricingMode;
+  l1Price: number;
+  l2Price: number;
+  onL1PriceChange: (v: number) => void;
+  onL2PriceChange: (v: number) => void;
 }) {
   const [selectedLotIds, setSelectedLotIds] = useState<Set<number>>(new Set());
+  const [landInputMode, setLandInputMode] = useState<"price" | "pct">("price");
 
   // Toggle lot selection (shift-click for multi)
   const handleSelectLot = useCallback((lotId: number) => {
@@ -577,12 +648,20 @@ function PhaseCard({
     return map;
   }, [activeLots, assignments]);
 
-  // Calculate results per typology
+  // Calculate results per typology — derive effective discounts from absolute prices + active lot retail
   const results = useMemo(() => {
     const r: Record<TypologyKey, TypologyResult> = {} as any;
-    for (const k of TYPOLOGY_KEYS) r[k] = calculateTypology(inputs[k], lotsByType[k], pricingMode);
+    const totalArea = activeLots.reduce((s, l) => s + l.area_sqm, 0);
+    const avgRetail = totalArea > 0
+      ? activeLots.reduce((s, l) => s + l.area_sqm * (LOT_RETAIL_MAP.get(l.id) ?? l.zone_price_retail), 0) / totalArea
+      : 0;
+    const avgL1 = l1Price > 0 ? l1Price : avgRetail * (1 - DEFAULT_L1_DISCOUNT);
+    const avgL2 = l2Price > 0 ? l2Price : avgRetail * (1 - DEFAULT_L2_DISCOUNT);
+    const effL1 = avgRetail > 0 ? Math.max(0, 1 - avgL1 / avgRetail) : DEFAULT_L1_DISCOUNT;
+    const effL2 = avgRetail > 0 ? Math.max(0, 1 - avgL2 / avgRetail) : DEFAULT_L2_DISCOUNT;
+    for (const k of TYPOLOGY_KEYS) r[k] = calculateTypology(inputs[k], lotsByType[k], pricingMode, effL1, effL2);
     return r;
-  }, [inputs, lotsByType, pricingMode]);
+  }, [inputs, lotsByType, pricingMode, activeLots, l1Price, l2Price]);
 
   // Phase totals
   const totals = useMemo(() => {
@@ -609,13 +688,11 @@ function PhaseCard({
     const totalArea = activeLots.reduce((s, l) => s + l.area_sqm, 0);
     const weightedRetail = activeLots.reduce((s, l) => s + l.area_sqm * (LOT_RETAIL_MAP.get(l.id) ?? l.zone_price_retail), 0);
     const avgRetail = weightedRetail / totalArea;
-    return {
-      avgRetail,
-      avgL1: avgRetail * (1 - L1_DISCOUNT),
-      avgL2: avgRetail * (1 - L2_DISCOUNT),
-      totalArea,
-    };
-  }, [activeLots]);
+    // If user set an absolute price, use it directly; otherwise derive from default discount
+    const avgL1 = l1Price > 0 ? l1Price : avgRetail * (1 - DEFAULT_L1_DISCOUNT);
+    const avgL2 = l2Price > 0 ? l2Price : avgRetail * (1 - DEFAULT_L2_DISCOUNT);
+    return { avgRetail, avgL1, avgL2, totalArea };
+  }, [activeLots, l1Price, l2Price]);
 
   if (lots.length === 0) return null;
 
@@ -701,31 +778,93 @@ function PhaseCard({
               </div>
             )}
 
-            {/* Avg land prices + Typology mix in two columns on larger screens */}
-            <div className="flex flex-col lg:flex-row gap-4">
+            {/* Avg land prices + Typology mix in three rows */}
+            <div className="flex flex-col gap-4">
               {/* Avg land prices */}
-              <div className="flex-1 space-y-1.5">
-                <div className="text-[9px] uppercase tracking-widest font-semibold text-gray-400">
-                  Avg Land Price / m²
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <div className="text-[9px] uppercase tracking-widest font-semibold text-gray-400">
+                    Avg Land Price / m²
+                  </div>
+                  <button
+                    onClick={() => setLandInputMode(m => m === "price" ? "pct" : "price")}
+                    className="text-[9px] text-gray-400 hover:text-gray-600 bg-gray-100 hover:bg-gray-200 rounded px-1.5 py-0.5 transition-colors"
+                  >
+                    {landInputMode === "price" ? "switch to %" : "switch to $"}
+                  </button>
                 </div>
                 <div className="grid grid-cols-3 gap-2">
                   <div className="bg-gray-50 rounded-lg p-2 text-center">
                     <div className="text-[9px] text-gray-400">Retail</div>
                     <div className="text-xs font-bold text-gray-700">${fmtN(landPricing.avgRetail, 0)}</div>
                   </div>
+                  {(() => {
+                    const effL1Pct = landPricing.avgRetail > 0 ? Math.max(0, 1 - landPricing.avgL1 / landPricing.avgRetail) : DEFAULT_L1_DISCOUNT;
+                    const effL2Pct = landPricing.avgRetail > 0 ? Math.max(0, 1 - landPricing.avgL2 / landPricing.avgRetail) : DEFAULT_L2_DISCOUNT;
+                    return (<>
                   <div className="bg-blue-50 rounded-lg p-2 text-center border border-blue-100">
-                    <div className="text-[9px] text-blue-500">L1 (−35%)</div>
-                    <div className="text-xs font-bold text-blue-700">${fmtN(landPricing.avgL1, 0)}</div>
+                    <div className="text-[9px] text-blue-500 mb-1">
+                      L1 {landInputMode === "price"
+                        ? `(−${Math.round(effL1Pct * 100)}%)`
+                        : `($${fmtN(landPricing.avgL1, 0)})`}
+                    </div>
+                    {landInputMode === "price" ? (
+                      <div className="flex items-center justify-center gap-0.5">
+                        <span className="text-[9px] font-semibold text-blue-600">$</span>
+                        <CommitInput
+                          value={Math.round(landPricing.avgL1)}
+                          onChange={v => onL1PriceChange(v > 0 ? v : 0)}
+                          min={1} step={1}
+                          className="w-14 text-center text-xs font-bold text-blue-700 bg-blue-100 border border-blue-200 rounded px-1 py-0 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center gap-0.5">
+                        <CommitInput
+                          value={Math.round(effL1Pct * 100)}
+                          onChange={v => onL1PriceChange(landPricing.avgRetail * (1 - Math.min(0.99, Math.max(0.01, v / 100))))}
+                          min={1} max={99} step={1}
+                          className="w-10 text-center text-xs font-bold text-blue-700 bg-blue-100 border border-blue-200 rounded px-1 py-0 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                        />
+                        <span className="text-[9px] font-semibold text-blue-600">%</span>
+                      </div>
+                    )}
                   </div>
                   <div className="bg-emerald-50 rounded-lg p-2 text-center border border-emerald-100">
-                    <div className="text-[9px] text-emerald-500">L2 (−25%)</div>
-                    <div className="text-xs font-bold text-emerald-700">${fmtN(landPricing.avgL2, 0)}</div>
+                    <div className="text-[9px] text-emerald-500 mb-1">
+                      L2 {landInputMode === "price"
+                        ? `(−${Math.round(effL2Pct * 100)}%)`
+                        : `($${fmtN(landPricing.avgL2, 0)})`}
+                    </div>
+                    {landInputMode === "price" ? (
+                      <div className="flex items-center justify-center gap-0.5">
+                        <span className="text-[9px] font-semibold text-emerald-600">$</span>
+                        <CommitInput
+                          value={Math.round(landPricing.avgL2)}
+                          onChange={v => onL2PriceChange(v > 0 ? v : 0)}
+                          min={1} step={1}
+                          className="w-14 text-center text-xs font-bold text-emerald-700 bg-emerald-100 border border-emerald-200 rounded px-1 py-0 focus:outline-none focus:ring-1 focus:ring-emerald-400"
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center gap-0.5">
+                        <CommitInput
+                          value={Math.round(effL2Pct * 100)}
+                          onChange={v => onL2PriceChange(landPricing.avgRetail * (1 - Math.min(0.99, Math.max(0.01, v / 100))))}
+                          min={1} max={99} step={1}
+                          className="w-10 text-center text-xs font-bold text-emerald-700 bg-emerald-100 border border-emerald-200 rounded px-1 py-0 focus:outline-none focus:ring-1 focus:ring-emerald-400"
+                        />
+                        <span className="text-[9px] font-semibold text-emerald-600">%</span>
+                      </div>
+                    )}
                   </div>
+                    </>);
+                  })()}
                 </div>
               </div>
 
               {/* Typology mix */}
-              <div className="flex-1 space-y-1">
+              <div className="space-y-1">
                 <div className="text-[9px] uppercase tracking-widest font-semibold text-gray-400">
                   Typology Mix
                 </div>
@@ -798,6 +937,9 @@ export default function ModelPage() {
   };
 
   const [pricingMode, setPricingMode] = useState<PricingMode>("by_location");
+  // Stored as absolute $/sqm (0 = unset, use default discount)
+  const [l1Price, setL1Price] = useState(0);
+  const [l2Price, setL2Price] = useState(0);
   const [phaseInputs, setPhaseInputs] = useState<Record<1 | 2 | 3, Record<TypologyKey, TypologyInputs>>>(defaultPhaseInputs);
 
   // Merge saved data with defaults (handles newly-added fields)
@@ -892,6 +1034,18 @@ export default function ModelPage() {
   const visibleInputs = activeScenario === "default" && defaultInputs ? defaultInputs : phaseInputs;
   const isReadOnly = activeScenario === "default";
 
+  // Per-phase average retail land price (for grand total pct derivation)
+  const phaseAvgRetail = useMemo(() => {
+    const result: Record<1|2|3, number> = { 1: 0, 2: 0, 3: 0 };
+    for (const ph of [1,2,3] as const) {
+      const lots = lotsByPhase[ph];
+      const totalArea = lots.reduce((s,l) => s + l.area_sqm, 0);
+      if (totalArea === 0) continue;
+      result[ph] = lots.reduce((s,l) => s + l.area_sqm * (LOT_RETAIL_MAP.get(l.id) ?? l.zone_price_retail), 0) / totalArea;
+    }
+    return result;
+  }, [lotsByPhase]);
+
   // Grand totals (computed from all phases)
   const grand = useMemo(() => {
     let plots = 0, area = 0, bua = 0, units = 0, revenue = 0, cost = 0, land = 0, net = 0;
@@ -903,7 +1057,12 @@ export default function ModelPage() {
         if (dt && dt in byType) byType[dt].push(lot);
       }
       for (const k of TYPOLOGY_KEYS) {
-        const r = calculateTypology(phInputs[k], byType[k], pricingMode);
+        const avgRetail = phaseAvgRetail[ph];
+        const avgL1 = l1Price > 0 ? l1Price : avgRetail * (1 - DEFAULT_L1_DISCOUNT);
+        const avgL2 = l2Price > 0 ? l2Price : avgRetail * (1 - DEFAULT_L2_DISCOUNT);
+        const effL1 = avgRetail > 0 ? Math.max(0, 1 - avgL1 / avgRetail) : DEFAULT_L1_DISCOUNT;
+        const effL2 = avgRetail > 0 ? Math.max(0, 1 - avgL2 / avgRetail) : DEFAULT_L2_DISCOUNT;
+        const r = calculateTypology(phInputs[k], byType[k], pricingMode, effL1, effL2);
         plots += r.numPlots;
         area += r.totalArea;
         bua += r.totalSellableArea;
@@ -915,7 +1074,7 @@ export default function ModelPage() {
       }
     }
     return { plots, area, bua, units, revenue, cost, land, net };
-  }, [lotsByPhase, visibleInputs, assignments, pricingMode]);
+  }, [lotsByPhase, visibleInputs, assignments, pricingMode, l1Price, l2Price, phaseAvgRetail]);
 
   if (!mounted) {
     return (
@@ -1054,6 +1213,10 @@ export default function ModelPage() {
             lotStatuses={lotStatuses}
             lang={lang}
             pricingMode={pricingMode}
+            l1Price={l1Price}
+            l2Price={l2Price}
+            onL1PriceChange={setL1Price}
+            onL2PriceChange={setL2Price}
           />
         ))}
       </div>

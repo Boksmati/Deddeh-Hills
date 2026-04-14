@@ -177,16 +177,16 @@ export default function StatusPage() {
         </div>
 
         {/* ── Status Pipeline Tiles ────────────────────────────────────────── */}
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           {STATUSES.map((s) => {
             const meta = STATUS_META[s];
             const count = data.statusCounts[s];
             const rev = data.statusRevenue[s];
             const pct = data.totalLots > 0 ? count / data.totalLots : 0;
             return (
-              <div key={s} className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-                <div className="flex items-center justify-between mb-3">
-                  <span className={`text-xs font-semibold uppercase tracking-wide ${meta.text}`}>
+              <div key={s} className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-5 shadow-sm border border-gray-100">
+                <div className="flex items-center justify-between mb-2 sm:mb-3">
+                  <span className={`text-[10px] sm:text-xs font-semibold uppercase tracking-wide ${meta.text}`}>
                     {meta.label}
                   </span>
                   <span
@@ -218,7 +218,7 @@ export default function StatusPage() {
         {data.projectedRevenue > 0 && (
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
             <h2 className="text-sm font-semibold text-gray-900 mb-4">{t("revenue_pipeline")}</h2>
-            <div className="flex items-end gap-8 mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-8 mb-4">
               <div>
                 <div className="text-xs text-gray-400 mb-0.5">{t("projected_total")}</div>
                 <div className="text-2xl font-bold text-gray-900 tabular-nums">
@@ -250,10 +250,10 @@ export default function StatusPage() {
                 style={{ width: `${(commitPct - soldPct) * 100}%` }}
               />
             </div>
-            <div className="flex gap-4 mt-2 text-[10px] text-gray-400">
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-400 inline-block" />{t("sold_pct")} {fmtPct(soldPct)}</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-300 inline-block" />{t("committed_pct")} {fmtPct(Math.max(0, commitPct - soldPct))}</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-gray-200 inline-block" />{t("status_available")} {fmtPct(1 - commitPct)}</span>
+            <div className="flex flex-wrap gap-2 sm:gap-4 mt-2 text-[10px] text-gray-400">
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-400 inline-block flex-shrink-0" />{t("sold_pct")} {fmtPct(soldPct)}</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-300 inline-block flex-shrink-0" />{t("committed_pct")} {fmtPct(Math.max(0, commitPct - soldPct))}</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-gray-200 inline-block flex-shrink-0" />{t("status_available")} {fmtPct(1 - commitPct)}</span>
             </div>
           </div>
         )}
@@ -331,11 +331,11 @@ export default function StatusPage() {
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-3 text-xs">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs">
                       {STATUSES.map((s) => (
                         <span key={s} className={`flex items-center gap-1 ${STATUS_TEXT[s]}`}>
                           <span
-                            className="w-1.5 h-1.5 rounded-full"
+                            className="w-1.5 h-1.5 rounded-full flex-shrink-0"
                             style={{ backgroundColor: STATUS_COLORS[s] }}
                           />
                           {p.phaseCounts[s]}
@@ -378,6 +378,7 @@ export default function StatusPage() {
         {data.typeBreakdown.length > 0 && (
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
             <h2 className="text-sm font-semibold text-gray-900 mb-4">{t("typology_mix")}</h2>
+            <div className="overflow-x-auto -mx-6 px-6">
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-gray-100">
@@ -430,6 +431,7 @@ export default function StatusPage() {
                 </tr>
               </tfoot>
             </table>
+            </div>
           </div>
         )}
 

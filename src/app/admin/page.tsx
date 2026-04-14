@@ -559,7 +559,8 @@ function PipelineView({
   const stages: CrmContact["stage"][] = ["lead", "prospect", "reserved", "under_contract", "sold"];
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12, overflowX: "auto" }}>
+    <div style={{ overflowX: "auto", marginLeft: -20, marginRight: -20, paddingLeft: 20, paddingRight: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12, minWidth: "min-content" }}>
       {stages.map((stage) => {
         const cfg = STAGE_CFG[stage];
         const cards = contacts.filter((c) => c.stage === stage);
@@ -617,6 +618,7 @@ function PipelineView({
           </div>
         );
       })}
+      </div>
     </div>
   );
 }
@@ -774,7 +776,8 @@ function BuyerRegistryView({
   return (
     <div>
       {/* KPI strip */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(150px,1fr))", gap: 10, marginBottom: 20 }}>
+      <div style={{ overflowX: "auto", marginLeft: -20, marginRight: -20, paddingLeft: 20, paddingRight: 20, marginBottom: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(120px,1fr))", gap: 10, minWidth: "min-content" }}>
         {[
           { label: "Total Buyers",       val: String(buyers.length),        color: C.ink    },
           { label: "Expected Revenue",   val: fmtUSD(totalExpected),        color: C.ink    },
@@ -788,6 +791,7 @@ function BuyerRegistryView({
             <div style={{ fontSize: 18, fontWeight: 700, color }}>{val}</div>
           </div>
         ))}
+        </div>
       </div>
 
       {/* Collection progress bar */}
@@ -1020,7 +1024,8 @@ function CrmTab() {
       </div>
 
       {/* KPI strip */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 10, marginBottom: 20 }}>
+      <div style={{ overflowX: "auto", marginLeft: -20, marginRight: -20, paddingLeft: 20, paddingRight: 20, marginBottom: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 10, minWidth: "min-content" }}>
         {(["lead", "prospect", "reserved", "under_contract", "sold"] as CrmContact["stage"][]).map((stage) => {
           const cfg = STAGE_CFG[stage];
           const count = contacts.filter((c) => c.stage === stage).length;
@@ -1035,6 +1040,7 @@ function CrmTab() {
           <div style={{ fontSize: 10, fontWeight: 600, color: C.muted, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 4 }}>Collected</div>
           <div style={{ fontSize: 20, fontWeight: 700, color: C.emerald }}>{fmtUSD(totalPaid)}</div>
           <div style={{ fontSize: 10, color: C.muted }}>of {fmtUSD(totalRevenue)}</div>
+        </div>
         </div>
       </div>
 
@@ -1429,7 +1435,8 @@ function OverviewTab() {
   return (
     <div style={{ maxWidth: 720, margin: "0 auto" }}>
       {/* KPIs */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 12, marginBottom: 24 }}>
+      <div style={{ overflowX: "auto", marginLeft: -20, marginRight: -20, paddingLeft: 20, paddingRight: 20, marginBottom: 24 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 12, minWidth: "min-content" }}>
         {(["available", "reserved", "under_contract", "sold"] as LotStatus[]).map((s) => {
           const cfg = STATUS_CFG[s];
           return (
@@ -1440,6 +1447,7 @@ function OverviewTab() {
             </div>
           );
         })}
+        </div>
       </div>
 
       {/* Revenue & assigned */}
@@ -1967,7 +1975,8 @@ function AnalyticsTab() {
       </div>
 
       {/* KPI row */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(140px,1fr))", gap: 10 }}>
+      <div style={{ overflowX: "auto", marginLeft: -20, marginRight: -20, paddingLeft: 20, paddingRight: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(120px,1fr))", gap: 10, minWidth: "min-content" }}>
         {[
           { label: "Total Events",      val: String(events.length),       color: C.ink        },
           { label: "Sessions",          val: String(sessions.size),       color: "#6366F1"    },
@@ -1982,10 +1991,11 @@ function AnalyticsTab() {
             <div style={{ fontSize: 20, fontWeight: 700, color }}>{val}</div>
           </div>
         ))}
+        </div>
       </div>
 
       {/* Two-column: event breakdown + top units */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 16 }}>
         {/* Event type breakdown */}
         <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: 16 }}>
           <h3 style={{ fontSize: 13, fontWeight: 600, color: C.ink, marginBottom: 12 }}>Event Breakdown</h3>
@@ -2188,8 +2198,8 @@ export default function AdminPage() {
       <AppHeader currentPage="admin" />
 
       {/* Tabs */}
-      <div style={{ background: C.white, borderBottom: `1px solid ${C.border}` }}>
-        <div style={{ maxWidth: 960, margin: "0 auto", display: "flex", paddingLeft: 20 }}>
+      <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, overflowX: "auto" }}>
+        <div style={{ maxWidth: 960, margin: "0 auto", display: "flex", paddingLeft: 20, minWidth: "min-content" }}>
           {TABS.map((t) => (
             <button
               key={t.id}
