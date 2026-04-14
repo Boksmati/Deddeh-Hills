@@ -487,46 +487,6 @@ export default function InvestorPage() {
                 })}
               </div>
 
-              {/* Per-villa breakdown confirming the 50% split */}
-              <div className="border-t border-gray-100 pt-4">
-                <div className="text-[10px] uppercase tracking-widest text-gray-400 font-semibold mb-3">
-                  {lang === "ar" ? "تفاصيل ربح كل فيلا" : "Per-villa profit breakdown"}
-                </div>
-                <table className="w-full text-xs">
-                  <tbody>
-                    <tr>
-                      <td className="py-1.5 text-gray-600 font-medium">{lang === "ar" ? "سعر بيع الفيلا" : "Villa sale price"}</td>
-                      <td className="py-1.5 text-right tabular-nums text-dh-green font-bold">{formatUSD(activeWaterfall.revenue)}</td>
-                    </tr>
-                    <tr>
-                      <td className="py-1.5 text-gray-400 pl-3">{lang === "ar" ? "− تكلفة البناء الكاملة" : "− Construction + soft costs"}</td>
-                      <td className="py-1.5 text-right tabular-nums text-gray-400">({formatUSD(activeWaterfall.totalConstructionCost)})</td>
-                    </tr>
-                    <tr>
-                      <td className="py-1.5 text-gray-400 pl-3">{lang === "ar" ? "− تكلفة الأرض" : "− Land cost"}</td>
-                      <td className="py-1.5 text-right tabular-nums text-gray-400">({formatUSD(activeWaterfall.totalLandCost)})</td>
-                    </tr>
-                    {waterfallModel === "priority" && activeWaterfall.priorityAmount > 0 && (
-                      <tr>
-                        <td className="py-1.5 text-emerald-600 pl-3">{lang === "ar" ? "+ عائد الأولوية (10%)" : "+ Priority return (10%)"}</td>
-                        <td className="py-1.5 text-right tabular-nums text-emerald-600">{formatUSD(activeWaterfall.priorityAmount)}</td>
-                      </tr>
-                    )}
-                    <tr className="border-t border-gray-200">
-                      <td className="py-1.5 text-gray-700 font-medium">{lang === "ar" ? "صافي الربح (تقسيم 50/50)" : "Net profit (50/50 split)"}</td>
-                      <td className="py-1.5 text-right tabular-nums font-semibold text-gray-800">{formatUSD(activeWaterfall.remainingForSplit)}</td>
-                    </tr>
-                    <tr>
-                      <td className="py-1.5 text-gray-400 pl-5 text-[10px]">{lang === "ar" ? "رأس مالك المسترد" : "Your capital returned"}</td>
-                      <td className="py-1.5 text-right tabular-nums text-gray-400 text-[10px]">{formatUSD(activeWaterfall.l2InvestorCash)}</td>
-                    </tr>
-                    <tr className="bg-emerald-50/70 rounded-lg">
-                      <td className="py-2 text-emerald-700 font-bold pl-1">{lang === "ar" ? "✓ حصتك 50%" : "✓ Your 50% share"}</td>
-                      <td className="py-2 text-right tabular-nums font-bold text-emerald-700">{formatUSD(activeWaterfall.l2InvestorProfit)}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
             </div>
 
             {/* ── Per-Typology Profitability ── */}
