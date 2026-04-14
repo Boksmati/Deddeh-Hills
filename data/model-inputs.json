@@ -20,22 +20,22 @@
       "exploitPct": 0.2,
       "floors": 2,
       "jamalonPct": 0,
-      "undergroundPct": 0.01,
+      "undergroundPct": 0,
       "balconyPct": 0.25,
       "maxUnitsPerPlot": 2,
       "avgUnitSize": 600,
       "constructionCost": 600,
       "sellingPrice": 1500,
-      "profitMargin": 400,
+      "profitMargin": 450,
       "buaPerPlot": 900,
-      "equityPct": 0.5
+      "equityPct": 0.3
     },
     "villa_3f": {
       "commonAreaPct": 0.1,
       "exploitPct": 0.2,
-      "floors": 2,
+      "floors": 3,
       "jamalonPct": 0,
-      "undergroundPct": 1,
+      "undergroundPct": 0.5,
       "balconyPct": 0.25,
       "maxUnitsPerPlot": 2,
       "avgUnitSize": 600,
@@ -43,14 +43,14 @@
       "sellingPrice": 1300,
       "profitMargin": 450,
       "buaPerPlot": 900,
-      "equityPct": 0.5
+      "equityPct": 0.3
     },
     "apartments": {
       "commonAreaPct": 0.1,
       "exploitPct": 0.2,
       "floors": 3,
       "jamalonPct": 0,
-      "undergroundPct": 1,
+      "undergroundPct": 0,
       "balconyPct": 0.25,
       "maxUnitsPerPlot": 6,
       "avgUnitSize": 150,
@@ -58,19 +58,19 @@
       "sellingPrice": 1100,
       "profitMargin": 450,
       "buaPerPlot": 900,
-      "equityPct": 0.5
+      "equityPct": 0.3
     }
   },
   "2": {
     "twin_villa": {
       "commonAreaPct": 0.1,
       "exploitPct": 0.2,
-      "floors": 3,
+      "floors": 2,
       "jamalonPct": 0,
-      "undergroundPct": 1,
+      "undergroundPct": 0,
       "balconyPct": 0.25,
       "maxUnitsPerPlot": 2,
-      "avgUnitSize": 2,
+      "avgUnitSize": 300,
       "constructionCost": 600,
       "sellingPrice": 1400,
       "profitMargin": 450,
@@ -112,7 +112,7 @@
       "exploitPct": 0.2,
       "floors": 3,
       "jamalonPct": 0,
-      "undergroundPct": 1,
+      "undergroundPct": 0,
       "balconyPct": 0.25,
       "maxUnitsPerPlot": 6,
       "avgUnitSize": 150,
@@ -127,12 +127,12 @@
     "twin_villa": {
       "commonAreaPct": 0.1,
       "exploitPct": 0.2,
-      "floors": 3,
+      "floors": 2,
       "jamalonPct": 0,
-      "undergroundPct": 0.98,
+      "undergroundPct": 0,
       "balconyPct": 0.25,
       "maxUnitsPerPlot": 2,
-      "avgUnitSize": 285,
+      "avgUnitSize": 300,
       "constructionCost": 600,
       "sellingPrice": 1400,
       "profitMargin": 450,
@@ -174,7 +174,7 @@
       "exploitPct": 0.2,
       "floors": 3,
       "jamalonPct": 0,
-      "undergroundPct": 1,
+      "undergroundPct": 0,
       "balconyPct": 0.25,
       "maxUnitsPerPlot": 6,
       "avgUnitSize": 150,
@@ -182,7 +182,7 @@
       "sellingPrice": 1100,
       "profitMargin": 450,
       "buaPerPlot": 900,
-      "equityPct": 0.5
+      "equityPct": 0.3
     }
   }
 }

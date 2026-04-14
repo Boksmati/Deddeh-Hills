@@ -56,15 +56,15 @@ export default function Toolbar() {
   ];
 
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-6">
+    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 lg:gap-0">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6">
         {/* View mode tabs */}
         <div className="flex bg-gray-100 rounded-lg p-0.5">
           {viewModes.map((vm) => (
             <button
               key={vm.id}
               onClick={() => setViewMode(vm.id)}
-              className={`px-4 py-1.5 rounded-md text-xs font-medium transition-all ${
+              className={`px-3 sm:px-4 py-1.5 rounded-md text-xs font-medium transition-all ${
                 viewMode === vm.id
                   ? "bg-white text-gray-900 shadow-sm"
                   : "text-gray-500 hover:text-gray-700"
@@ -77,13 +77,13 @@ export default function Toolbar() {
 
         {/* Color mode */}
         <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-400">{t("color_label")}</span>
-          <div className="flex bg-gray-100 rounded-lg p-0.5">
+          <span className="text-xs text-gray-400 whitespace-nowrap">{t("color_label")}</span>
+          <div className="flex bg-gray-100 rounded-lg p-0.5 overflow-x-auto">
             {colorModes.map((cm) => (
               <button
                 key={cm.id}
                 onClick={() => setMapColorMode(cm.id)}
-                className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all ${
+                className={`px-2 sm:px-3 py-1 rounded-md text-[11px] font-medium transition-all whitespace-nowrap ${
                   mapColorMode === cm.id
                     ? "bg-white text-gray-900 shadow-sm"
                     : "text-gray-500 hover:text-gray-700"
@@ -97,7 +97,7 @@ export default function Toolbar() {
 
         {/* Legend */}
         {mapColorMode === "type" && (
-          <div className="flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-3 flex-wrap">
             {Object.values(DEVELOPMENT_TYPES)
               .filter((t) => t.id !== "unassigned")
               .map((dt) => (
@@ -115,7 +115,7 @@ export default function Toolbar() {
         )}
 
         {mapColorMode === "phase" && (
-          <div className="flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-3">
             {[1, 2, 3].map((p) => (
               <div key={p} className="flex items-center gap-1">
                 <span
@@ -131,7 +131,7 @@ export default function Toolbar() {
         )}
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
         {/* Investor share slider */}
         <div className="flex items-center gap-2">
           <span className="text-xs text-gray-400">{t("investor_label")}</span>

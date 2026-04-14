@@ -354,10 +354,12 @@ function Row({ label, value, bold, color, indent, tip }: {
 
 function TypologySection({
   typKey, inputs, result, onInputChange, lang, pricingMode, defaultOpen = false,
+  avgL1Sqm = 0, avgL2Sqm = 0,
 }: {
   typKey: TypologyKey; inputs: TypologyInputs; result: TypologyResult;
   onInputChange: (f: keyof TypologyInputs, v: number) => void;
   lang: string; pricingMode: PricingMode; defaultOpen?: boolean;
+  avgL1Sqm?: number; avgL2Sqm?: number;
 }) {
   const meta = TYPOLOGY_META[typKey];
   const [open, setOpen] = useState(defaultOpen);
@@ -380,11 +382,11 @@ function TypologySection({
           <div className="flex items-center gap-3 text-[10px] text-gray-400 flex-wrap">
             <span><span className="text-gray-300 mr-0.5">plots</span>{result.numPlots}</span>
             <span><span className="text-gray-300 mr-0.5">area</span>{fmtN(result.totalArea, 0)} m²</span>
-            <span title="Avg land price per m² of land area at L2 discount">
-              <span className="text-gray-300 mr-0.5">L2</span>${fmtN(result.avgLandPriceSqm, 0)}/m²
+            <span title="Avg land price per m² at L2 (user-set or default discount)">
+              <span className="text-gray-300 mr-0.5">L2</span>${fmtN(avgL2Sqm || result.avgLandPriceSqm, 0)}/m²
             </span>
-            <span className="text-blue-300" title="Avg land price per m² of land area at L1 discount">
-              <span className="mr-0.5">L1</span>${fmtN(result.totalArea > 0 ? result.landCostL1 / result.totalArea : 0, 0)}/m²
+            <span className="text-blue-300" title="Avg land price per m² at L1 (user-set or default discount)">
+              <span className="mr-0.5">L1</span>${fmtN(avgL1Sqm || (result.totalArea > 0 ? result.landCostL1 / result.totalArea : 0), 0)}/m²
             </span>
           </div>
         </div>
@@ -630,6 +632,12 @@ function PhaseCard({
   const clearSelection = useCallback(() => setSelectedLotIds(new Set()), []);
 
   const hasSelection = selectedLotIds.size > 0;
+
+  // When selection changes, reset manual land price overrides → revert to dynamic calculation
+  useEffect(() => {
+    onL1PriceChange(0);
+    onL2PriceChange(0);
+  }, [selectedLotIds]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // The lots to use for the breakdown: selected lots if any, otherwise all phase lots
   const activeLots = useMemo(() => {
@@ -902,6 +910,8 @@ function PhaseCard({
               lang={lang}
               pricingMode={pricingMode}
               defaultOpen={k === TYPOLOGY_KEYS.find(tk => results[tk].numPlots > 0)}
+              avgL1Sqm={landPricing.avgL1}
+              avgL2Sqm={landPricing.avgL2}
             />
           ))}
         </div>

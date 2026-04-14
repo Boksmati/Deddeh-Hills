@@ -1131,5 +1131,26 @@
     "ts": 1773501498089,
     "ip": "::ffff:127.0.0.1",
     "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1.4498 Chrome/144.0.7559.173 Electron/40.4.1 Safari/537.36"
+  },
+  {
+    "id": "zevnfeypaalmnxrp883",
+    "event": "page_view",
+    "page": "/customer",
+    "sessionId": "wc1lf0bz1csmnxrp6vk",
+    "ts": 1776119512594,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1617.0 Chrome/144.0.7559.236 Electron/40.8.5 Safari/537.36"
+  },
+  {
+    "id": "srr1h7uci9mnxrpam1",
+    "event": "time_on_page",
+    "page": "/customer",
+    "sessionId": "wc1lf0bz1csmnxrp6vk",
+    "data": {
+      "seconds": 5
+    },
+    "ts": 1776119517257,
+    "ip": "::1",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Claude/1.1617.0 Chrome/144.0.7559.236 Electron/40.8.5 Safari/537.36"
   }
 ]
