@@ -1429,8 +1429,8 @@ export function ModelContent() {
           />
         ))}
 
-        {/* ── Full-Project Aggregate by Typology ── */}
-        {(() => {
+        {/* ── Full-Project Aggregate by Typology ── (hidden for now) */}
+        {false && (() => {
           // Aggregate L1 grand totals across all typologies
           const grandL1 = TYPOLOGY_KEYS.reduce((acc, k) => ({
             revenue: acc.revenue + aggByTypology[k].revenue,
