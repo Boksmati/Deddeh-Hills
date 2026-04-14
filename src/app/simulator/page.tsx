@@ -42,7 +42,7 @@ export default function Home() {
   }, [selectedLotIds]);
 
   return (
-    <div className="flex flex-col" style={{ background: "#F4F9EF", height: "200vh" }}>
+    <div className="flex flex-col" style={{ background: "#F4F9EF", minHeight: "100vh" }}>
       {/* Shared navigation header */}
       <AppHeader currentPage="simulator" />
 
@@ -65,15 +65,15 @@ export default function Home() {
         <SimulationSummaryBar />
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex min-h-0 px-6 pb-4 gap-4">
-        {/* Master Plan Map */}
-        <div className="flex-1 min-w-0">
+      {/* Main Content — map drives the height via its natural aspect ratio */}
+      <div className="flex px-6 pb-4 gap-4 items-start">
+        {/* Master Plan Map — sized to its natural 1000:795 aspect ratio */}
+        <div className="flex-1 min-w-0" style={{ aspectRatio: "1000 / 795" }}>
           <MasterPlanSVG />
         </div>
 
-        {/* Right Sidebar */}
-        <div ref={sidebarRef} className="w-80 flex-shrink-0 flex flex-col gap-4 overflow-y-auto">
+        {/* Right Sidebar — matches map height via align-items stretch on parent */}
+        <div ref={sidebarRef} className="w-80 flex-shrink-0 flex flex-col gap-4 overflow-y-auto" style={{ alignSelf: "stretch" }}>
           {/* Lot Configuration Panel — admin only */}
           {isAdmin && (
             <div className="bg-white rounded-xl shadow-sm border border-gray-100">
