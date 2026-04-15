@@ -1150,20 +1150,21 @@ export function ModelContent() {
   // Load both working and default scenarios on mount
   useEffect(() => {
     setMounted(true);
-    // Working scenario
-    fetch("/api/model-inputs")
-      .then(r => r.json())
-      .then(data => {
-        if (data && data[1] && data[2] && data[3]) setPhaseInputs(mergeWithDefaults(data));
-      })
-      .catch(() => {});
-    // Default scenario
-    fetch("/api/model-inputs?scenario=default")
-      .then(r => r.json())
-      .then(data => {
-        if (data && data[1] && data[2] && data[3]) setDefaultInputs(mergeWithDefaults(data));
-      })
-      .catch(() => {});
+    // Load default scenario first — this is the authoritative baseline that
+    // "Save as Default" writes to. Fresh page loads always start from here.
+    Promise.all([
+      fetch("/api/model-inputs").then(r => r.json()).catch(() => null),
+      fetch("/api/model-inputs?scenario=default").then(r => r.json()).catch(() => null),
+    ]).then(([working, def]) => {
+      // If a saved default exists, use it as the initial displayed inputs
+      if (def && def[1] && def[2] && def[3]) {
+        setPhaseInputs(mergeWithDefaults(def));
+        setDefaultInputs(mergeWithDefaults(def));
+      } else if (working && working[1] && working[2] && working[3]) {
+        // No default saved yet — fall back to working copy
+        setPhaseInputs(mergeWithDefaults(working));
+      }
+    });
   }, []);
 
   // Auto-save with debounce whenever inputs change
@@ -1183,14 +1184,20 @@ export function ModelContent() {
     return () => clearTimeout(t);
   }, [phaseInputs, mounted]);
 
-  // Save current working inputs as the locked default baseline
+  // Save current working inputs as the locked default baseline.
+  // Writes to BOTH model-inputs (so fresh page loads see it) and
+  // model-inputs?scenario=default (for the scenario comparison toggle).
   const saveAsDefault = () => {
     setDefaultSaveStatus("saving");
-    fetch("/api/model-inputs?scenario=default", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(phaseInputs),
-    }).then(() => {
+    const body = JSON.stringify(phaseInputs);
+    Promise.all([
+      fetch("/api/model-inputs?scenario=default", {
+        method: "POST", headers: { "Content-Type": "application/json" }, body,
+      }),
+      fetch("/api/model-inputs", {
+        method: "POST", headers: { "Content-Type": "application/json" }, body,
+      }),
+    ]).then(() => {
       setDefaultInputs(phaseInputs);
       setDefaultSaveStatus("saved");
       setTimeout(() => setDefaultSaveStatus("idle"), 2500);
