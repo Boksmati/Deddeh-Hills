@@ -97,22 +97,22 @@ const DEFAULT_INPUTS: Record<TypologyKey, TypologyInputs> = {
   twin_villa: {
     commonAreaPct: 0.10, exploitPct: 0.20, floors: 2,
     jamalonPct: 0, undergroundPct: 0, balconyPct: 0.25,
-    maxUnitsPerPlot: 2, avgUnitSize: 300, constructionCost: 600, sellingPrice: 1400, profitMargin: 450, buaPerPlot: 900, equityPct: 0.30,
+    maxUnitsPerPlot: 2, avgUnitSize: 300, constructionCost: 600, sellingPrice: 1400, profitMargin: 300, buaPerPlot: 900, equityPct: 0.30,
   },
   villa_2f: {
     commonAreaPct: 0.10, exploitPct: 0.20, floors: 2,
     jamalonPct: 0, undergroundPct: 0, balconyPct: 0.25,
-    maxUnitsPerPlot: 2, avgUnitSize: 600, constructionCost: 600, sellingPrice: 1500, profitMargin: 450, buaPerPlot: 900, equityPct: 0.30,
+    maxUnitsPerPlot: 2, avgUnitSize: 600, constructionCost: 600, sellingPrice: 1500, profitMargin: 300, buaPerPlot: 900, equityPct: 0.30,
   },
   villa_3f: {
     commonAreaPct: 0.10, exploitPct: 0.20, floors: 3,
     jamalonPct: 0, undergroundPct: 0.50, balconyPct: 0.25,
-    maxUnitsPerPlot: 2, avgUnitSize: 600, constructionCost: 600, sellingPrice: 1300, profitMargin: 450, buaPerPlot: 900, equityPct: 0.30,
+    maxUnitsPerPlot: 2, avgUnitSize: 600, constructionCost: 600, sellingPrice: 1300, profitMargin: 300, buaPerPlot: 900, equityPct: 0.30,
   },
   apartments: {
     commonAreaPct: 0.10, exploitPct: 0.20, floors: 3,
     jamalonPct: 0, undergroundPct: 0, balconyPct: 0.25,
-    maxUnitsPerPlot: 6, avgUnitSize: 150, constructionCost: 600, sellingPrice: 1100, profitMargin: 450, buaPerPlot: 900, equityPct: 0.30,
+    maxUnitsPerPlot: 6, avgUnitSize: 150, constructionCost: 600, sellingPrice: 1100, profitMargin: 300, buaPerPlot: 900, equityPct: 0.30,
   },
 };
 
