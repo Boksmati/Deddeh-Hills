@@ -55,6 +55,8 @@ interface TypologyResult {
   grossCostPerSqm: number;
   netProfitPerSqm: number;
   totalSellableArea: number;
+  /** Regulation maximum BUA (exploit × floors × land area) — before applying unit cap */
+  potentialBUA: number;
   /** Total BUA per unit including underground share */
   sellableAreaPerUnit: number;
   totalConstructionCost: number;
@@ -151,11 +153,17 @@ function calculateTypology(inputs: TypologyInputs, lots: typeof LOTS, pricingMod
   const aboveGroundBUA = aboveGroundArea * (1 + inputs.balconyPct);
   const totalBuiltArea = aboveGroundBUA + undergroundArea;
 
-  // Units = total BUA allowed (above-ground + underground) ÷ unit size
-  const rawUnitsExact = inputs.avgUnitSize > 0 ? totalBuiltArea / inputs.avgUnitSize : 0;
-  const totalUnits = rawUnitsExact;
-  // Per-unit BUA = total BUA allowed ÷ units (= avgUnitSize when no underground, larger when underground present)
-  const sellableAreaPerUnit = totalUnits > 0 ? totalBuiltArea / totalUnits : 0;
+  // ── Potential vs Actual ──────────────────────────────────────────────────
+  // Potential BUA = regulation maximum (exploit × floors × land area)
+  const potentialBUA = totalBuiltArea;
+
+  // Actual units = capped by architectural design intent (max units per plot)
+  const potentialUnitsFloat = inputs.avgUnitSize > 0 ? potentialBUA / inputs.avgUnitSize : 0;
+  const maxAllowedUnits = numPlots * inputs.maxUnitsPerPlot;
+  const totalUnits = Math.min(potentialUnitsFloat, maxAllowedUnits);
+
+  // Per-unit BUA always = the input unit size (what each unit is designed to be)
+  const sellableAreaPerUnit = inputs.avgUnitSize;
   const unitsPerPlot = numPlots > 0 ? totalUnits / numPlots : 0;
   // Villa footprint = actual building ground area per unit
   // Unit size (above-ground portion) includes balconies, so strip them out, then divide by floors
@@ -172,7 +180,7 @@ function calculateTypology(inputs: TypologyInputs, lots: typeof LOTS, pricingMod
       numPlots, totalArea, commonArea, netArea, footprint,
       regularFloorArea, jamalonArea, undergroundArea, totalBuiltArea,
       totalUnits: 0, unitsPerPlot: 0, villaFootprint: 0, lotPerVilla: 0, garden: 0,
-      avgUnitPrice: 0, grossProfitPerSqm: 0, avgLandPriceSqm, landCost,
+      potentialBUA: 0, avgUnitPrice: 0, grossProfitPerSqm: 0, avgLandPriceSqm, landCost,
       grossCostPerSqm: 0, netProfitPerSqm: 0, totalSellableArea: 0, sellableAreaPerUnit: inputs.avgUnitSize,
       totalConstructionCost: 0, totalSales: 0, grossProfit: 0, netProfit: -landCost,
       effectiveSellingPrice: inputs.sellingPrice, sellingPriceMin: inputs.sellingPrice, sellingPriceMax: inputs.sellingPrice,
@@ -181,8 +189,8 @@ function calculateTypology(inputs: TypologyInputs, lots: typeof LOTS, pricingMod
     };
   }
 
-  // Sellable area = total BUA allowed (above-ground + underground), priced per m²
-  const totalSellableArea = totalBuiltArea; // = totalUnits × sellableAreaPerUnit
+  // Actual sellable area = actual units built × unit size (capped by maxUnitsPerPlot)
+  const totalSellableArea = totalUnits * inputs.avgUnitSize;
 
   // ── Selling price: average vs by-location (cost-plus) ──
   //
@@ -250,6 +258,7 @@ function calculateTypology(inputs: TypologyInputs, lots: typeof LOTS, pricingMod
   return {
     numPlots, totalArea, commonArea, netArea, footprint,
     regularFloorArea, jamalonArea, undergroundArea, totalBuiltArea,
+    potentialBUA,
     totalUnits, unitsPerPlot, villaFootprint, lotPerVilla, garden,
     avgUnitPrice, grossProfitPerSqm, avgLandPriceSqm, landCost,
     grossCostPerSqm, netProfitPerSqm, totalSellableArea, sellableAreaPerUnit,
@@ -456,21 +465,30 @@ function TypologySection({
                 {inputs.undergroundPct > 0 && (
                   <Row label={`+ Underground (${(inputs.undergroundPct*100).toFixed(0)}%)`} value={`${fmtN(result.undergroundArea, 0)} m²`} indent tip={`Footprint × ${(inputs.undergroundPct*100).toFixed(0)}% (${fmtN(result.footprint,0)} × ${(inputs.undergroundPct*100).toFixed(0)}% = ${fmtN(result.undergroundArea,0)} m²)`} />
                 )}
-                <Row label="= Total BUA allowed" value={`${fmtN(result.totalBuiltArea, 0)} m²`} bold tip={`(Floor area + jamalon) × (1 + ${(inputs.balconyPct*100).toFixed(0)}% balconies) + underground (${fmtN(result.regularFloorArea + result.jamalonArea,0)} × ${(1+inputs.balconyPct).toFixed(2)} + ${fmtN(result.undergroundArea,0)} = ${fmtN(result.totalBuiltArea,0)} m²)`} />
+                <Row label="= Potential BUA" value={`${fmtN(result.potentialBUA, 0)} m²`} bold tip={`Regulation maximum: (floor area + jamalon) × (1 + ${(inputs.balconyPct*100).toFixed(0)}% balconies) + underground = ${fmtN(result.potentialBUA,0)} m². Actual build may be less if capped by max units/plot.`} />
               </div>
             </div>
 
             {/* Col 2: Geometry + Per-m² */}
             <div className="space-y-2">
               <div className="text-[9px] uppercase tracking-widest font-semibold text-gray-400">Unit Geometry</div>
-              <div className="bg-gray-50/60 rounded-lg p-2 space-y-0.5">
-                <Row label="Total units" value={fmtU(result.totalUnits)} bold tip={`Total BUA allowed ÷ unit size (${fmtN(result.totalBuiltArea, 0)} ÷ ${inputs.avgUnitSize} = ${fmtU(result.totalUnits)} units)`} />
-                <Row label="Total BUA / unit" value={`${fmtN(result.sellableAreaPerUnit, 0)} m²`} tip={`Total BUA allowed ÷ units (${fmtN(result.totalBuiltArea,0)} ÷ ${fmtN(result.totalUnits,2)} = ${fmtN(result.sellableAreaPerUnit,0)} m²)`} />
-                <Row label="Units / plot" value={fmtN(result.unitsPerPlot, 2)} tip={`Total units ÷ number of plots (${fmtN(result.totalUnits,1)} ÷ ${result.numPlots} = ${fmtN(result.unitsPerPlot,2)})`} />
-                <Row label="Villa footprint" value={`${fmtN(result.villaFootprint, 0)} m²`} tip={`Unit size ÷ (floors × (1 + balcony%)) = ${inputs.avgUnitSize} ÷ (${inputs.floors} × ${(1+inputs.balconyPct).toFixed(2)}) = ${fmtN(result.villaFootprint,0)} m²`} />
-                <Row label="Lot / villa" value={`${fmtN(result.lotPerVilla, 0)} m²`} tip={`Net area ÷ total units (${fmtN(result.netArea,0)} ÷ ${fmtN(result.totalUnits,1)} = ${fmtN(result.lotPerVilla,0)} m²)`} />
-                <Row label="Garden" value={`${fmtN(Math.max(0, result.garden), 0)} m²`} color="#00B050" tip={`Lot per villa − villa footprint (${fmtN(result.lotPerVilla,0)} − ${fmtN(result.villaFootprint,0)} = ${fmtN(Math.max(0,result.garden),0)} m²)`} />
-              </div>
+              {(() => {
+                const potentialUnits = inputs.avgUnitSize > 0 ? result.potentialBUA / inputs.avgUnitSize : 0;
+                const isCapped = result.totalUnits < potentialUnits - 0.01;
+                return (
+                  <div className="bg-gray-50/60 rounded-lg p-2 space-y-0.5">
+                    <Row label="Actual units" value={fmtU(result.totalUnits)} bold tip={isCapped ? `Capped at ${inputs.maxUnitsPerPlot} units/plot × ${result.numPlots} plots = ${result.totalUnits} (potential ${fmtN(potentialUnits,1)} from BUA ÷ unit size)` : `Potential BUA ÷ unit size (${fmtN(result.potentialBUA, 0)} ÷ ${inputs.avgUnitSize} = ${fmtU(result.totalUnits)} units) — not capped`} />
+                    {isCapped && (
+                      <Row label={`  of ${fmtN(potentialUnits, 1)} potential`} value={`cap: ${inputs.maxUnitsPerPlot}/plot`} color="#9CA3AF" tip={`Design cap: ${inputs.maxUnitsPerPlot} units × ${result.numPlots} plots = ${result.totalUnits}. The regulation allows ${fmtN(potentialUnits,1)} units (${fmtN(result.potentialBUA,0)} m² ÷ ${inputs.avgUnitSize} m²/unit), but design limits each plot to ${inputs.maxUnitsPerPlot} units.`} />
+                    )}
+                    <Row label="Unit size" value={`${fmtN(result.sellableAreaPerUnit, 0)} m²`} tip={`Designed unit size input: ${inputs.avgUnitSize} m² per unit`} />
+                    <Row label="Units / plot" value={fmtN(result.unitsPerPlot, 2)} tip={`Actual units ÷ number of plots (${fmtN(result.totalUnits,1)} ÷ ${result.numPlots} = ${fmtN(result.unitsPerPlot,2)})`} />
+                    <Row label="Villa footprint" value={`${fmtN(result.villaFootprint, 0)} m²`} tip={`Unit size ÷ (floors × (1 + balcony%)) = ${inputs.avgUnitSize} ÷ (${inputs.floors} × ${(1+inputs.balconyPct).toFixed(2)}) = ${fmtN(result.villaFootprint,0)} m²`} />
+                    <Row label="Lot / villa" value={`${fmtN(result.lotPerVilla, 0)} m²`} tip={`Net area ÷ actual units (${fmtN(result.netArea,0)} ÷ ${fmtN(result.totalUnits,1)} = ${fmtN(result.lotPerVilla,0)} m²)`} />
+                    <Row label="Garden" value={`${fmtN(Math.max(0, result.garden), 0)} m²`} color="#00B050" tip={`Lot per villa − villa footprint (${fmtN(result.lotPerVilla,0)} − ${fmtN(result.villaFootprint,0)} = ${fmtN(Math.max(0,result.garden),0)} m²)`} />
+                  </div>
+                );
+              })()}
               <div className="text-[9px] uppercase tracking-widest font-semibold text-gray-400 pt-1">Per Unit</div>
               <div className="bg-gray-50/60 rounded-lg p-2 space-y-0.5">
                 {/* Pricing reference row — market comparison */}
@@ -526,11 +544,22 @@ function TypologySection({
 
             {/* Col 3: Totals P&L */}
             <div className="space-y-2">
-              <div className="text-[9px] uppercase tracking-widest font-semibold text-gray-400">Totals &amp; P&amp;L</div>
+              <div className="text-[9px] uppercase tracking-widest font-semibold text-gray-400">Actual Build &amp; P&amp;L</div>
               <div className="bg-gray-50/60 rounded-lg p-2 space-y-0.5">
-                <Row label="Sellable area" value={`${fmtN(result.totalSellableArea, 0)} m²`} tip={`Total BUA allowed = units × BUA/unit (${result.totalUnits.toFixed(2)} × ${fmtN(result.sellableAreaPerUnit,0)} m² = ${fmtN(result.totalSellableArea,0)} m²)`} />
-                <Row label="Construction" value={fmt(result.totalConstructionCost)} color="#E53E3E" tip={`Total BUA × construction $/m² (${fmtN(result.totalSellableArea,0)} × $${inputs.constructionCost} = ${fmt(result.totalConstructionCost)})`} />
-                <Row label="Total sales" value={fmt(result.totalSales)} bold tip={`Total BUA × avg selling $/m² (${fmtN(result.totalSellableArea,0)} × $${fmtN(result.effectiveSellingPrice,0)} = ${fmt(result.totalSales)})`} />
+                {(() => {
+                  const potentialUnits = inputs.avgUnitSize > 0 ? result.potentialBUA / inputs.avgUnitSize : 0;
+                  const isCapped = result.totalUnits < potentialUnits - 0.01;
+                  return (
+                    <>
+                      {isCapped && (
+                        <Row label="Potential BUA" value={`${fmtN(result.potentialBUA, 0)} m²`} color="#9CA3AF" tip={`Regulation maximum: ${fmtN(potentialUnits,1)} potential units × ${inputs.avgUnitSize} m² = ${fmtN(result.potentialBUA,0)} m² — capped by ${inputs.maxUnitsPerPlot} units/plot design limit`} />
+                      )}
+                      <Row label="Actual BUA" value={`${fmtN(result.totalSellableArea, 0)} m²`} bold tip={`Actual units built × unit size (${fmtN(result.totalUnits,2)} × ${fmtN(result.sellableAreaPerUnit,0)} m² = ${fmtN(result.totalSellableArea,0)} m²)${isCapped ? ` — capped from ${fmtN(result.potentialBUA,0)} m² potential` : ""}`} />
+                    </>
+                  );
+                })()}
+                <Row label="Construction" value={fmt(result.totalConstructionCost)} color="#E53E3E" tip={`Actual BUA × construction $/m² (${fmtN(result.totalSellableArea,0)} × $${inputs.constructionCost} = ${fmt(result.totalConstructionCost)})`} />
+                <Row label="Total sales" value={fmt(result.totalSales)} bold tip={`Actual BUA × avg selling $/m² (${fmtN(result.totalSellableArea,0)} × $${fmtN(result.effectiveSellingPrice,0)} = ${fmt(result.totalSales)})`} />
                 <Row label="Gross profit" value={fmt(result.grossProfit)} tip={`Total sales − construction (${fmt(result.totalSales)} − ${fmt(result.totalConstructionCost)} = ${fmt(result.grossProfit)})`} />
                 <Row label="Land cost (L2 −20%)" value={fmt(result.landCost)} color="#E53E3E" tip={`Sum of (lot area × retail $/m²) × (1 − 20%) = ${fmt(result.landCost)}`} />
                 <Row label="Land cost (L1 −33%)" value={fmt(result.landCostL1)} color="#C05621" indent tip={`Sum of (lot area × retail $/m²) × (1 − 33%) = ${fmt(result.landCostL1)}`} />
@@ -539,7 +568,7 @@ function TypologySection({
               {result.totalUnits > 0 && (
                 <div className="bg-blue-50/60 rounded-lg p-2 space-y-0.5">
                   <div className="text-[9px] uppercase tracking-widest font-semibold text-blue-400 mb-0.5">Per Villa</div>
-                  <Row label="BUA" value={`${fmtN(result.sellableAreaPerUnit, 0)} m²`} tip={`Total BUA allowed ÷ units (${fmtN(result.totalBuiltArea,0)} ÷ ${fmtN(result.totalUnits,2)} = ${fmtN(result.sellableAreaPerUnit,0)} m²)`} />
+                  <Row label="BUA" value={`${fmtN(result.sellableAreaPerUnit, 0)} m²`} tip={`Designed unit size: ${inputs.avgUnitSize} m² per unit`} />
                   <Row label="Land cost" value={fmt(result.landCost / result.totalUnits)} color="#E53E3E" tip={`Total land ÷ units (${fmt(result.landCost)} ÷ ${result.totalUnits.toFixed(2)} = ${fmt(result.landCost / result.totalUnits)})`} />
                   <Row label="Construction" value={fmt(result.totalConstructionCost / result.totalUnits)} color="#E53E3E" tip={`Unit size × build $/m² (${inputs.avgUnitSize} × $${inputs.constructionCost} = ${fmt(inputs.avgUnitSize * inputs.constructionCost)})`} />
                   <Row label="Sale price" value={fmt(result.totalSales / result.totalUnits)} bold tip={`Total sales ÷ units (${fmt(result.totalSales)} ÷ ${result.totalUnits.toFixed(2)} = ${fmt(result.totalSales / result.totalUnits)})`} />
