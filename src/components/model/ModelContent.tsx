@@ -593,7 +593,7 @@ function LotPricingCard({ lotId, lang }: { lotId: number; lang: string }) {
           <div className="text-[8px] text-blue-400">{fmt(l1Sqm * lot.area_sqm)}</div>
         </div>
         <div className="bg-emerald-50 rounded p-1.5 border border-emerald-100">
-          <div className="text-[8px] text-emerald-500">L2 (−25%)</div>
+          <div className="text-[8px] text-emerald-500">L2 (−20%)</div>
           <div className="text-[11px] font-bold text-emerald-700">${fmtN(l2Sqm, 0)}</div>
           <div className="text-[8px] text-emerald-400">{fmt(l2Sqm * lot.area_sqm)}</div>
         </div>
