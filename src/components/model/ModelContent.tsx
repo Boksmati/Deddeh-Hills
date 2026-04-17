@@ -370,6 +370,11 @@ function TypologySection({
 }) {
   const meta = TYPOLOGY_META[typKey];
   const [open, setOpen] = useState(defaultOpen);
+  const [landScenario, setLandScenario] = useState<"L1" | "L2">("L2");
+
+  // Derived net profit for the active land scenario
+  const activeNetProfit = landScenario === "L1" ? result.netProfitL1 : result.netProfit;
+  const activeLandCost  = landScenario === "L1" ? result.landCostL1  : result.landCost;
 
   if (result.numPlots === 0) return null;
 
@@ -412,15 +417,15 @@ function TypologySection({
             <div className="text-[10px] tabular-nums font-semibold text-dh-green">{fmt(result.totalSales)}</div>
           </div>
           <div className="text-right">
-            <div className="text-[9px] text-gray-300 leading-none mb-0.5">net profit</div>
-            <div className={`text-[10px] tabular-nums font-bold ${result.netProfit >= 0 ? "text-emerald-600" : "text-red-600"}`}>
-              {fmt(result.netProfit)}
+            <div className="text-[9px] text-gray-300 leading-none mb-0.5">net profit <span className="text-[8px] opacity-60">({landScenario})</span></div>
+            <div className={`text-[10px] tabular-nums font-bold ${activeNetProfit >= 0 ? "text-emerald-600" : "text-red-600"}`}>
+              {fmt(activeNetProfit)}
             </div>
           </div>
           <div className="text-right">
             <div className="text-[9px] text-gray-300 leading-none mb-0.5">margin</div>
-            <div className={`text-[10px] tabular-nums ${result.netProfit >= 0 ? "text-emerald-500" : "text-red-400"}`}>
-              {result.totalSales > 0 ? ((result.netProfit / result.totalSales) * 100).toFixed(0) : 0}%
+            <div className={`text-[10px] tabular-nums ${activeNetProfit >= 0 ? "text-emerald-500" : "text-red-400"}`}>
+              {result.totalSales > 0 ? ((activeNetProfit / result.totalSales) * 100).toFixed(0) : 0}%
             </div>
           </div>
           <span className="text-gray-400 text-xs">{open ? "▼" : "▶"}</span>
@@ -489,7 +494,23 @@ function TypologySection({
                   </div>
                 );
               })()}
-              <div className="text-[9px] uppercase tracking-widest font-semibold text-gray-400 pt-1">Per Unit</div>
+              <div className="flex items-center justify-between pt-1">
+                <div className="text-[9px] uppercase tracking-widest font-semibold text-gray-400">Per Unit</div>
+                {/* Land scenario toggle */}
+                <div className="flex items-center rounded-full border border-gray-200 overflow-hidden text-[9px] font-semibold">
+                  {(["L2", "L1"] as const).map(s => (
+                    <button
+                      key={s}
+                      onClick={e => { e.stopPropagation(); setLandScenario(s); }}
+                      className={`px-2 py-0.5 transition-colors ${landScenario === s
+                        ? s === "L2" ? "bg-emerald-500 text-white" : "bg-blue-500 text-white"
+                        : "text-gray-400 hover:bg-gray-100"}`}
+                    >
+                      {s === "L2" ? "L2 −20%" : "L1 −33%"}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <div className="bg-gray-50/60 rounded-lg p-2 space-y-0.5">
                 {/* Pricing reference row — market comparison */}
                 <Row
@@ -524,17 +545,18 @@ function TypologySection({
                 {(() => {
                   const revenuePerUnit = result.avgUnitPrice;
                   const constructionPerUnit = inputs.constructionCost * result.sellableAreaPerUnit;
-                  const landPerUnit = result.totalUnits > 0 ? result.landCost / result.totalUnits : 0;
+                  const landPerUnit = result.totalUnits > 0 ? activeLandCost / result.totalUnits : 0;
                   const grossPerUnit = revenuePerUnit - constructionPerUnit;
                   const netPerUnit = grossPerUnit - landPerUnit;
+                  const scenarioLabel = landScenario === "L1" ? "L1 (−33%)" : "L2 (−20%)";
                   return (
                     <>
                       <div className="border-t border-gray-200 my-0.5" />
-                      <Row label="Revenue/unit" value={fmt(revenuePerUnit)} bold tip={`Sell $/m² × total BUA/unit (${fmtN(result.effectiveSellingPrice,0)} × ${fmtN(result.sellableAreaPerUnit,0)} m² = ${fmt(revenuePerUnit)})`} />
-                      <Row label="Construction/unit" value={`−${fmt(constructionPerUnit)}`} color="#E53E3E" tip={`Build $/m² × total BUA/unit ($${inputs.constructionCost} × ${fmtN(result.sellableAreaPerUnit,0)} m² = ${fmt(constructionPerUnit)})`} />
-                      <Row label="Land/unit" value={`−${fmt(landPerUnit)}`} color="#E53E3E" tip={`Total land cost ÷ units (${fmt(result.landCost)} ÷ ${fmtN(result.totalUnits,0)} = ${fmt(landPerUnit)})`} />
+                      <Row label="Revenue/unit" value={fmt(revenuePerUnit)} bold tip={`Sell $/m² × unit size (${fmtN(result.effectiveSellingPrice,0)} × ${fmtN(result.sellableAreaPerUnit,0)} m² = ${fmt(revenuePerUnit)})`} />
+                      <Row label="Construction/unit" value={`−${fmt(constructionPerUnit)}`} color="#E53E3E" tip={`Build $/m² × unit size ($${inputs.constructionCost} × ${fmtN(result.sellableAreaPerUnit,0)} m² = ${fmt(constructionPerUnit)})`} />
+                      <Row label={`Land/unit (${scenarioLabel})`} value={`−${fmt(landPerUnit)}`} color="#E53E3E" tip={`${scenarioLabel} total land ÷ units (${fmt(activeLandCost)} ÷ ${fmtN(result.totalUnits,0)} = ${fmt(landPerUnit)})`} />
                       <div className="border-t border-gray-200 my-0.5" />
-                      <Row label="Net profit/unit" value={fmt(netPerUnit)} bold color={netPerUnit >= 0 ? "#00B050" : "#E53E3E"} tip={`Revenue − construction − land (${fmt(revenuePerUnit)} − ${fmt(constructionPerUnit)} − ${fmt(landPerUnit)} = ${fmt(netPerUnit)})`} />
+                      <Row label="Net profit/unit" value={fmt(netPerUnit)} bold color={netPerUnit >= 0 ? "#00B050" : "#E53E3E"} tip={`Revenue − construction − land@${scenarioLabel} (${fmt(revenuePerUnit)} − ${fmt(constructionPerUnit)} − ${fmt(landPerUnit)} = ${fmt(netPerUnit)})`} />
                       <Row label="Margin/unit" value={`${revenuePerUnit > 0 ? ((netPerUnit / revenuePerUnit) * 100).toFixed(1) : 0}%`} color={netPerUnit >= 0 ? "#00B050" : "#E53E3E"} tip={`Net profit ÷ revenue per unit (${fmt(netPerUnit)} ÷ ${fmt(revenuePerUnit)} = ${revenuePerUnit > 0 ? ((netPerUnit / revenuePerUnit) * 100).toFixed(1) : 0}%)`} />
                     </>
                   );
