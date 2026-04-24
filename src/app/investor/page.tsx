@@ -968,7 +968,7 @@ export default function InvestorPage() {
 // ── Investor Map with L1/L2 Pricing ─────────────────────────────────────────
 
 const LOT_RETAIL_MAP = new Map(LOT_PRICES.map(lp => [lp.lot, lp.price_sqm]));
-const L1_DISCOUNT = 0.33;
+const L1_DISCOUNT = 0.35;
 const L2_DISCOUNT_MAP = 0.20;
 
 function InvestorMap({ lang, assignments }: { lang: string; assignments: Map<number, any> }) {

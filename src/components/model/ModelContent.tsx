@@ -123,7 +123,7 @@ const DEFAULT_INPUTS: Record<TypologyKey, TypologyInputs> = {
    ──────────────────────────────────────────────────────────── */
 
 const DEFAULT_L2_DISCOUNT = 0.20;
-const DEFAULT_L1_DISCOUNT = 0.33;
+const DEFAULT_L1_DISCOUNT = 0.35;
 
 type PricingMode = "average" | "by_location";
 
