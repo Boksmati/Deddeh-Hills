@@ -34,6 +34,11 @@ interface SimulationState {
   // Lot statuses
   lotStatuses: Map<number, LotStatus>;
 
+  // Per-plot pricing overrides (user edits on the calculator)
+  lotPriceOverrides: Map<number, { retail: number; l1: number }>;
+  // The "saved default" snapshot from Redis. Loaded on init; set by savePricingAsDefault.
+  savedPricingDefault: Map<number, { retail: number; l1: number }> | null;
+
   // Assumptions (editable per development type)
   typeAssumptions: Record<DevelopmentType, TypeAssumption>;
 
@@ -102,6 +107,14 @@ interface SimulationState {
   setLotStatus: (lotIds: number[], status: LotStatus) => void;
   /** @deprecated Use setLotStatus instead */
   toggleLotSold: (lotIds: number[]) => void;
+
+  // Actions — Pricing Overrides
+  setLotPriceOverride: (lotId: number, retail: number, l1: number) => void;
+  clearLotPriceOverride: (lotId: number) => void;
+  bulkSetOverrides: (updates: Array<{ lotId: number; retail: number; l1: number }>) => void;
+  savePricingAsDefault: () => Promise<void>;
+  resetToSavedDefault: () => void;
+  resetToBaseline: () => Promise<void>;
 
   // Actions — Investor model
   setInvestorModel: (model: InvestorModel) => void;
@@ -501,6 +514,8 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   scenarios: [],
   activeScenarioId: null,
   lotStatuses: _initial.lotStatuses,
+  lotPriceOverrides: new Map(),
+  savedPricingDefault: null,
   typeAssumptions: _initial.typeAssumptions,
   investorModel: _initialInvestorModel.investorModel,
   landSharePct: _initialInvestorModel.landSharePct,
@@ -724,6 +739,19 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
         : undefined;
       if (investorFeatureFlags) saveInvestorFlags(investorFeatureFlags);
 
+      // Hydrate per-plot pricing overrides. Task 4 adds this field server-side;
+      // until then, `pricingDefault` is undefined and we skip the update.
+      const pricingDefaultArr = (data as { pricingDefault?: Array<{ lotId: number; retail: number; l1: number }> })
+        .pricingDefault;
+      const pricingOverridesPatch: Partial<SimulationState> = {};
+      if (pricingDefaultArr && pricingDefaultArr.length > 0) {
+        const m = new Map<number, { retail: number; l1: number }>(
+          pricingDefaultArr.map((p) => [p.lotId, { retail: p.retail, l1: p.l1 }])
+        );
+        pricingOverridesPatch.lotPriceOverrides = new Map(m);
+        pricingOverridesPatch.savedPricingDefault = new Map(m);
+      }
+
       set({
         assignments,
         lotStatuses,
@@ -740,6 +768,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
         ...(data.projectSpecs ? { projectSpecs: data.projectSpecs } : {}),
         ...(phaseRevenueTargets ? { phaseRevenueTargets } : {}),
         ...(investorFeatureFlags ? { investorFeatureFlags } : {}),
+        ...pricingOverridesPatch,
       });
     } catch { /* server unavailable, localStorage already loaded */ }
   },
@@ -791,6 +820,57 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
       saveLotStatuses(newStatuses);
       return { lotStatuses: newStatuses };
     });
+  },
+
+  // ── Pricing Override Actions ──────────────────────────────────────────────
+
+  setLotPriceOverride: (lotId, retail, l1) => {
+    set((state) => {
+      const next = new Map(state.lotPriceOverrides);
+      next.set(lotId, { retail, l1 });
+      return { lotPriceOverrides: next };
+    });
+  },
+
+  clearLotPriceOverride: (lotId) => {
+    set((state) => {
+      const next = new Map(state.lotPriceOverrides);
+      next.delete(lotId);
+      return { lotPriceOverrides: next };
+    });
+  },
+
+  bulkSetOverrides: (updates) => {
+    set((state) => {
+      const next = new Map(state.lotPriceOverrides);
+      for (const u of updates) next.set(u.lotId, { retail: u.retail, l1: u.l1 });
+      return { lotPriceOverrides: next };
+    });
+  },
+
+  savePricingAsDefault: async () => {
+    const overrides = get().lotPriceOverrides;
+    const payload = Array.from(overrides.entries()).map(([lotId, v]) => ({ lotId, ...v }));
+    await fetch("/api/state", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pricingDefault: payload }),
+    });
+    set({ savedPricingDefault: new Map(overrides) });
+  },
+
+  resetToSavedDefault: () => {
+    const saved = get().savedPricingDefault;
+    set({ lotPriceOverrides: saved ? new Map(saved) : new Map() });
+  },
+
+  resetToBaseline: async () => {
+    await fetch("/api/state", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pricingDefault: [] }),
+    });
+    set({ lotPriceOverrides: new Map(), savedPricingDefault: null });
   },
 
   setTypeAssumption: (type, field, value) => {
