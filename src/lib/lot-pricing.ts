@@ -16,6 +16,7 @@ export interface LotPricingValues {
   l2: number;       // $/m² (always retail × 0.80)
 }
 
+// L2 is always derived from retail × (1 - L2_DISCOUNT_DEFAULT) — not user-overridable by design.
 export interface LotPriceOverride {
   retail: number;
   l1: number;
@@ -29,6 +30,17 @@ const BASELINE_RETAIL = new Map<number, number>(
   LOT_PRICES.map(p => [p.lot, p.price_sqm])
 );
 const LOTS_BY_ID = new Map(LOTS.map(l => [l.id, l]));
+
+function resolveBaselineRetail(lotId: number): number {
+  const viaCsv = BASELINE_RETAIL.get(lotId);
+  if (viaCsv !== undefined) return viaCsv;
+  const viaZone = LOTS_BY_ID.get(lotId)?.zone_price_retail;
+  if (viaZone !== undefined) return viaZone;
+  if (process.env.NODE_ENV !== "production") {
+    console.warn(`[lot-pricing] unknown lotId ${lotId} — returning 0`);
+  }
+  return 0;
+}
 
 /**
  * Single source of truth for per-lot pricing.
@@ -46,14 +58,11 @@ export function getLotPricing(
   if (override) {
     return {
       retail: override.retail,
-      l1: override.l1,
+      l1: Math.round(override.l1),
       l2: Math.round(override.retail * (1 - L2_DISCOUNT_DEFAULT)),
     };
   }
-  const baselineRetail =
-    BASELINE_RETAIL.get(lotId) ??
-    LOTS_BY_ID.get(lotId)?.zone_price_retail ??
-    0;
+  const baselineRetail = resolveBaselineRetail(lotId);
   return {
     retail: baselineRetail,
     l1: Math.round(baselineRetail * (1 - L1_DISCOUNT_DEFAULT)),
@@ -63,11 +72,7 @@ export function getLotPricing(
 
 /** Baseline (CSV) retail price for a lot. Used to detect "edited" state. */
 export function getBaselineRetail(lotId: number): number {
-  return (
-    BASELINE_RETAIL.get(lotId) ??
-    LOTS_BY_ID.get(lotId)?.zone_price_retail ??
-    0
-  );
+  return resolveBaselineRetail(lotId);
 }
 
 /** Baseline L1 computed from CSV retail × 0.65. */
