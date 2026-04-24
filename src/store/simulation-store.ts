@@ -14,8 +14,7 @@ import {
 import { LOTS } from "@/data/lots";
 import { DEVELOPMENT_TYPES } from "@/data/development-types";
 import { ProjectSpecs, DEFAULT_PROJECT_SPECS } from "@/data/project-specs";
-
-export type LotPriceOverride = { retail: number; l1: number };
+import { LotPriceOverride } from "@/lib/lot-pricing";
 
 interface SimulationState {
   // Lot assignments
