@@ -15,6 +15,8 @@ import { LOTS } from "@/data/lots";
 import { DEVELOPMENT_TYPES } from "@/data/development-types";
 import { ProjectSpecs, DEFAULT_PROJECT_SPECS } from "@/data/project-specs";
 
+export type LotPriceOverride = { retail: number; l1: number };
+
 interface SimulationState {
   // Lot assignments
   assignments: Map<number, LotAssignment>;
@@ -35,9 +37,13 @@ interface SimulationState {
   lotStatuses: Map<number, LotStatus>;
 
   // Per-plot pricing overrides (user edits on the calculator)
-  lotPriceOverrides: Map<number, { retail: number; l1: number }>;
+  lotPriceOverrides: Map<number, LotPriceOverride>;
   // The "saved default" snapshot from Redis. Loaded on init; set by savePricingAsDefault.
-  savedPricingDefault: Map<number, { retail: number; l1: number }> | null;
+  savedPricingDefault: Map<number, LotPriceOverride> | null;
+
+  // Internal: prevents concurrent save/reset races on pricing actions.
+  // Not for public UI subscription (leading underscore signals internal use).
+  _pricingSaveInFlight: boolean;
 
   // Assumptions (editable per development type)
   typeAssumptions: Record<DevelopmentType, TypeAssumption>;
@@ -111,7 +117,7 @@ interface SimulationState {
   // Actions — Pricing Overrides
   setLotPriceOverride: (lotId: number, retail: number, l1: number) => void;
   clearLotPriceOverride: (lotId: number) => void;
-  bulkSetOverrides: (updates: Array<{ lotId: number; retail: number; l1: number }>) => void;
+  bulkSetOverrides: (updates: Array<{ lotId: number } & LotPriceOverride>) => void;
   savePricingAsDefault: () => Promise<void>;
   resetToSavedDefault: () => void;
   resetToBaseline: () => Promise<void>;
@@ -438,9 +444,15 @@ interface PersistedServerState {
   phaseRevenueTargets?: { 1: number; 2: number; 3: number };
   lotGroups?: LotGroup[];
   investorFeatureFlags?: SimulationState["investorFeatureFlags"];
+  pricingDefault?: Array<{ lotId: number } & LotPriceOverride>;
 }
 
 function buildServerState(s: SimulationState): PersistedServerState {
+  // Derive pricingDefault from the SAVED snapshot (not live edits), so that
+  // unrelated auto-saves preserve whatever was previously persisted.
+  const pricingDefault = s.savedPricingDefault
+    ? Array.from(s.savedPricingDefault.entries()).map(([lotId, v]) => ({ lotId, ...v }))
+    : [];
   return {
     assignments: Array.from(s.assignments.values()),
     lotStatuses: Array.from(s.lotStatuses.entries()),
@@ -459,6 +471,7 @@ function buildServerState(s: SimulationState): PersistedServerState {
     phaseRevenueTargets: s.phaseRevenueTargets,
     lotGroups: s.lotGroups,
     investorFeatureFlags: s.investorFeatureFlags,
+    pricingDefault,
   };
 }
 
@@ -516,6 +529,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   lotStatuses: _initial.lotStatuses,
   lotPriceOverrides: new Map(),
   savedPricingDefault: null,
+  _pricingSaveInFlight: false,
   typeAssumptions: _initial.typeAssumptions,
   investorModel: _initialInvestorModel.investorModel,
   landSharePct: _initialInvestorModel.landSharePct,
@@ -739,13 +753,16 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
         : undefined;
       if (investorFeatureFlags) saveInvestorFlags(investorFeatureFlags);
 
-      // Hydrate per-plot pricing overrides. Task 4 adds this field server-side;
-      // until then, `pricingDefault` is undefined and we skip the update.
-      const pricingDefaultArr = (data as { pricingDefault?: Array<{ lotId: number; retail: number; l1: number }> })
-        .pricingDefault;
+      // Hydrate per-plot pricing overrides. `pricingDefault` is now part of
+      // PersistedServerState; when the server has been written to since this
+      // feature shipped, the field is always present (possibly as []).
+      //   - undefined   → pre-feature state; leave savedPricingDefault = null
+      //   - []          → server has NO saved overrides; savedPricingDefault = empty Map
+      //   - [ ... ]     → hydrate both live edits and snapshot from server data
+      const pricingDefaultArr = data.pricingDefault;
       const pricingOverridesPatch: Partial<SimulationState> = {};
-      if (pricingDefaultArr && pricingDefaultArr.length > 0) {
-        const m = new Map<number, { retail: number; l1: number }>(
+      if (pricingDefaultArr !== undefined) {
+        const m = new Map<number, LotPriceOverride>(
           pricingDefaultArr.map((p) => [p.lotId, { retail: p.retail, l1: p.l1 }])
         );
         pricingOverridesPatch.lotPriceOverrides = new Map(m);
@@ -849,14 +866,29 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   },
 
   savePricingAsDefault: async () => {
-    const overrides = get().lotPriceOverrides;
-    const payload = Array.from(overrides.entries()).map(([lotId, v]) => ({ lotId, ...v }));
-    await fetch("/api/state", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pricingDefault: payload }),
-    });
-    set({ savedPricingDefault: new Map(overrides) });
+    if (get()._pricingSaveInFlight) return;
+    const prevSaved = get().savedPricingDefault;
+    set({ _pricingSaveInFlight: true });
+    try {
+      // Snapshot live edits into savedPricingDefault, then POST the FULL state.
+      // buildServerState derives pricingDefault from savedPricingDefault, so the
+      // blob we POST will carry the new snapshot.
+      const overrides = get().lotPriceOverrides;
+      set({ savedPricingDefault: new Map(overrides) });
+      const payload = buildServerState(get());
+      const res = await fetch("/api/state", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        // Roll back the snapshot on failure
+        set({ savedPricingDefault: prevSaved });
+        throw new Error(`savePricingAsDefault failed: ${res.status}`);
+      }
+    } finally {
+      set({ _pricingSaveInFlight: false });
+    }
   },
 
   resetToSavedDefault: () => {
@@ -865,12 +897,33 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   },
 
   resetToBaseline: async () => {
-    await fetch("/api/state", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pricingDefault: [] }),
-    });
-    set({ lotPriceOverrides: new Map(), savedPricingDefault: null });
+    if (get()._pricingSaveInFlight) return;
+    const prev = {
+      lotPriceOverrides: get().lotPriceOverrides,
+      savedPricingDefault: get().savedPricingDefault,
+    };
+    set({ _pricingSaveInFlight: true });
+    try {
+      // Clear locally, then POST the full cleared blob. buildServerState will
+      // emit pricingDefault: [] because savedPricingDefault is null.
+      set({ lotPriceOverrides: new Map(), savedPricingDefault: null });
+      const payload = buildServerState(get());
+      const res = await fetch("/api/state", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        // Restore on failure
+        set({
+          lotPriceOverrides: prev.lotPriceOverrides,
+          savedPricingDefault: prev.savedPricingDefault,
+        });
+        throw new Error(`resetToBaseline failed: ${res.status}`);
+      }
+    } finally {
+      set({ _pricingSaveInFlight: false });
+    }
   },
 
   setTypeAssumption: (type, field, value) => {
