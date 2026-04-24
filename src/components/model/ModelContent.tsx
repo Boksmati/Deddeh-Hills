@@ -8,6 +8,7 @@ import { useTranslations } from "@/i18n/useTranslations";
 import type { DevelopmentType, Phase, LotAssignment } from "@/types";
 import type { LotPricing } from "@/lib/investment-layers";
 import LOT_PRICES_RAW from "@/data/lot-prices.json";
+import { getLotPricing } from "@/lib/lot-pricing";
 
 const LOT_PRICES = LOT_PRICES_RAW as LotPricing[];
 // Build a lookup: lot ID → retail price per sqm from lot-prices.json
@@ -829,7 +830,6 @@ function LandMapPricing({ lang, assignments, lotStatuses }: {
 
 function PhaseCard({
   phaseNum, lots, inputs, onInputChange, assignments, lotStatuses, lang, pricingMode,
-  l1Price, l2Price, onL1PriceChange, onL2PriceChange,
 }: {
   phaseNum: 1 | 2 | 3;
   lots: typeof LOTS;
@@ -839,13 +839,9 @@ function PhaseCard({
   lotStatuses: Map<number, any>;
   lang: string;
   pricingMode: PricingMode;
-  l1Price: number;
-  l2Price: number;
-  onL1PriceChange: (v: number) => void;
-  onL2PriceChange: (v: number) => void;
 }) {
   const [selectedLotIds, setSelectedLotIds] = useState<Set<number>>(new Set());
-  const [landInputMode, setLandInputMode] = useState<"price" | "pct">("price");
+  const lotPriceOverrides = useSimulationStore(s => s.lotPriceOverrides);
 
   // Toggle lot selection (shift-click for multi)
   const handleSelectLot = useCallback((lotId: number) => {
@@ -869,12 +865,6 @@ function PhaseCard({
 
   const hasSelection = selectedLotIds.size > 0;
 
-  // When selection changes, reset manual land price overrides → revert to defaults
-  useEffect(() => {
-    onL1PriceChange(0);
-    onL2PriceChange(300);
-  }, [selectedLotIds]); // eslint-disable-line react-hooks/exhaustive-deps
-
   // The lots to use for the breakdown: selected lots if any, otherwise all phase lots
   const activeLots = useMemo(() => {
     if (!hasSelection) return lots;
@@ -892,20 +882,45 @@ function PhaseCard({
     return map;
   }, [activeLots, assignments]);
 
-  // Calculate results per typology — derive effective discounts from absolute prices + active lot retail
+  // Per-typology weighted-avg pricing (retail / L1 / L2), sourced from the per-lot
+  // pricing schedule via getLotPricing(). This replaces the prior mixed-typology
+  // blended average which produced misleading numbers (e.g. Twin Villa $450 +
+  // Apartment $130 averaged to $267).
+  const pricingByTypology = useMemo(() => {
+    const r: Record<TypologyKey, { retail: number; l1: number; l2: number; totalArea: number; numPlots: number }> =
+      { twin_villa: { retail: 0, l1: 0, l2: 0, totalArea: 0, numPlots: 0 },
+        villa_2f:   { retail: 0, l1: 0, l2: 0, totalArea: 0, numPlots: 0 },
+        villa_3f:   { retail: 0, l1: 0, l2: 0, totalArea: 0, numPlots: 0 },
+        apartments: { retail: 0, l1: 0, l2: 0, totalArea: 0, numPlots: 0 } };
+    for (const k of TYPOLOGY_KEYS) {
+      const tLots = lotsByType[k];
+      if (tLots.length === 0) continue;
+      let totalArea = 0, retailSum = 0, l1Sum = 0, l2Sum = 0;
+      for (const l of tLots) {
+        const p = getLotPricing(l.id, lotPriceOverrides);
+        totalArea += l.area_sqm;
+        retailSum += l.area_sqm * p.retail;
+        l1Sum     += l.area_sqm * p.l1;
+        l2Sum     += l.area_sqm * p.l2;
+      }
+      r[k] = {
+        retail: totalArea > 0 ? retailSum / totalArea : 0,
+        l1:     totalArea > 0 ? l1Sum     / totalArea : 0,
+        l2:     totalArea > 0 ? l2Sum     / totalArea : 0,
+        totalArea,
+        numPlots: tLots.length,
+      };
+    }
+    return r;
+  }, [lotsByType, lotPriceOverrides]);
+
+  // Calculate results per typology — each typology gets its own retail × canonical
+  // L1/L2 discounts. No cross-typology averaging, no scalar user override.
   const results = useMemo(() => {
     const r: Record<TypologyKey, TypologyResult> = {} as any;
-    const totalArea = activeLots.reduce((s, l) => s + l.area_sqm, 0);
-    const avgRetail = totalArea > 0
-      ? activeLots.reduce((s, l) => s + l.area_sqm * (LOT_RETAIL_MAP.get(l.id) ?? l.zone_price_retail), 0) / totalArea
-      : 0;
-    const avgL1 = l1Price > 0 ? l1Price : avgRetail * (1 - DEFAULT_L1_DISCOUNT);
-    const avgL2 = l2Price > 0 ? l2Price : avgRetail * (1 - DEFAULT_L2_DISCOUNT);
-    const effL1 = avgRetail > 0 ? Math.max(0, 1 - avgL1 / avgRetail) : DEFAULT_L1_DISCOUNT;
-    const effL2 = avgRetail > 0 ? Math.max(0, 1 - avgL2 / avgRetail) : DEFAULT_L2_DISCOUNT;
-    for (const k of TYPOLOGY_KEYS) r[k] = calculateTypology(inputs[k], lotsByType[k], pricingMode, effL1, effL2);
+    for (const k of TYPOLOGY_KEYS) r[k] = calculateTypology(inputs[k], lotsByType[k], pricingMode);
     return r;
-  }, [inputs, lotsByType, pricingMode, activeLots, l1Price, l2Price]);
+  }, [inputs, lotsByType, pricingMode]);
 
   // Phase totals
   const totals = useMemo(() => {
@@ -925,18 +940,6 @@ function PhaseCard({
 
   // Filtered lot IDs for the mini-map
   const phaseLotIds = useMemo(() => new Set(lots.map(l => l.id)), [lots]);
-
-  // Land pricing averages — scoped to active (selected or all) lots
-  const landPricing = useMemo(() => {
-    if (activeLots.length === 0) return { avgRetail: 0, avgL1: 0, avgL2: 0, totalArea: 0 };
-    const totalArea = activeLots.reduce((s, l) => s + l.area_sqm, 0);
-    const weightedRetail = activeLots.reduce((s, l) => s + l.area_sqm * (LOT_RETAIL_MAP.get(l.id) ?? l.zone_price_retail), 0);
-    const avgRetail = weightedRetail / totalArea;
-    // If user set an absolute price, use it directly; otherwise derive from default discount
-    const avgL1 = l1Price > 0 ? l1Price : avgRetail * (1 - DEFAULT_L1_DISCOUNT);
-    const avgL2 = l2Price > 0 ? l2Price : avgRetail * (1 - DEFAULT_L2_DISCOUNT);
-    return { avgRetail, avgL1, avgL2, totalArea };
-  }, [activeLots, l1Price, l2Price]);
 
   if (lots.length === 0) return null;
 
@@ -1022,89 +1025,42 @@ function PhaseCard({
               </div>
             )}
 
-            {/* Avg land prices + Typology mix in three rows */}
+            {/* Avg land prices per typology + Typology mix */}
             <div className="flex flex-col gap-4">
-              {/* Avg land prices */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <div className="text-[9px] uppercase tracking-widest font-semibold text-gray-400">
-                    Avg Land Price / m²
-                  </div>
-                  <button
-                    onClick={() => setLandInputMode(m => m === "price" ? "pct" : "price")}
-                    className="text-[9px] text-gray-400 hover:text-gray-600 bg-gray-100 hover:bg-gray-200 rounded px-1.5 py-0.5 transition-colors"
-                  >
-                    {landInputMode === "price" ? "switch to %" : "switch to $"}
-                  </button>
+              {/* Per-typology avg land prices */}
+              <div className="space-y-2">
+                <div className="text-[9px] uppercase tracking-widest font-semibold text-gray-400">
+                  Avg Land Price / m²
                 </div>
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="bg-gray-50 rounded-lg p-2 text-center">
-                    <div className="text-[9px] text-gray-400">Retail</div>
-                    <div className="text-xs font-bold text-gray-700">${fmtN(landPricing.avgRetail, 0)}</div>
-                  </div>
-                  {(() => {
-                    const effL1Pct = landPricing.avgRetail > 0 ? Math.max(0, 1 - landPricing.avgL1 / landPricing.avgRetail) : DEFAULT_L1_DISCOUNT;
-                    const effL2Pct = landPricing.avgRetail > 0 ? Math.max(0, 1 - landPricing.avgL2 / landPricing.avgRetail) : DEFAULT_L2_DISCOUNT;
-                    return (<>
-                  <div className="bg-blue-50 rounded-lg p-2 text-center border border-blue-100">
-                    <div className="text-[9px] text-blue-500 mb-1">
-                      L1 {landInputMode === "price"
-                        ? `(−${L1_DISCOUNT_PCT}%)`
-                        : `($${fmtN(landPricing.avgL1, 0)})`}
+                {TYPOLOGY_KEYS.filter(k => pricingByTypology[k].numPlots > 0).map(k => {
+                  const meta = TYPOLOGY_META[k];
+                  const p = pricingByTypology[k];
+                  return (
+                    <div key={k} className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-2 h-2 rounded-full" style={{ background: meta.color }} />
+                          <span className="text-[10px] font-semibold text-gray-700">{lang === "ar" ? meta.labelAr : meta.label}</span>
+                        </div>
+                        <span className="text-[9px] text-gray-400 tabular-nums">{p.numPlots} {lang === "ar" ? "قطع" : "plots"}</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2">
+                        <div className="bg-gray-50 rounded-lg p-2 text-center">
+                          <div className="text-[9px] text-gray-400">Retail</div>
+                          <div className="text-xs font-bold text-gray-700 tabular-nums">${fmtN(p.retail, 0)}</div>
+                        </div>
+                        <div className="bg-blue-50 rounded-lg p-2 text-center border border-blue-100">
+                          <div className="text-[9px] text-blue-500">L1 (−{L1_DISCOUNT_PCT}%)</div>
+                          <div className="text-xs font-bold text-blue-700 tabular-nums">${fmtN(p.l1, 0)}</div>
+                        </div>
+                        <div className="bg-emerald-50 rounded-lg p-2 text-center border border-emerald-100">
+                          <div className="text-[9px] text-emerald-500">L2 (−{L2_DISCOUNT_PCT}%)</div>
+                          <div className="text-xs font-bold text-emerald-700 tabular-nums">${fmtN(p.l2, 0)}</div>
+                        </div>
+                      </div>
                     </div>
-                    {landInputMode === "price" ? (
-                      <div className="flex items-center justify-center gap-0.5">
-                        <span className="text-[9px] font-semibold text-blue-600">$</span>
-                        <CommitInput
-                          value={Math.round(landPricing.avgL1)}
-                          onChange={v => onL1PriceChange(v > 0 ? v : 0)}
-                          min={1} step={1}
-                          className="w-14 text-center text-xs font-bold text-blue-700 bg-blue-100 border border-blue-200 rounded px-1 py-0 focus:outline-none focus:ring-1 focus:ring-blue-400"
-                        />
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center gap-0.5">
-                        <CommitInput
-                          value={Math.round(effL1Pct * 100)}
-                          onChange={v => onL1PriceChange(landPricing.avgRetail * (1 - Math.min(0.99, Math.max(0.01, v / 100))))}
-                          min={1} max={99} step={1}
-                          className="w-10 text-center text-xs font-bold text-blue-700 bg-blue-100 border border-blue-200 rounded px-1 py-0 focus:outline-none focus:ring-1 focus:ring-blue-400"
-                        />
-                        <span className="text-[9px] font-semibold text-blue-600">%</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="bg-emerald-50 rounded-lg p-2 text-center border border-emerald-100">
-                    <div className="text-[9px] text-emerald-500 mb-1">
-                      L2 {landInputMode === "price"
-                        ? `(−${L2_DISCOUNT_PCT}%)`
-                        : `($${fmtN(landPricing.avgL2, 0)})`}
-                    </div>
-                    {landInputMode === "price" ? (
-                      <div className="flex items-center justify-center gap-0.5">
-                        <span className="text-[9px] font-semibold text-emerald-600">$</span>
-                        <CommitInput
-                          value={Math.round(landPricing.avgL2)}
-                          onChange={v => onL2PriceChange(v > 0 ? v : 0)}
-                          min={1} step={1}
-                          className="w-14 text-center text-xs font-bold text-emerald-700 bg-emerald-100 border border-emerald-200 rounded px-1 py-0 focus:outline-none focus:ring-1 focus:ring-emerald-400"
-                        />
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center gap-0.5">
-                        <CommitInput
-                          value={Math.round(effL2Pct * 100)}
-                          onChange={v => onL2PriceChange(landPricing.avgRetail * (1 - Math.min(0.99, Math.max(0.01, v / 100))))}
-                          min={1} max={99} step={1}
-                          className="w-10 text-center text-xs font-bold text-emerald-700 bg-emerald-100 border border-emerald-200 rounded px-1 py-0 focus:outline-none focus:ring-1 focus:ring-emerald-400"
-                        />
-                        <span className="text-[9px] font-semibold text-emerald-600">%</span>
-                      </div>
-                    )}
-                  </div>
-                    </>);
-                  })()}
-                </div>
+                  );
+                })}
               </div>
 
               {/* Typology mix */}
@@ -1146,8 +1102,8 @@ function PhaseCard({
               lang={lang}
               pricingMode={pricingMode}
               defaultOpen={k === TYPOLOGY_KEYS.find(tk => results[tk].numPlots > 0)}
-              avgL1Sqm={landPricing.avgL1}
-              avgL2Sqm={landPricing.avgL2}
+              avgL1Sqm={pricingByTypology[k].l1}
+              avgL2Sqm={pricingByTypology[k].l2}
             />
           ))}
         </div>
@@ -1183,9 +1139,6 @@ export function ModelContent() {
   };
 
   const [pricingMode, setPricingMode] = useState<PricingMode>("by_location");
-  // Stored as absolute $/sqm (0 = unset, use default discount)
-  const [l1Price, setL1Price] = useState(0);
-  const [l2Price, setL2Price] = useState(300);
   const [phaseInputs, setPhaseInputs] = useState<Record<1 | 2 | 3, Record<TypologyKey, TypologyInputs>>>(defaultPhaseInputs);
 
   // Merge saved data with defaults (handles newly-added fields)
@@ -1287,18 +1240,6 @@ export function ModelContent() {
   const visibleInputs = activeScenario === "default" && defaultInputs ? defaultInputs : phaseInputs;
   const isReadOnly = activeScenario === "default";
 
-  // Per-phase average retail land price (for grand total pct derivation)
-  const phaseAvgRetail = useMemo(() => {
-    const result: Record<1|2|3, number> = { 1: 0, 2: 0, 3: 0 };
-    for (const ph of [1,2,3] as const) {
-      const lots = lotsByPhase[ph];
-      const totalArea = lots.reduce((s,l) => s + l.area_sqm, 0);
-      if (totalArea === 0) continue;
-      result[ph] = lots.reduce((s,l) => s + l.area_sqm * (LOT_RETAIL_MAP.get(l.id) ?? l.zone_price_retail), 0) / totalArea;
-    }
-    return result;
-  }, [lotsByPhase]);
-
   // Grand totals (computed from all phases)
   const grand = useMemo(() => {
     let plots = 0, area = 0, bua = 0, units = 0, revenue = 0, cost = 0, land = 0, net = 0;
@@ -1310,12 +1251,7 @@ export function ModelContent() {
         if (dt && dt in byType) byType[dt].push(lot);
       }
       for (const k of TYPOLOGY_KEYS) {
-        const avgRetail = phaseAvgRetail[ph];
-        const avgL1 = l1Price > 0 ? l1Price : avgRetail * (1 - DEFAULT_L1_DISCOUNT);
-        const avgL2 = l2Price > 0 ? l2Price : avgRetail * (1 - DEFAULT_L2_DISCOUNT);
-        const effL1 = avgRetail > 0 ? Math.max(0, 1 - avgL1 / avgRetail) : DEFAULT_L1_DISCOUNT;
-        const effL2 = avgRetail > 0 ? Math.max(0, 1 - avgL2 / avgRetail) : DEFAULT_L2_DISCOUNT;
-        const r = calculateTypology(phInputs[k], byType[k], pricingMode, effL1, effL2);
+        const r = calculateTypology(phInputs[k], byType[k], pricingMode);
         plots += r.numPlots;
         area += r.totalArea;
         bua += r.totalSellableArea;
@@ -1327,7 +1263,7 @@ export function ModelContent() {
       }
     }
     return { plots, area, bua, units, revenue, cost, land, net };
-  }, [lotsByPhase, visibleInputs, assignments, pricingMode, l1Price, l2Price, phaseAvgRetail]);
+  }, [lotsByPhase, visibleInputs, assignments, pricingMode]);
 
   // Per-typology aggregate across all phases (L2 land for phase cards, L1 land for the summary card)
   const aggByTypology = useMemo(() => {
@@ -1344,13 +1280,8 @@ export function ModelContent() {
         const dt = assignments.get(lot.id)?.developmentType as TypologyKey;
         if (dt && dt in byType) byType[dt].push(lot);
       }
-      const avgRetail = phaseAvgRetail[ph];
-      const avgL1 = l1Price > 0 ? l1Price : avgRetail * (1 - DEFAULT_L1_DISCOUNT);
-      const avgL2 = l2Price > 0 ? l2Price : avgRetail * (1 - DEFAULT_L2_DISCOUNT);
-      const effL1 = avgRetail > 0 ? Math.max(0, 1 - avgL1 / avgRetail) : DEFAULT_L1_DISCOUNT;
-      const effL2 = avgRetail > 0 ? Math.max(0, 1 - avgL2 / avgRetail) : DEFAULT_L2_DISCOUNT;
       for (const k of TYPOLOGY_KEYS) {
-        const r = calculateTypology(phInputs[k], byType[k], pricingMode, effL1, effL2);
+        const r = calculateTypology(phInputs[k], byType[k], pricingMode);
         acc[k].plots   += r.numPlots;
         acc[k].area    += r.totalArea;
         acc[k].bua     += r.totalSellableArea;
@@ -1364,7 +1295,7 @@ export function ModelContent() {
       }
     }
     return acc;
-  }, [lotsByPhase, visibleInputs, assignments, pricingMode, l1Price, l2Price, phaseAvgRetail]);
+  }, [lotsByPhase, visibleInputs, assignments, pricingMode]);
 
   if (!mounted) {
     return (
@@ -1479,10 +1410,6 @@ export function ModelContent() {
             lotStatuses={lotStatuses}
             lang={lang}
             pricingMode={pricingMode}
-            l1Price={l1Price}
-            l2Price={l2Price}
-            onL1PriceChange={setL1Price}
-            onL2PriceChange={setL2Price}
           />
         ))}
 
