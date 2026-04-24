@@ -125,6 +125,7 @@ const DEFAULT_INPUTS: Record<TypologyKey, TypologyInputs> = {
 const DEFAULT_L2_DISCOUNT = 0.20;
 const DEFAULT_L1_DISCOUNT = 0.35;
 const L1_DISCOUNT_PCT = Math.round(DEFAULT_L1_DISCOUNT * 100);
+const L2_DISCOUNT_PCT = Math.round(DEFAULT_L2_DISCOUNT * 100);
 
 type PricingMode = "average" | "by_location";
 
@@ -1048,7 +1049,7 @@ function PhaseCard({
                   <div className="bg-blue-50 rounded-lg p-2 text-center border border-blue-100">
                     <div className="text-[9px] text-blue-500 mb-1">
                       L1 {landInputMode === "price"
-                        ? `(−${Math.round(effL1Pct * 100)}%)`
+                        ? `(−${L1_DISCOUNT_PCT}%)`
                         : `($${fmtN(landPricing.avgL1, 0)})`}
                     </div>
                     {landInputMode === "price" ? (
@@ -1076,7 +1077,7 @@ function PhaseCard({
                   <div className="bg-emerald-50 rounded-lg p-2 text-center border border-emerald-100">
                     <div className="text-[9px] text-emerald-500 mb-1">
                       L2 {landInputMode === "price"
-                        ? `(−${Math.round(effL2Pct * 100)}%)`
+                        ? `(−${L2_DISCOUNT_PCT}%)`
                         : `($${fmtN(landPricing.avgL2, 0)})`}
                     </div>
                     {landInputMode === "price" ? (
