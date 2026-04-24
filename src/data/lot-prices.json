@@ -1,7 +1,7 @@
 [
   {
     "lot": 1,
-    "price_sqm": 250,
+    "price_sqm": 130,
     "status": "available",
     "view": "sea_view",
     "zone": "north",
@@ -641,7 +641,7 @@
   },
   {
     "lot": 82,
-    "price_sqm": 300,
+    "price_sqm": 180,
     "status": "available",
     "view": "mountain",
     "zone": "east",
@@ -649,7 +649,7 @@
   },
   {
     "lot": 83,
-    "price_sqm": 300,
+    "price_sqm": 180,
     "status": "available",
     "view": "mountain",
     "zone": "southeast",
@@ -657,7 +657,7 @@
   },
   {
     "lot": 84,
-    "price_sqm": 280,
+    "price_sqm": 160,
     "status": "available",
     "view": "mountain",
     "zone": "southeast",
@@ -665,7 +665,7 @@
   },
   {
     "lot": 85,
-    "price_sqm": 280,
+    "price_sqm": 160,
     "status": "available",
     "view": "mountain",
     "zone": "southeast",
@@ -673,7 +673,7 @@
   },
   {
     "lot": 86,
-    "price_sqm": 280,
+    "price_sqm": 160,
     "status": "available",
     "view": "mountain",
     "zone": "southeast",
@@ -681,7 +681,7 @@
   },
   {
     "lot": 87,
-    "price_sqm": 250,
+    "price_sqm": 130,
     "status": "available",
     "view": "mountain",
     "zone": "south",
@@ -689,7 +689,7 @@
   },
   {
     "lot": 88,
-    "price_sqm": 250,
+    "price_sqm": 130,
     "status": "available",
     "view": "mountain",
     "zone": "south",
@@ -697,7 +697,7 @@
   },
   {
     "lot": 89,
-    "price_sqm": 250,
+    "price_sqm": 130,
     "status": "available",
     "view": "mountain",
     "zone": "south",
@@ -705,7 +705,7 @@
   },
   {
     "lot": 90,
-    "price_sqm": 250,
+    "price_sqm": 130,
     "status": "available",
     "view": "mountain",
     "zone": "south",
@@ -713,7 +713,7 @@
   },
   {
     "lot": 91,
-    "price_sqm": 250,
+    "price_sqm": 130,
     "status": "available",
     "view": "mountain",
     "zone": "south",
@@ -721,7 +721,7 @@
   },
   {
     "lot": 92,
-    "price_sqm": 280,
+    "price_sqm": 160,
     "status": "available",
     "view": "mountain_sea",
     "zone": "east",
@@ -729,7 +729,7 @@
   },
   {
     "lot": 93,
-    "price_sqm": 280,
+    "price_sqm": 160,
     "status": "available",
     "view": "mountain_sea",
     "zone": "east",
@@ -737,7 +737,7 @@
   },
   {
     "lot": 94,
-    "price_sqm": 300,
+    "price_sqm": 180,
     "status": "available",
     "view": "mountain_sea",
     "zone": "east",
@@ -745,7 +745,7 @@
   },
   {
     "lot": 95,
-    "price_sqm": 300,
+    "price_sqm": 180,
     "status": "available",
     "view": "sea_mountain",
     "zone": "northeast",
@@ -753,7 +753,7 @@
   },
   {
     "lot": 96,
-    "price_sqm": 300,
+    "price_sqm": 180,
     "status": "available",
     "view": "sea_mountain",
     "zone": "northeast",
@@ -761,7 +761,7 @@
   },
   {
     "lot": 97,
-    "price_sqm": 300,
+    "price_sqm": 180,
     "status": "available",
     "view": "sea_mountain",
     "zone": "northeast",
@@ -769,7 +769,7 @@
   },
   {
     "lot": 98,
-    "price_sqm": 250,
+    "price_sqm": 130,
     "status": "available",
     "view": "sea_mountain",
     "zone": "north",
@@ -777,7 +777,7 @@
   },
   {
     "lot": 99,
-    "price_sqm": 250,
+    "price_sqm": 130,
     "status": "available",
     "view": "sea_mountain",
     "zone": "north",
@@ -785,7 +785,7 @@
   },
   {
     "lot": 100,
-    "price_sqm": 250,
+    "price_sqm": 130,
     "status": "available",
     "view": "sea_view",
     "zone": "north",
@@ -793,7 +793,7 @@
   },
   {
     "lot": 101,
-    "price_sqm": 250,
+    "price_sqm": 130,
     "status": "available",
     "view": "sea_view",
     "zone": "north",
@@ -817,7 +817,7 @@
   },
   {
     "lot": 109,
-    "price_sqm": 220,
+    "price_sqm": 80,
     "status": "available",
     "view": "mountain_view",
     "zone": "east",
@@ -825,7 +825,7 @@
   },
   {
     "lot": 110,
-    "price_sqm": 220,
+    "price_sqm": 80,
     "status": "available",
     "view": "mountain_view",
     "zone": "east",
