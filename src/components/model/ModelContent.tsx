@@ -168,10 +168,12 @@ function calculateTypology(inputs: TypologyInputs, lots: typeof LOTS, pricingMod
   // Per-unit BUA always = the input unit size (what each unit is designed to be)
   const sellableAreaPerUnit = inputs.avgUnitSize;
   const unitsPerPlot = numPlots > 0 ? totalUnits / numPlots : 0;
-  // Villa footprint = actual building ground area per unit
-  // Unit size (above-ground portion) includes balconies, so strip them out, then divide by floors
+  // Villa footprint = actual building shell on the ground per unit
+  // BUA (unit size) is gross in Lebanese practice — already includes wall thickness AND
+  // balconies (whether at-grade terraces or upper-floor cantilevers). Per-floor building
+  // footprint is simply BUA / floors. Used downstream for garden = lotPerVilla − footprint.
   const villaFootprint = inputs.floors > 0
-    ? inputs.avgUnitSize / ((1 + inputs.balconyPct) * inputs.floors)
+    ? inputs.avgUnitSize / inputs.floors
     : 0;
   // Land per villa = share of the net area (after common) each unit gets
   const lotPerVilla = totalUnits > 0 ? netArea / totalUnits : 0;
@@ -492,7 +494,7 @@ function TypologySection({
                     <Row label="Unit size" value={`${fmtN(result.sellableAreaPerUnit, 0)} m²`} tip={`Designed unit size input: ${inputs.avgUnitSize} m² per unit`} />
                     <Row label="Units / plot" value={fmtN(result.unitsPerPlot, 2)} tip={`Actual units ÷ number of plots (${fmtN(result.totalUnits,1)} ÷ ${result.numPlots} = ${fmtN(result.unitsPerPlot,2)})`} />
                     <Row label="Floors" value={`${inputs.floors}`} tip={`Above-ground floors per unit (input)`} />
-                    <Row label="Villa footprint" value={`${fmtN(result.villaFootprint, 0)} m²`} tip={`Unit size ÷ (floors × (1 + balcony%)) = ${inputs.avgUnitSize} ÷ (${inputs.floors} × ${(1+inputs.balconyPct).toFixed(2)}) = ${fmtN(result.villaFootprint,0)} m²`} />
+                    <Row label="Villa footprint" value={`${fmtN(result.villaFootprint, 0)} m²`} tip={`Building footprint per floor on the ground — includes wall thickness (BUA is gross by Lebanese convention) and balconies/terraces. Unit size ÷ floors = ${inputs.avgUnitSize} ÷ ${inputs.floors} = ${fmtN(result.villaFootprint,0)} m²`} />
                     <Row label="Lot / villa" value={`${fmtN(result.lotPerVilla, 0)} m²`} tip={`Net area ÷ actual units (${fmtN(result.netArea,0)} ÷ ${fmtN(result.totalUnits,1)} = ${fmtN(result.lotPerVilla,0)} m²)`} />
                     <Row label="Garden" value={`${fmtN(Math.max(0, result.garden), 0)} m²`} color="#00B050" tip={`Lot per villa − villa footprint (${fmtN(result.lotPerVilla,0)} − ${fmtN(result.villaFootprint,0)} = ${fmtN(Math.max(0,result.garden),0)} m²)`} />
                     <Row label="Price per unit" value={fmt(result.avgUnitPrice)} bold color="#1A3810" tip={`Unit size × selling price/m² (${fmtN(result.sellableAreaPerUnit,0)} × ${fmtN(result.effectiveSellingPrice,0)} = ${fmt(result.avgUnitPrice)})`} />
