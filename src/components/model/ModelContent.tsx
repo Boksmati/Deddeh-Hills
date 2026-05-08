@@ -491,9 +491,11 @@ function TypologySection({
                     )}
                     <Row label="Unit size" value={`${fmtN(result.sellableAreaPerUnit, 0)} m²`} tip={`Designed unit size input: ${inputs.avgUnitSize} m² per unit`} />
                     <Row label="Units / plot" value={fmtN(result.unitsPerPlot, 2)} tip={`Actual units ÷ number of plots (${fmtN(result.totalUnits,1)} ÷ ${result.numPlots} = ${fmtN(result.unitsPerPlot,2)})`} />
+                    <Row label="Floors" value={`${inputs.floors}`} tip={`Above-ground floors per unit (input)`} />
                     <Row label="Villa footprint" value={`${fmtN(result.villaFootprint, 0)} m²`} tip={`Unit size ÷ (floors × (1 + balcony%)) = ${inputs.avgUnitSize} ÷ (${inputs.floors} × ${(1+inputs.balconyPct).toFixed(2)}) = ${fmtN(result.villaFootprint,0)} m²`} />
                     <Row label="Lot / villa" value={`${fmtN(result.lotPerVilla, 0)} m²`} tip={`Net area ÷ actual units (${fmtN(result.netArea,0)} ÷ ${fmtN(result.totalUnits,1)} = ${fmtN(result.lotPerVilla,0)} m²)`} />
                     <Row label="Garden" value={`${fmtN(Math.max(0, result.garden), 0)} m²`} color="#00B050" tip={`Lot per villa − villa footprint (${fmtN(result.lotPerVilla,0)} − ${fmtN(result.villaFootprint,0)} = ${fmtN(Math.max(0,result.garden),0)} m²)`} />
+                    <Row label="Price per unit" value={fmt(result.avgUnitPrice)} bold color="#1A3810" tip={`Unit size × selling price/m² (${fmtN(result.sellableAreaPerUnit,0)} × ${fmtN(result.effectiveSellingPrice,0)} = ${fmt(result.avgUnitPrice)})`} />
                   </div>
                 );
               })()}
