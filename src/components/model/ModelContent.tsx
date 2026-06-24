@@ -118,7 +118,6 @@ const DEFAULT_INPUTS: Record<TypologyKey, TypologyInputs> = {
 
 // Single land discount applied to retail (the former "L1"). One discounted price, no L1/L2 split.
 const DEFAULT_LAND_DISCOUNT = 0.35;
-const LAND_DISCOUNT_PCT = Math.round(DEFAULT_LAND_DISCOUNT * 100);
 
 type PricingMode = "average" | "by_location";
 
@@ -349,15 +348,16 @@ function Row({ label, value, bold, color, indent, tip }: {
 
 function TypologySection({
   typKey, inputs, result, onInputChange, lang, pricingMode, defaultOpen = false,
-  avgLandSqm = 0, coDev,
+  avgLandSqm = 0, coDev, landDiscount = DEFAULT_LAND_DISCOUNT,
 }: {
   typKey: TypologyKey; inputs: TypologyInputs; result: TypologyResult;
   onInputChange: (f: keyof TypologyInputs, v: number) => void;
   lang: string; pricingMode: PricingMode; defaultOpen?: boolean;
-  avgLandSqm?: number; coDev?: CoDevControlValues;
+  avgLandSqm?: number; coDev?: CoDevControlValues; landDiscount?: number;
 }) {
   const meta = TYPOLOGY_META[typKey];
   const [open, setOpen] = useState(defaultOpen);
+  const ldPct = Math.round(landDiscount * 100);
 
   if (result.numPlots === 0) return null;
 
@@ -377,7 +377,7 @@ function TypologySection({
           <div className="flex items-center gap-3 text-[10px] text-gray-400 flex-wrap">
             <span><span className="text-gray-300 mr-0.5">plots</span>{result.numPlots}</span>
             <span><span className="text-gray-300 mr-0.5">area</span>{fmtN(result.totalArea, 0)} m²</span>
-            <span className="text-blue-300" title={`Avg discounted land price per m² (−${LAND_DISCOUNT_PCT}% off retail)`}>
+            <span className="text-blue-300" title={`Avg discounted land price per m² (−${ldPct}% off retail)`}>
               <span className="mr-0.5">land</span>${fmtN(avgLandSqm || result.avgLandPriceSqm, 0)}/m²
             </span>
           </div>
@@ -478,7 +478,7 @@ function TypologySection({
               })()}
               <div className="flex items-center justify-between pt-1">
                 <div className="text-[9px] uppercase tracking-widest font-semibold text-gray-400">Per Unit</div>
-                <div className="text-[9px] font-semibold text-blue-500">Land −{LAND_DISCOUNT_PCT}%</div>
+                <div className="text-[9px] font-semibold text-blue-500">Land −{ldPct}%</div>
               </div>
               <div className="bg-gray-50/60 rounded-lg p-2 space-y-0.5">
                 {/* Pricing reference row — market comparison */}
@@ -504,7 +504,7 @@ function TypologySection({
                   const landPerUnit = result.totalUnits > 0 ? result.landCost / result.totalUnits : 0;
                   const grossPerUnit = revenuePerUnit - constructionPerUnit;
                   const netPerUnit = grossPerUnit - landPerUnit;
-                  const scenarioLabel = `−${LAND_DISCOUNT_PCT}%`;
+                  const scenarioLabel = `−${ldPct}%`;
                   return (
                     <>
                       <div className="border-t border-gray-200 my-0.5" />
@@ -539,7 +539,7 @@ function TypologySection({
                 <Row label="Construction" value={fmt(result.totalConstructionCost)} color="#E53E3E" tip={`Actual BUA × construction $/m² (${fmtN(result.totalSellableArea,0)} × $${inputs.constructionCost} = ${fmt(result.totalConstructionCost)})`} />
                 <Row label="Total sales" value={fmt(result.totalSales)} bold tip={`Actual BUA × avg selling $/m² (${fmtN(result.totalSellableArea,0)} × $${fmtN(result.effectiveSellingPrice,0)} = ${fmt(result.totalSales)})`} />
                 <Row label="Gross profit" value={fmt(result.grossProfit)} tip={`Total sales − construction (${fmt(result.totalSales)} − ${fmt(result.totalConstructionCost)} = ${fmt(result.grossProfit)})`} />
-                <Row label={`Land cost (−${LAND_DISCOUNT_PCT}%)`} value={fmt(result.landCost)} color="#E53E3E" tip={`Sum of (lot area × retail $/m²) × (1 − ${LAND_DISCOUNT_PCT}%) = ${fmt(result.landCost)}`} />
+                <Row label={`Land cost (−${ldPct}%)`} value={fmt(result.landCost)} color="#E53E3E" tip={`Sum of (lot area × retail $/m²) × (1 − ${ldPct}%) = ${fmt(result.landCost)}`} />
               </div>
               {/* Per Villa breakdown */}
               {result.totalUnits > 0 && (
@@ -553,7 +553,7 @@ function TypologySection({
                 </div>
               )}
               <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-2 space-y-0.5">
-                <div className="text-[9px] uppercase tracking-widest font-semibold text-gray-400 mb-0.5">{`Land at −${LAND_DISCOUNT_PCT}%`}</div>
+                <div className="text-[9px] uppercase tracking-widest font-semibold text-gray-400 mb-0.5">{`Land at −${ldPct}%`}</div>
                 <Row label="Net profit" value={fmt(result.netProfit)} bold color={result.netProfit >= 0 ? "#00B050" : "#E53E3E"} tip={`Gross profit − land cost (${fmt(result.grossProfit)} − ${fmt(result.landCost)} = ${fmt(result.netProfit)})`} />
                 <Row label="Margin" value={`${result.totalSales > 0 ? ((result.netProfit / result.totalSales) * 100).toFixed(1) : 0}%`} color={result.netProfit >= 0 ? "#00B050" : "#E53E3E"} tip={`Net profit ÷ total sales (${fmt(result.netProfit)} ÷ ${fmt(result.totalSales)} = ${result.totalSales > 0 ? ((result.netProfit / result.totalSales) * 100).toFixed(1) : 0}%)`} />
                 <Row label={`ROI on ${(inputs.equityPct*100).toFixed(0)}% equity`} value={`${result.roiOnEquity.toFixed(1)}%`} bold color={result.roiOnEquity >= 0 ? "#00B050" : "#E53E3E"} tip={`Net profit ÷ cash equity (${fmt(result.netProfit)} ÷ ${fmt(result.cashEquity)} = ${result.roiOnEquity.toFixed(1)}%) — equity = ${(inputs.equityPct*100).toFixed(0)}% × (land ${fmt(result.landCost)} + construction ${fmt(result.totalConstructionCost)}) = ${fmt(result.cashEquity)}`} />
@@ -571,7 +571,7 @@ function TypologySection({
                   landValue: result.landCost,
                   buildCost: result.totalConstructionCost,
                   revenue: result.totalSales,
-                  retailLandValue: result.landCost / (1 - DEFAULT_LAND_DISCOUNT),
+                  retailLandValue: result.landCost / (1 - landDiscount),
                 }}
                 controls={coDev}
                 variant="compact"
@@ -589,11 +589,12 @@ function TypologySection({
    PHASE CARD
    ──────────────────────────────────────────────────────────── */
 
-function LotPricingCard({ lotId, lang }: { lotId: number; lang: string }) {
+function LotPricingCard({ lotId, lang, landDiscount = DEFAULT_LAND_DISCOUNT }: { lotId: number; lang: string; landDiscount?: number }) {
   const lot = LOTS.find(l => l.id === lotId);
   if (!lot) return null;
+  const ldPct = Math.round(landDiscount * 100);
   const retailSqm = LOT_RETAIL_MAP.get(lotId) ?? lot.zone_price_retail;
-  const landSqm = retailSqm * (1 - DEFAULT_LAND_DISCOUNT);
+  const landSqm = retailSqm * (1 - landDiscount);
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-2.5 space-y-1.5">
       <div className="flex items-center justify-between">
@@ -607,7 +608,7 @@ function LotPricingCard({ lotId, lang }: { lotId: number; lang: string }) {
           <div className="text-[8px] text-gray-400">{fmt(retailSqm * lot.area_sqm)}</div>
         </div>
         <div className="bg-blue-50 rounded p-1.5 border border-blue-100">
-          <div className="text-[8px] text-blue-500">{`Land (−${LAND_DISCOUNT_PCT}%)`}</div>
+          <div className="text-[8px] text-blue-500">{`Land (−${ldPct}%)`}</div>
           <div className="text-[11px] font-bold text-blue-700">${fmtN(landSqm, 0)}</div>
           <div className="text-[8px] text-blue-400">{fmt(landSqm * lot.area_sqm)}</div>
         </div>
@@ -620,11 +621,13 @@ function LotPricingCard({ lotId, lang }: { lotId: number; lang: string }) {
    LAND MAP & PRICING  (mirrored from investor page)
    ──────────────────────────────────────────────────────────── */
 
-function LandMapPricing({ lang, assignments, lotStatuses }: {
+function LandMapPricing({ lang, assignments, lotStatuses, landDiscount = DEFAULT_LAND_DISCOUNT }: {
   lang: string;
   assignments: Map<number, any>;
   lotStatuses: Map<number, any>;
+  landDiscount?: number;
 }) {
+  const ldPct = Math.round(landDiscount * 100);
   const [phaseFilter, setPhaseFilter] = useState<"all" | 1 | 2 | 3>("all");
   const [selectedLotIds, setSelectedLotIds] = useState<Set<number>>(new Set());
   const [lassoMode, setLassoMode] = useState(false);
@@ -663,10 +666,10 @@ function LandMapPricing({ lang, assignments, lotStatuses }: {
     const avgRetail = weightedRetail / totalArea;
     return {
       count: lots.length, totalArea, avgRetail,
-      avgLand: avgRetail * (1 - DEFAULT_LAND_DISCOUNT),
+      avgLand: avgRetail * (1 - landDiscount),
       isSelection: selectedLotIds.size > 0,
     };
-  }, [selectedLotIds, filteredLotIds, lotStatuses]);
+  }, [selectedLotIds, filteredLotIds, lotStatuses, landDiscount]);
 
   const fmtP = (n: number) => `$${n.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
 
@@ -757,7 +760,7 @@ function LandMapPricing({ lang, assignments, lotStatuses }: {
                 </div>
               </div>
               <div className="bg-blue-50 rounded-xl p-3 text-center border border-blue-100">
-                <div className="text-[9px] uppercase tracking-wider text-blue-500 mb-0.5">{`${lang === "ar" ? "سعر الأرض" : "Land Price"} (−${LAND_DISCOUNT_PCT}%)`}</div>
+                <div className="text-[9px] uppercase tracking-wider text-blue-500 mb-0.5">{`${lang === "ar" ? "سعر الأرض" : "Land Price"} (−${ldPct}%)`}</div>
                 <div className="text-xl font-bold text-blue-700">{fmtP(selectionPricing.avgLand)}/m²</div>
                 <div className="text-[10px] text-blue-400 mt-0.5">
                   {lang === "ar" ? "إجمالي" : "total"} {fmtP(selectionPricing.avgLand * selectionPricing.totalArea)}
@@ -781,7 +784,7 @@ function LandMapPricing({ lang, assignments, lotStatuses }: {
 }
 
 function PhaseCard({
-  phaseNum, lots, inputs, onInputChange, assignments, lotStatuses, lang, pricingMode, coDev,
+  phaseNum, lots, inputs, onInputChange, assignments, lotStatuses, lang, pricingMode, coDev, landDiscount,
 }: {
   phaseNum: 1 | 2 | 3;
   lots: typeof LOTS;
@@ -792,7 +795,9 @@ function PhaseCard({
   lang: string;
   pricingMode: PricingMode;
   coDev: CoDevControlValues;
+  landDiscount: number;
 }) {
+  const ldPct = Math.round(landDiscount * 100);
   const [selectedLotIds, setSelectedLotIds] = useState<Set<number>>(new Set());
   const lotPriceOverrides = useSimulationStore(s => s.lotPriceOverrides);
 
@@ -853,7 +858,7 @@ function PhaseCard({
         const p = getLotPricing(l.id, lotPriceOverrides);
         totalArea += l.area_sqm;
         retailSum += l.area_sqm * p.retail;
-        landSum   += l.area_sqm * (p.retail * (1 - DEFAULT_LAND_DISCOUNT));
+        landSum   += l.area_sqm * (p.retail * (1 - landDiscount));
       }
       r[k] = {
         retail: totalArea > 0 ? retailSum / totalArea : 0,
@@ -863,15 +868,15 @@ function PhaseCard({
       };
     }
     return r;
-  }, [lotsByType, lotPriceOverrides]);
+  }, [lotsByType, lotPriceOverrides, landDiscount]);
 
   // Calculate results per typology — each typology gets its own retail × canonical
   // L1/L2 discounts. No cross-typology averaging, no scalar user override.
   const results = useMemo(() => {
     const r: Record<TypologyKey, TypologyResult> = {} as any;
-    for (const k of TYPOLOGY_KEYS) r[k] = calculateTypology(inputs[k], lotsByType[k], pricingMode);
+    for (const k of TYPOLOGY_KEYS) r[k] = calculateTypology(inputs[k], lotsByType[k], pricingMode, landDiscount);
     return r;
-  }, [inputs, lotsByType, pricingMode]);
+  }, [inputs, lotsByType, pricingMode, landDiscount]);
 
   // Phase totals
   const totals = useMemo(() => {
@@ -971,7 +976,7 @@ function PhaseCard({
             {hasSelection && selectedLotIds.size <= 3 && (
               <div className="space-y-2">
                 {Array.from(selectedLotIds).map(id => (
-                  <LotPricingCard key={id} lotId={id} lang={lang} />
+                  <LotPricingCard key={id} lotId={id} lang={lang} landDiscount={landDiscount} />
                 ))}
               </div>
             )}
@@ -1001,7 +1006,7 @@ function PhaseCard({
                           <div className="text-xs font-bold text-gray-700 tabular-nums">${fmtN(p.retail, 0)}</div>
                         </div>
                         <div className="bg-blue-50 rounded-lg p-2 text-center border border-blue-100">
-                          <div className="text-[9px] text-blue-500">Land (−{LAND_DISCOUNT_PCT}%)</div>
+                          <div className="text-[9px] text-blue-500">Land (−{ldPct}%)</div>
                           <div className="text-xs font-bold text-blue-700 tabular-nums">${fmtN(p.land, 0)}</div>
                         </div>
                       </div>
@@ -1045,7 +1050,7 @@ function PhaseCard({
               landValue: totals.land,
               buildCost: totals.construction,
               revenue: totals.revenue,
-              retailLandValue: totals.land / (1 - DEFAULT_LAND_DISCOUNT),
+              retailLandValue: totals.land / (1 - landDiscount),
             }}
             controls={coDev}
             variant="full"
@@ -1066,6 +1071,7 @@ function PhaseCard({
               defaultOpen={k === TYPOLOGY_KEYS.find(tk => results[tk].numPlots > 0)}
               avgLandSqm={pricingByTypology[k].land}
               coDev={coDev}
+              landDiscount={landDiscount}
             />
           ))}
         </div>
@@ -1101,6 +1107,7 @@ export function ModelContent() {
   };
 
   const [pricingMode, setPricingMode] = useState<PricingMode>("by_location");
+  const [landDiscount, setLandDiscount] = useState(DEFAULT_LAND_DISCOUNT);
   const [coDev, setCoDev] = useState<CoDevControlValues>({
     scenario: "land_only", manualPct: 0, mgmtFeePct: 0.05, salesCommPct: 0.025,
   });
@@ -1216,7 +1223,7 @@ export function ModelContent() {
         if (dt && dt in byType) byType[dt].push(lot);
       }
       for (const k of TYPOLOGY_KEYS) {
-        const r = calculateTypology(phInputs[k], byType[k], pricingMode);
+        const r = calculateTypology(phInputs[k], byType[k], pricingMode, landDiscount);
         plots += r.numPlots;
         area += r.totalArea;
         bua += r.totalSellableArea;
@@ -1228,7 +1235,7 @@ export function ModelContent() {
       }
     }
     return { plots, area, bua, units, revenue, cost, land, net };
-  }, [lotsByPhase, visibleInputs, assignments, pricingMode]);
+  }, [lotsByPhase, visibleInputs, assignments, pricingMode, landDiscount]);
 
   // Per-typology aggregate across all phases
   const aggByTypology = useMemo(() => {
@@ -1246,7 +1253,7 @@ export function ModelContent() {
         if (dt && dt in byType) byType[dt].push(lot);
       }
       for (const k of TYPOLOGY_KEYS) {
-        const r = calculateTypology(phInputs[k], byType[k], pricingMode);
+        const r = calculateTypology(phInputs[k], byType[k], pricingMode, landDiscount);
         acc[k].plots   += r.numPlots;
         acc[k].area    += r.totalArea;
         acc[k].bua     += r.totalSellableArea;
@@ -1258,7 +1265,7 @@ export function ModelContent() {
       }
     }
     return acc;
-  }, [lotsByPhase, visibleInputs, assignments, pricingMode]);
+  }, [lotsByPhase, visibleInputs, assignments, pricingMode, landDiscount]);
 
   if (!mounted) {
     return (
@@ -1282,7 +1289,7 @@ export function ModelContent() {
                 {activeScenario === "working" && saveStatus === "saved"  && <span className="text-[10px] text-dh-light">✓ Saved</span>}
               </div>
               <p className="text-[11px] text-white/50 mt-0.5">
-                {lang === "ar" ? `تقسيم حسب المراحل — أرض بسعر مخفض ${LAND_DISCOUNT_PCT}% عن سعر التجزئة لكل قطعة` : `Phase-by-phase breakdown — land at −${LAND_DISCOUNT_PCT}% off retail`}
+                {lang === "ar" ? `تقسيم حسب المراحل — أرض بسعر مخفض ${Math.round(landDiscount*100)}% عن سعر التجزئة لكل قطعة` : `Phase-by-phase breakdown — land at −${Math.round(landDiscount*100)}% off retail`}
               </p>
             </div>
           </div>
@@ -1361,6 +1368,32 @@ export function ModelContent() {
           </div>
         </div>
 
+        {/* Global land discount off retail */}
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 flex flex-wrap items-center gap-3">
+          <div>
+            <div className="text-xs font-semibold text-gray-800">{lang === "ar" ? "خصم الأرض عن سعر التجزئة" : "Land discount off retail"}</div>
+            <div className="text-[10px] text-gray-400">{lang === "ar" ? "يُطبَّق على كل المراحل والأنماط" : "Applied to every phase & typology"}</div>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <input
+              type="number" min={0} max={90} step={1}
+              value={Math.round(landDiscount * 100)}
+              onChange={e => {
+                const v = parseFloat(e.target.value);
+                setLandDiscount(Number.isFinite(v) ? Math.min(0.9, Math.max(0, v / 100)) : 0);
+              }}
+              className="w-20 text-sm text-right px-2 py-1.5 border border-gray-200 rounded-lg tabular-nums font-bold text-dh-green focus:outline-none focus:ring-1 focus:ring-dh-hills"
+            />
+            <span className="text-sm text-gray-400">%</span>
+          </div>
+          <input
+            type="range" min={0} max={60} step={1}
+            value={Math.round(landDiscount * 100)}
+            onChange={e => setLandDiscount(parseInt(e.target.value) / 100)}
+            className="flex-1 min-w-[140px] accent-dh-hills"
+          />
+        </div>
+
         {/* Co-development split — global controls + project total */}
         <CoDevControls value={coDev} onChange={setCoDev} />
         <CoDevSplitCard
@@ -1369,7 +1402,7 @@ export function ModelContent() {
             landValue: grand.land,
             buildCost: grand.cost,
             revenue: grand.revenue,
-            retailLandValue: grand.land / (1 - DEFAULT_LAND_DISCOUNT),
+            retailLandValue: grand.land / (1 - landDiscount),
           }}
           controls={coDev}
           variant="full"
@@ -1388,11 +1421,12 @@ export function ModelContent() {
             lang={lang}
             pricingMode={pricingMode}
             coDev={coDev}
+            landDiscount={landDiscount}
           />
         ))}
 
         {/* Land Map & Pricing */}
-        <LandMapPricing lang={lang} assignments={assignments} lotStatuses={lotStatuses} />
+        <LandMapPricing lang={lang} assignments={assignments} lotStatuses={lotStatuses} landDiscount={landDiscount} />
 
         {/* ── Full-Project Aggregate by Typology ── (hidden for now) */}
         {false && (() => {
@@ -1415,7 +1449,7 @@ export function ModelContent() {
                   <h2 className="text-sm font-bold text-gray-800">All Phases — Full Project</h2>
                   <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">L1 pricing</span>
                 </div>
-                <p className="text-[10px] text-gray-400 mt-0.5">{grand.plots} plots · {fmtN(grand.area, 0)} m² · {fmtN(grand.units, 1)} units · {`land at −${LAND_DISCOUNT_PCT}% off retail`}</p>
+                <p className="text-[10px] text-gray-400 mt-0.5">{grand.plots} plots · {fmtN(grand.area, 0)} m² · {fmtN(grand.units, 1)} units · {`land at −${Math.round(landDiscount*100)}% off retail`}</p>
               </div>
               <div className="flex items-center gap-4 text-xs tabular-nums">
                 {[
@@ -1523,9 +1557,3 @@ export function ModelContent() {
     </div>
   );
 }
-
-
-
-
-
-
