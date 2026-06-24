@@ -117,7 +117,7 @@ const DEFAULT_INPUTS: Record<TypologyKey, TypologyInputs> = {
    ──────────────────────────────────────────────────────────── */
 
 // Single land discount applied to retail (the former "L1"). One discounted price, no L1/L2 split.
-const DEFAULT_LAND_DISCOUNT = 0.35;
+const DEFAULT_LAND_DISCOUNT = 0.30;
 
 type PricingMode = "average" | "by_location";
 
@@ -1375,23 +1375,20 @@ export function ModelContent() {
             <div className="text-[10px] text-gray-400">{lang === "ar" ? "يُطبَّق على كل المراحل والأنماط" : "Applied to every phase & typology"}</div>
           </div>
           <div className="flex items-center gap-1.5">
-            <input
-              type="number" min={0} max={90} step={1}
-              value={Math.round(landDiscount * 100)}
-              onChange={e => {
-                const v = parseFloat(e.target.value);
-                setLandDiscount(Number.isFinite(v) ? Math.min(0.9, Math.max(0, v / 100)) : 0);
-              }}
-              className="w-20 text-sm text-right px-2 py-1.5 border border-gray-200 rounded-lg tabular-nums font-bold text-dh-green focus:outline-none focus:ring-1 focus:ring-dh-hills"
-            />
-            <span className="text-sm text-gray-400">%</span>
+            {[0.25, 0.30, 0.35].map(d => (
+              <button
+                key={d}
+                onClick={() => setLandDiscount(d)}
+                className={`px-4 py-1.5 rounded-lg text-sm font-semibold tabular-nums transition-colors ${
+                  Math.abs(landDiscount - d) < 0.001
+                    ? "bg-dh-dark text-white"
+                    : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                }`}
+              >
+                {Math.round(d * 100)}%
+              </button>
+            ))}
           </div>
-          <input
-            type="range" min={0} max={60} step={1}
-            value={Math.round(landDiscount * 100)}
-            onChange={e => setLandDiscount(parseInt(e.target.value) / 100)}
-            className="flex-1 min-w-[140px] accent-dh-hills"
-          />
         </div>
 
         {/* Co-development split — global controls + project total */}
