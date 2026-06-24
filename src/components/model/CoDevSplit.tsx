@@ -140,9 +140,16 @@ export function CoDevSplitCard({
     equityPct,
   });
 
+  // Cumulative (whole-project) column — Tilal + HD combined.
+  const totalNet = s.mahmoudNet + s.hdNet;          // = gross profit (fees redistribute to HD)
+  const totalCash = s.mahmoudCash + s.hdCash;
+  const totalROC = s.totalContrib > 0 ? totalNet / s.totalContrib : 0;
+  const totalCashROI = totalCash > 0 ? totalNet / totalCash : 0;
+
   if (variant === "compact") {
     return (
-      <div className="grid grid-cols-2 gap-2 text-[11px]">
+      <div className="grid grid-cols-3 gap-2 text-[11px]">
+        <PartyMini name="Total" net={totalNet} roc={totalROC} accent="#374151" />
         <PartyMini name="Mahmoud (Tilal)" net={s.mahmoudNet} roc={s.mahmoudROC} accent="#1A3810" />
         <PartyMini name="HD Group" net={s.hdNet} roc={s.hdROC} accent="#2E5A8C" />
       </div>
@@ -165,41 +172,50 @@ export function CoDevSplitCard({
         <Mini label="− Sales comm" value={`−${usd(s.salesComm)}`} color="#E53E3E" />
       </div>
 
-      {/* two-party table */}
-      <div className="grid grid-cols-[1.3fr_1fr_1fr] text-[11px]">
+      {/* total + two-party table */}
+      <div className="grid grid-cols-[1.3fr_1fr_1fr_1fr] text-[11px]">
         <HeadCell />
+        <HeadCell label="Total" accent="#374151" />
         <HeadCell label="Mahmoud (Tilal)" accent="#1A3810" />
         <HeadCell label="HD Group" accent="#2E5A8C" />
 
         <Cell label="Contribution" />
+        <Cell value={usd(s.totalContrib)} totalCol />
         <Cell value={usd(s.mahmoudContrib)} />
         <Cell value={usd(s.hdContrib)} />
 
         <Cell label="Contribution %" />
+        <Cell value={pct(1)} totalCol />
         <Cell value={pct(s.mahmoudShare)} />
         <Cell value={pct(s.hdShare)} />
 
         <Cell label="Net profit" bold />
+        <Cell value={usd(totalNet)} bold totalCol />
         <Cell value={usd(s.mahmoudNet)} bold color="#1A3810" />
         <Cell value={usd(s.hdNet)} bold color="#2E5A8C" />
 
         <Cell label="Return on capital" />
+        <Cell value={pct(totalROC)} totalCol />
         <Cell value={pct(s.mahmoudROC)} />
         <Cell value={pct(s.hdROC)} />
 
         <Cell label={`Cash to start (${pct(equityPct,0)})`} />
+        <Cell value={usd(totalCash)} totalCol />
         <Cell value={usd(s.mahmoudCash)} />
         <Cell value={usd(s.hdCash)} />
 
         <Cell label="Cash-on-cash ROI" />
+        <Cell value={pct(totalCashROI)} totalCol />
         <Cell value={pct(s.mahmoudCashROI)} />
         <Cell value={pct(s.hdCashROI)} />
 
         <Cell label="Annualized — exit Y2" subtle />
+        <Cell value={pct(annualizedByExit(totalCashROI, 2))} subtle totalCol />
         <Cell value={pct(annualizedByExit(s.mahmoudCashROI, 2))} subtle />
         <Cell value={pct(annualizedByExit(s.hdCashROI, 2))} subtle />
 
         <Cell label="Annualized — exit Y3" subtle />
+        <Cell value={pct(annualizedByExit(totalCashROI, 3))} subtle totalCol />
         <Cell value={pct(annualizedByExit(s.mahmoudCashROI, 3))} subtle />
         <Cell value={pct(annualizedByExit(s.hdCashROI, 3))} subtle />
       </div>
@@ -252,10 +268,10 @@ function HeadCell({ label, accent }: { label?: string; accent?: string }) {
   );
 }
 
-function Cell({ label, value, bold, color, subtle }: { label?: string; value?: string; bold?: boolean; color?: string; subtle?: boolean }) {
+function Cell({ label, value, bold, color, subtle, totalCol }: { label?: string; value?: string; bold?: boolean; color?: string; subtle?: boolean; totalCol?: boolean }) {
   const isLabel = label !== undefined;
   return (
-    <div className={`px-3 py-1 border-b border-gray-50 tabular-nums ${isLabel ? "text-left text-gray-500" : "text-right"} ${bold ? "font-bold" : ""} ${subtle ? "text-gray-400" : ""}`}
+    <div className={`px-3 py-1 border-b border-gray-50 tabular-nums ${isLabel ? "text-left text-gray-500" : "text-right"} ${bold ? "font-bold" : ""} ${subtle ? "text-gray-400" : ""} ${totalCol ? "bg-gray-50/70 text-gray-700" : ""}`}
       style={!isLabel && color ? { color } : undefined}>
       {isLabel ? label : value}
     </div>
