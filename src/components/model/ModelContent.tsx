@@ -9,6 +9,7 @@ import type { DevelopmentType, Phase, LotAssignment } from "@/types";
 import type { LotPricing } from "@/lib/investment-layers";
 import LOT_PRICES_RAW from "@/data/lot-prices.json";
 import { getLotPricing } from "@/lib/lot-pricing";
+import { CoDevControls, CoDevSplitCard, type CoDevControlValues } from "./CoDevSplit";
 
 const LOT_PRICES = LOT_PRICES_RAW as LotPricing[];
 // Build a lookup: lot ID → retail price per sqm from lot-prices.json
@@ -348,12 +349,12 @@ function Row({ label, value, bold, color, indent, tip }: {
 
 function TypologySection({
   typKey, inputs, result, onInputChange, lang, pricingMode, defaultOpen = false,
-  avgLandSqm = 0,
+  avgLandSqm = 0, coDev,
 }: {
   typKey: TypologyKey; inputs: TypologyInputs; result: TypologyResult;
   onInputChange: (f: keyof TypologyInputs, v: number) => void;
   lang: string; pricingMode: PricingMode; defaultOpen?: boolean;
-  avgLandSqm?: number;
+  avgLandSqm?: number; coDev?: CoDevControlValues;
 }) {
   const meta = TYPOLOGY_META[typKey];
   const [open, setOpen] = useState(defaultOpen);
@@ -559,6 +560,25 @@ function TypologySection({
               </div>
             </div>
           </div>
+
+          {/* Co-development split for this typology */}
+          {coDev && (
+            <div className="bg-blue-50/30 border border-blue-100/60 rounded-lg p-2.5 space-y-1.5">
+              <div className="text-[9px] uppercase tracking-widest font-semibold text-blue-400">Co-Development Split</div>
+              <CoDevSplitCard
+                label=""
+                deal={{
+                  landValue: result.landCost,
+                  buildCost: result.totalConstructionCost,
+                  revenue: result.totalSales,
+                  retailLandValue: result.landCost / (1 - DEFAULT_LAND_DISCOUNT),
+                }}
+                controls={coDev}
+                variant="compact"
+                equityPct={inputs.equityPct}
+              />
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -761,7 +781,7 @@ function LandMapPricing({ lang, assignments, lotStatuses }: {
 }
 
 function PhaseCard({
-  phaseNum, lots, inputs, onInputChange, assignments, lotStatuses, lang, pricingMode,
+  phaseNum, lots, inputs, onInputChange, assignments, lotStatuses, lang, pricingMode, coDev,
 }: {
   phaseNum: 1 | 2 | 3;
   lots: typeof LOTS;
@@ -771,6 +791,7 @@ function PhaseCard({
   lotStatuses: Map<number, any>;
   lang: string;
   pricingMode: PricingMode;
+  coDev: CoDevControlValues;
 }) {
   const [selectedLotIds, setSelectedLotIds] = useState<Set<number>>(new Set());
   const lotPriceOverrides = useSimulationStore(s => s.lotPriceOverrides);
@@ -1016,6 +1037,21 @@ function PhaseCard({
           </div>
         </div>
 
+        {/* Per-phase co-development split */}
+        <div className="px-4 pt-1">
+          <CoDevSplitCard
+            label={lang === "ar" ? `تقاسم المرحلة ${phaseNum}` : `Phase ${phaseNum} Split`}
+            deal={{
+              landValue: totals.land,
+              buildCost: totals.construction,
+              revenue: totals.revenue,
+              retailLandValue: totals.land / (1 - DEFAULT_LAND_DISCOUNT),
+            }}
+            controls={coDev}
+            variant="full"
+          />
+        </div>
+
         {/* Typology breakdowns below */}
         <div className="p-4 space-y-2">
           {TYPOLOGY_KEYS.map(k => (
@@ -1029,6 +1065,7 @@ function PhaseCard({
               pricingMode={pricingMode}
               defaultOpen={k === TYPOLOGY_KEYS.find(tk => results[tk].numPlots > 0)}
               avgLandSqm={pricingByTypology[k].land}
+              coDev={coDev}
             />
           ))}
         </div>
@@ -1064,6 +1101,9 @@ export function ModelContent() {
   };
 
   const [pricingMode, setPricingMode] = useState<PricingMode>("by_location");
+  const [coDev, setCoDev] = useState<CoDevControlValues>({
+    scenario: "land_only", manualPct: 0, mgmtFeePct: 0.05, salesCommPct: 0.025,
+  });
   const [phaseInputs, setPhaseInputs] = useState<Record<1 | 2 | 3, Record<TypologyKey, TypologyInputs>>>(defaultPhaseInputs);
 
   // Merge saved data with defaults (handles newly-added fields)
@@ -1321,6 +1361,20 @@ export function ModelContent() {
           </div>
         </div>
 
+        {/* Co-development split — global controls + project total */}
+        <CoDevControls value={coDev} onChange={setCoDev} />
+        <CoDevSplitCard
+          label={lang === "ar" ? "إجمالي المشروع" : "Project Total"}
+          deal={{
+            landValue: grand.land,
+            buildCost: grand.cost,
+            revenue: grand.revenue,
+            retailLandValue: grand.land / (1 - DEFAULT_LAND_DISCOUNT),
+          }}
+          controls={coDev}
+          variant="full"
+        />
+
         {/* Phase 1, 2, 3 */}
         {([1, 2, 3] as const).map(ph => (
           <PhaseCard
@@ -1333,6 +1387,7 @@ export function ModelContent() {
             lotStatuses={lotStatuses}
             lang={lang}
             pricingMode={pricingMode}
+            coDev={coDev}
           />
         ))}
 
