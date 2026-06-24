@@ -1051,6 +1051,8 @@ function PhaseCard({
               buildCost: totals.construction,
               revenue: totals.revenue,
               retailLandValue: totals.land / (1 - landDiscount),
+              plots: totals.plots,
+              units: totals.units,
             }}
             controls={coDev}
             variant="full"
@@ -1400,6 +1402,8 @@ export function ModelContent() {
             buildCost: grand.cost,
             revenue: grand.revenue,
             retailLandValue: grand.land / (1 - landDiscount),
+            plots: grand.plots,
+            units: grand.units,
           }}
           controls={coDev}
           variant="full"

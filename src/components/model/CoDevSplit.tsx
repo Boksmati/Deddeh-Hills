@@ -114,6 +114,8 @@ export interface CoDevDealInputs {
   buildCost: number;
   revenue: number;
   retailLandValue: number;
+  plots?: number;
+  units?: number;
 }
 
 export function CoDevSplitCard({
@@ -156,20 +158,45 @@ export function CoDevSplitCard({
     );
   }
 
+  const mgmtPctLbl = pct(controls.mgmtFeePct, 1);
+  const salesPctLbl = pct(controls.salesCommPct, 1);
+
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
       <div className="px-4 py-2.5 bg-gray-50/80 border-b border-gray-100 flex items-center justify-between">
-        <span className="text-xs font-semibold text-gray-800">{label}</span>
+        <div className="flex items-baseline gap-2">
+          <span className="text-xs font-semibold text-gray-800">{label}</span>
+          {deal.plots !== undefined && (
+            <span className="text-[10px] text-gray-400 tabular-nums" title="Number of plots in this scope">
+              {deal.plots} plots{deal.units !== undefined ? ` · ${Math.round(deal.units)} units` : ""}
+            </span>
+          )}
+        </div>
         <span className="text-[10px] text-gray-400 tabular-nums">
           gross {usd(s.grossProfit)} · pool {usd(s.netPool)}
         </span>
       </div>
 
+      {/* economics waterfall — revenue → gross */}
+      <div className="px-4 py-2 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px] border-b border-gray-100">
+        <Mini label="Total sales" value={usd(deal.revenue)} color="#1A3810"
+          tip={`Total sale revenue across ${deal.plots ?? "all"} plots = ${usd(deal.revenue)} (from the build & P&L model)`} />
+        <Mini label="− Land cost" value={`−${usd(deal.landValue)}`} color="#E53E3E"
+          tip={`Discounted land value (retail − discount) = ${usd(deal.landValue)}. Retail land was ${usd(deal.retailLandValue)}.`} />
+        <Mini label="− Construction" value={`−${usd(deal.buildCost)}`} color="#E53E3E"
+          tip={`Construction cost = ${usd(deal.buildCost)} (BUA × build $/m² from the model)`} />
+        <Mini label="Gross profit" value={usd(s.grossProfit)} color="#374151"
+          tip={`Revenue − land − construction (${usd(deal.revenue)} − ${usd(deal.landValue)} − ${usd(deal.buildCost)} = ${usd(s.grossProfit)})`} />
+      </div>
+
       {/* fee breakdown */}
       <div className="px-4 py-2 grid grid-cols-3 gap-2 text-[10px] border-b border-gray-100">
-        <Mini label="Gross profit" value={usd(s.grossProfit)} />
-        <Mini label="− Mgmt fee" value={`−${usd(s.mgmtFee)}`} color="#E53E3E" />
-        <Mini label="− Sales comm" value={`−${usd(s.salesComm)}`} color="#E53E3E" />
+        <Mini label={`− Mgmt fee (${mgmtPctLbl})`} value={`−${usd(s.mgmtFee)}`} color="#E53E3E"
+          tip={`Construction × management fee % (${usd(deal.buildCost)} × ${mgmtPctLbl} = ${usd(s.mgmtFee)}). Paid to HD.`} />
+        <Mini label={`− Sales comm (${salesPctLbl})`} value={`−${usd(s.salesComm)}`} color="#E53E3E"
+          tip={`Revenue × sales commission % (${usd(deal.revenue)} × ${salesPctLbl} = ${usd(s.salesComm)}). Paid to HD.`} />
+        <Mini label="= Pool to split" value={usd(s.netPool)} color="#374151"
+          tip={`Gross profit − mgmt fee − sales commission (${usd(s.grossProfit)} − ${usd(s.mgmtFee)} − ${usd(s.salesComm)} = ${usd(s.netPool)})`} />
       </div>
 
       {/* total + two-party table */}
@@ -179,45 +206,45 @@ export function CoDevSplitCard({
         <HeadCell label="Mahmoud (Tilal)" accent="#1A3810" />
         <HeadCell label="HD Group" accent="#2E5A8C" />
 
-        <Cell label="Contribution" />
-        <Cell value={usd(s.totalContrib)} totalCol />
-        <Cell value={usd(s.mahmoudContrib)} />
-        <Cell value={usd(s.hdContrib)} />
+        <Cell label="Contribution" tip="Capital each party puts in (land and/or construction). Returned as capital; the split divides the profit on top." />
+        <Cell value={usd(s.totalContrib)} totalCol tip={`Land ${usd(deal.landValue)} + construction ${usd(deal.buildCost)} = ${usd(s.totalContrib)}`} />
+        <Cell value={usd(s.mahmoudContrib)} tip={`Land ${usd(deal.landValue)} + Mahmoud's build share (${pct(mahmoudConstrPct,0)} × ${usd(deal.buildCost)}) = ${usd(s.mahmoudContrib)}`} />
+        <Cell value={usd(s.hdContrib)} tip={`HD's build share (${pct(1-mahmoudConstrPct,0)} × ${usd(deal.buildCost)}) = ${usd(s.hdContrib)}`} />
 
-        <Cell label="Contribution %" />
-        <Cell value={pct(1)} totalCol />
-        <Cell value={pct(s.mahmoudShare)} />
-        <Cell value={pct(s.hdShare)} />
+        <Cell label="Contribution %" tip="Each party's share of total capital — this is the profit-split ratio." />
+        <Cell value={pct(1)} totalCol tip="Land + construction = 100% of capital deployed" />
+        <Cell value={pct(s.mahmoudShare)} tip={`${usd(s.mahmoudContrib)} ÷ ${usd(s.totalContrib)} = ${pct(s.mahmoudShare)}`} />
+        <Cell value={pct(s.hdShare)} tip={`${usd(s.hdContrib)} ÷ ${usd(s.totalContrib)} = ${pct(s.hdShare)}`} />
 
-        <Cell label="Net profit" bold />
-        <Cell value={usd(totalNet)} bold totalCol />
-        <Cell value={usd(s.mahmoudNet)} bold color="#1A3810" />
-        <Cell value={usd(s.hdNet)} bold color="#2E5A8C" />
+        <Cell label="Net profit" bold tip="Each party's profit after the pool is split by contribution; HD also collects the mgmt fee + sales commission." />
+        <Cell value={usd(totalNet)} bold totalCol tip={`Mahmoud ${usd(s.mahmoudNet)} + HD ${usd(s.hdNet)} = ${usd(totalNet)} (equals gross profit — fees just move to HD)`} />
+        <Cell value={usd(s.mahmoudNet)} bold color="#1A3810" tip={`Pool × Mahmoud share (${usd(s.netPool)} × ${pct(s.mahmoudShare)} = ${usd(s.mahmoudNet)})`} />
+        <Cell value={usd(s.hdNet)} bold color="#2E5A8C" tip={`Pool × HD share + fees (${usd(s.netPool)} × ${pct(s.hdShare)} + ${usd(s.mgmtFee)} + ${usd(s.salesComm)} = ${usd(s.hdNet)})`} />
 
-        <Cell label="Return on capital" />
-        <Cell value={pct(totalROC)} totalCol />
-        <Cell value={pct(s.mahmoudROC)} />
-        <Cell value={pct(s.hdROC)} />
+        <Cell label="Return on capital" tip="Net profit ÷ capital contributed." />
+        <Cell value={pct(totalROC)} totalCol tip={`${usd(totalNet)} ÷ ${usd(s.totalContrib)} = ${pct(totalROC)}`} />
+        <Cell value={pct(s.mahmoudROC)} tip={`${usd(s.mahmoudNet)} ÷ ${usd(s.mahmoudContrib)} = ${pct(s.mahmoudROC)}`} />
+        <Cell value={pct(s.hdROC)} tip={`${usd(s.hdNet)} ÷ ${usd(s.hdContrib)} = ${pct(s.hdROC)}`} />
 
-        <Cell label={`Cash to start (${pct(equityPct,0)})`} />
-        <Cell value={usd(totalCash)} totalCol />
-        <Cell value={usd(s.mahmoudCash)} />
-        <Cell value={usd(s.hdCash)} />
+        <Cell label={`Cash to start (${pct(equityPct,0)})`} tip={`Upfront equity = ${pct(equityPct,0)} of capital; the rest assumed financed.`} />
+        <Cell value={usd(totalCash)} totalCol tip={`${pct(equityPct,0)} × ${usd(s.totalContrib)} = ${usd(totalCash)}`} />
+        <Cell value={usd(s.mahmoudCash)} tip={`${pct(equityPct,0)} × ${usd(s.mahmoudContrib)} = ${usd(s.mahmoudCash)}`} />
+        <Cell value={usd(s.hdCash)} tip={`${pct(equityPct,0)} × ${usd(s.hdContrib)} = ${usd(s.hdCash)}`} />
 
-        <Cell label="Cash-on-cash ROI" />
-        <Cell value={pct(totalCashROI)} totalCol />
-        <Cell value={pct(s.mahmoudCashROI)} />
-        <Cell value={pct(s.hdCashROI)} />
+        <Cell label="Cash-on-cash ROI" tip="Net profit ÷ cash-to-start — return on the equity actually deployed." />
+        <Cell value={pct(totalCashROI)} totalCol tip={`${usd(totalNet)} ÷ ${usd(totalCash)} = ${pct(totalCashROI)}`} />
+        <Cell value={pct(s.mahmoudCashROI)} tip={`${usd(s.mahmoudNet)} ÷ ${usd(s.mahmoudCash)} = ${pct(s.mahmoudCashROI)}`} />
+        <Cell value={pct(s.hdCashROI)} tip={`${usd(s.hdNet)} ÷ ${usd(s.hdCash)} = ${pct(s.hdCashROI)}`} />
 
-        <Cell label="Annualized — exit Y2" subtle />
-        <Cell value={pct(annualizedByExit(totalCashROI, 2))} subtle totalCol />
-        <Cell value={pct(annualizedByExit(s.mahmoudCashROI, 2))} subtle />
-        <Cell value={pct(annualizedByExit(s.hdCashROI, 2))} subtle />
+        <Cell label="Annualized — exit Y2" subtle tip="Cash-on-cash ROI annualized over a 2-year hold: (1 + ROI)^(1/2) − 1." />
+        <Cell value={pct(annualizedByExit(totalCashROI, 2))} subtle totalCol tip={`(1 + ${pct(totalCashROI)})^(1/2) − 1 = ${pct(annualizedByExit(totalCashROI,2))}`} />
+        <Cell value={pct(annualizedByExit(s.mahmoudCashROI, 2))} subtle tip={`(1 + ${pct(s.mahmoudCashROI)})^(1/2) − 1 = ${pct(annualizedByExit(s.mahmoudCashROI,2))}`} />
+        <Cell value={pct(annualizedByExit(s.hdCashROI, 2))} subtle tip={`(1 + ${pct(s.hdCashROI)})^(1/2) − 1 = ${pct(annualizedByExit(s.hdCashROI,2))}`} />
 
-        <Cell label="Annualized — exit Y3" subtle />
-        <Cell value={pct(annualizedByExit(totalCashROI, 3))} subtle totalCol />
-        <Cell value={pct(annualizedByExit(s.mahmoudCashROI, 3))} subtle />
-        <Cell value={pct(annualizedByExit(s.hdCashROI, 3))} subtle />
+        <Cell label="Annualized — exit Y3" subtle tip="Cash-on-cash ROI annualized over a 3-year hold: (1 + ROI)^(1/3) − 1." />
+        <Cell value={pct(annualizedByExit(totalCashROI, 3))} subtle totalCol tip={`(1 + ${pct(totalCashROI)})^(1/3) − 1 = ${pct(annualizedByExit(totalCashROI,3))}`} />
+        <Cell value={pct(annualizedByExit(s.mahmoudCashROI, 3))} subtle tip={`(1 + ${pct(s.mahmoudCashROI)})^(1/3) − 1 = ${pct(annualizedByExit(s.mahmoudCashROI,3))}`} />
+        <Cell value={pct(annualizedByExit(s.hdCashROI, 3))} subtle tip={`(1 + ${pct(s.hdCashROI)})^(1/3) − 1 = ${pct(annualizedByExit(s.hdCashROI,3))}`} />
       </div>
 
       {/* insight footer */}
@@ -250,10 +277,10 @@ function PartyMini({ name, net, roc, accent }: { name: string; net: number; roc:
   );
 }
 
-function Mini({ label, value, color }: { label: string; value: string; color?: string }) {
+function Mini({ label, value, color, tip }: { label: string; value: string; color?: string; tip?: string }) {
   return (
-    <div className="text-center">
-      <div className="text-gray-400">{label}</div>
+    <div className="text-center" title={tip}>
+      <div className={`text-gray-400 ${tip ? "border-b border-dotted border-gray-300 inline-block cursor-help" : ""}`}>{label}</div>
       <div className="font-bold tabular-nums" style={{ color: color ?? "#374151" }}>{value}</div>
     </div>
   );
@@ -268,12 +295,13 @@ function HeadCell({ label, accent }: { label?: string; accent?: string }) {
   );
 }
 
-function Cell({ label, value, bold, color, subtle, totalCol }: { label?: string; value?: string; bold?: boolean; color?: string; subtle?: boolean; totalCol?: boolean }) {
+function Cell({ label, value, bold, color, subtle, totalCol, tip }: { label?: string; value?: string; bold?: boolean; color?: string; subtle?: boolean; totalCol?: boolean; tip?: string }) {
   const isLabel = label !== undefined;
   return (
-    <div className={`px-3 py-1 border-b border-gray-50 tabular-nums ${isLabel ? "text-left text-gray-500" : "text-right"} ${bold ? "font-bold" : ""} ${subtle ? "text-gray-400" : ""} ${totalCol ? "bg-gray-50/70 text-gray-700" : ""}`}
+    <div title={tip}
+      className={`px-3 py-1 border-b border-gray-50 tabular-nums ${isLabel ? "text-left text-gray-500" : "text-right"} ${bold ? "font-bold" : ""} ${subtle ? "text-gray-400" : ""} ${totalCol ? "bg-gray-50/70 text-gray-700" : ""} ${tip ? "cursor-help" : ""}`}
       style={!isLabel && color ? { color } : undefined}>
-      {isLabel ? label : value}
+      {isLabel && tip ? <span className="border-b border-dotted border-gray-300">{label}</span> : (isLabel ? label : value)}
     </div>
   );
 }
