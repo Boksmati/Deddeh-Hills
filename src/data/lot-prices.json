@@ -73,7 +73,7 @@
   },
   {
     "lot": 10,
-    "price_sqm": 350,
+    "price_sqm": 380,
     "status": "available",
     "view": "partial_sea",
     "zone": "west",
@@ -81,7 +81,7 @@
   },
   {
     "lot": 11,
-    "price_sqm": 350,
+    "price_sqm": 380,
     "status": "available",
     "view": "partial_sea",
     "zone": "southwest",
@@ -89,7 +89,7 @@
   },
   {
     "lot": 12,
-    "price_sqm": 350,
+    "price_sqm": 380,
     "status": "available",
     "view": "mountain",
     "zone": "southwest",
