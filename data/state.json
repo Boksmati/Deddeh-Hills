@@ -1057,5 +1057,6 @@
     "showPhaseBreakdown": false,
     "showL1ExitMechanisms": false,
     "showCashFlowHorizon": false
-  }
+  },
+  "pricingDefault": []
 }

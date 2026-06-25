@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deddeh Hills Pricing</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F4EEE4;--card:#FAF6EE;--ink:#2B1D12;--soft:#6B5A47;--line:#D8CEBD;--accent:#8C3B1F;--gold:#A67B2E;--green:#3A6B3A;--blue:#2E5A8C}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;padding:40px 24px 80px}
+.wrap{max-width:1100px;margin:0 auto}
+.eyebrow{font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+h1{font-family:'Fraunces',serif;font-size:36px;font-weight:400;margin-bottom:6px}
+.sub{font-size:13px;color:var(--soft);margin-bottom:28px;line-height:1.5}
+.summary-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:28px;position:sticky;top:0;z-index:10;background:var(--bg);padding:16px 0 12px;border-bottom:2px solid var(--accent)}
+.stat{text-align:center}
+.stat .label{font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);margin-bottom:4px}
+.stat .value{font-family:'Fraunces',serif;font-size:24px;font-weight:500}
+.stat .value.accent{color:var(--accent)}
+.stat .value.green{color:var(--green)}
+.controls{display:flex;gap:12px;align-items:center;margin-bottom:20px;padding:14px 18px;background:var(--card);border:1px solid var(--line);border-radius:3px;flex-wrap:wrap}
+.controls label{font-size:12px;font-weight:500;color:var(--soft)}
+.controls select,.controls input[type=number]{font-family:'Inter',sans-serif;font-size:13px;padding:6px 10px;border:1px solid var(--line);border-radius:3px;background:#fff;color:var(--ink);width:75px}
+.controls select{width:140px}
+.spacer{flex:1}
+.btn{font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:8px 16px;background:var(--accent);color:#fff;border:none;border-radius:3px;cursor:pointer}
+.btn:hover{opacity:.85}
+.btn.sec{background:var(--soft)}
+table{width:100%;border-collapse:collapse;font-size:13px;background:var(--card);border:1px solid var(--line)}
+thead th{background:var(--ink);color:var(--card);font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:10px 12px;text-align:right;position:sticky;top:88px;z-index:5}
+thead th:first-child,thead th:nth-child(2),thead th:nth-child(3){text-align:left}
+tbody tr{border-bottom:1px solid var(--line);transition:background .15s}
+tbody tr:hover{background:rgba(140,59,31,.04)}
+tbody tr.zone-a{border-left:3px solid var(--green)}
+tbody tr.zone-b{border-left:3px solid var(--gold)}
+tbody tr.zone-c{border-left:3px solid var(--blue)}
+td{padding:8px 12px;text-align:right}
+td:first-child,td:nth-child(2),td:nth-child(3){text-align:left}
+td:first-child{font-weight:600}
+.zt{display:inline-block;font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border-radius:2px;margin-left:6px}
+.zt.a{background:rgba(58,107,58,.12);color:var(--green)}
+.zt.b{background:rgba(166,123,46,.12);color:var(--gold)}
+.zt.c{background:rgba(46,90,140,.12);color:var(--blue)}
+td input[type=number]{width:70px;font-family:'Inter',sans-serif;font-size:13px;padding:4px 6px;border:1px solid var(--line);border-radius:2px;text-align:right;background:#fffdf7;color:var(--accent);font-weight:600}
+td input[type=number]:focus{outline:2px solid var(--accent);border-color:var(--accent)}
+tfoot td{background:var(--ink);color:var(--card);font-weight:600;padding:12px;font-size:13px}
+tfoot .al{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+.legend{display:flex;gap:24px;margin-top:16px;font-size:11px;color:var(--soft)}
+.legend span{display:flex;align-items:center;gap:6px}
+.dot{width:10px;height:3px;border-radius:1px}
+.dot.a{background:var(--green)}.dot.b{background:var(--gold)}.dot.c{background:var(--blue)}
+@media(max-width:768px){.summary-bar{grid-template-columns:repeat(3,1fr)}}
+.saved-banner{display:none;padding:10px 18px;background:rgba(58,107,58,0.12);border:1px solid rgba(58,107,58,0.3);border-radius:3px;margin-bottom:16px;font-size:12px;color:var(--green);font-weight:500;align-items:center;gap:8px}
+.saved-banner.show{display:flex}
+.locked td input[type=number]{background:var(--card);color:var(--ink);border-color:transparent;pointer-events:none;font-weight:500}
+.filter-bar{display:flex;gap:10px;align-items:center;margin-bottom:18px;padding:12px 18px;background:var(--card);border:1px solid var(--line);border-radius:3px;flex-wrap:wrap}
+.filter-bar .label{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin-right:4px}
+.filter-btn{font-family:'Inter',sans-serif;font-size:12px;padding:7px 14px;border-radius:3px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;transition:all .15s;font-weight:600}
+.filter-btn:hover{border-color:var(--accent)}
+.filter-btn.active{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.filter-btn.inactive{background:#fff;color:var(--soft);opacity:.55;text-decoration:line-through}
+.filter-hint{font-size:11px;color:var(--soft);font-style:italic}
+tr.muted{opacity:.32;background:rgba(0,0,0,0.02)}
+tr.muted td input[type=number]{pointer-events:none;opacity:.5}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="eyebrow">Interactive pricing calculator</div>
+<h1>Deddeh Hills — Plot pricing table</h1>
+<p class="sub">Edit any L1 price directly in the table. All averages recalculate live. Use bulk controls to apply discounts by zone. 61 active plots (sold excluded). Click "Save as default" to lock current prices.</p>
+<div class="summary-bar">
+<div class="stat"><div class="label">Active plots</div><div class="value" id="sp">59</div></div>
+<div class="stat"><div class="label">Avg retail</div><div class="value" id="sr">$0</div></div>
+<div class="stat"><div class="label">Avg L1</div><div class="value accent" id="sl">$0</div></div>
+<div class="stat"><div class="label">Avg L2</div><div class="value" id="s2">$0</div></div>
+<div class="stat"><div class="label">Avg discount</div><div class="value green" id="sd">0%</div></div>
+</div>
+<div class="filter-bar">
+<span class="label">Active typologies:</span>
+<button class="filter-btn active" id="ft-villa" onclick="toggleType('villa')">Villas &amp; Twins (38)</button>
+<button class="filter-btn active" id="ft-apt" onclick="toggleType('apt')">Apartments (23)</button>
+<div class="spacer"></div>
+<span class="filter-hint">Click a typology to exclude it from the totals above. Investor scenarios — e.g. "what if we drop apartments?"</span>
+</div>
+<div class="controls">
+<label>Zone:</label>
+<select id="zs"><option value="all">All plots</option><option value="villa">Villas & Twins</option><option value="apt">Apartments only</option></select>
+<label>Discount:</label><input type="number" id="bd" value="35" min="0" max="80" step="1"><label>%</label>
+<button class="btn" onclick="bulkDisc()">Apply %</button>
+<div class="spacer"></div>
+<label>Flat L1 $:</label><input type="number" id="fp" value="200" min="0" max="500" step="5">
+<button class="btn sec" onclick="bulkFlat()">Apply flat</button>
+<div class="spacer"></div>
+<button class="btn" style="background:var(--gold)" onclick="reset()">Reset 35%</button>
+<button class="btn" style="background:var(--green)" onclick="saveDefault()">Save as default</button>
+<button class="btn sec" onclick="loadDefault()" id="load-btn" style="display:none">Load saved</button>
+<button class="btn" style="background:#2E5A8C" onclick="exportCSV()" id="csv-btn">Export CSV</button>
+<button class="btn sec" onclick="exportJSON()" id="json-btn">Copy JSON</button>
+</div>
+<div class="controls" style="border-left:3px solid var(--blue);background:rgba(46,90,140,0.06)">
+<label style="color:var(--blue);font-weight:600">Apartment scenarios:</label>
+<div class="spacer" style="flex:0"></div>
+<label>Set all apt L1 to flat $:</label>
+<input type="number" id="apt-flat" value="100" min="0" max="400" step="10">
+<button class="btn" style="background:var(--blue)" onclick="aptFlat()">Apply</button>
+<div class="spacer"></div>
+<label>Reduce apt retail by $:</label>
+<input type="number" id="apt-reduce" value="50" min="0" max="200" step="10">
+<button class="btn" style="background:var(--blue)" onclick="aptReduce()">Apply</button>
+<button class="btn sec" onclick="aptResetRetail()">Reset retail</button>
+</div>
+<div class="saved-banner" id="saved-banner">Prices locked as default. Click "Load saved" to restore, or continue editing.</div>
+<table><thead><tr><th>Lot</th><th>Typology</th><th>Phase</th><th>Retail $/m²</th><th>L1 $/m²</th><th>L2 $/m²</th><th>Discount</th></tr></thead>
+<tbody id="tb"></tbody>
+<tfoot>
+<tr><td colspan="3"><span class="al" id="all-label">Average — all 61 plots</span></td><td id="fr"></td><td id="fl"></td><td id="f2"></td><td id="fd"></td></tr>
+<tr><td colspan="3"><span class="al" id="villa-label">Villas & twins (38 plots)</span></td><td id="vr"></td><td id="vl"></td><td id="v2"></td><td id="vd"></td></tr>
+<tr><td colspan="3"><span class="al" id="apt-label">Apartments (23 plots)</span></td><td id="ar"></td><td id="al2"></td><td id="a2"></td><td id="ad"></td></tr>
+</tfoot></table>
+<div class="legend">
+<span><span class="dot a"></span> Zone A — Premium ($400+)</span>
+<span><span class="dot b"></span> Zone B — Mid ($330–400)</span>
+<span><span class="dot c"></span> Zone C — Apartments</span>
+</div>
+</div>
+<script>
+const P=[
+{l:1,t:"Apartments",p:"Phase 2",r:130},{l:7,t:"Villa 2F",p:"Phase 1",r:420},{l:8,t:"Villa 2F",p:"Phase 1",r:420},
+{l:9,t:"Villa 2F",p:"Phase 1",r:380},{l:10,t:"Villa 2F",p:"Phase 1",r:350},{l:11,t:"Villa 2F",p:"Phase 1",r:350},
+{l:12,t:"Villa 2F",p:"Phase 1",r:350},{l:13,t:"Villa 2F",p:"Phase 1",r:350},{l:20,t:"Villa 2F",p:"Phase 1",r:380},
+{l:32,t:"Villa 3F",p:"Phase 1",r:420},{l:33,t:"Villa 3F",p:"Phase 1",r:420},{l:34,t:"Villa 3F",p:"Phase 1",r:420},
+{l:35,t:"Villa 3F",p:"Phase 1",r:420},{l:46,t:"Villa 3F",p:"Phase 1",r:450},{l:47,t:"Villa 3F",p:"Phase 1",r:450},
+{l:48,t:"Villa 3F",p:"Phase 1",r:450},{l:59,t:"Twin Villa",p:"Phase 2",r:450},{l:60,t:"Twin Villa",p:"Phase 2",r:450},
+{l:61,t:"Twin Villa",p:"Phase 2",r:420},{l:62,t:"Twin Villa",p:"Phase 2",r:420},{l:63,t:"Twin Villa",p:"Phase 2",r:450},
+{l:64,t:"Twin Villa",p:"Phase 2",r:450},{l:65,t:"Twin Villa",p:"Phase 2",r:450},{l:66,t:"Twin Villa",p:"Phase 3",r:450},
+{l:67,t:"Twin Villa",p:"Phase 3",r:450},{l:68,t:"Twin Villa",p:"Phase 3",r:450},{l:69,t:"Twin Villa",p:"Phase 3",r:450},
+{l:70,t:"Twin Villa",p:"Phase 3",r:450},{l:71,t:"Twin Villa",p:"Phase 3",r:380},{l:72,t:"Twin Villa",p:"Phase 3",r:450},
+{l:73,t:"Twin Villa",p:"Phase 3",r:380},{l:74,t:"Twin Villa",p:"Phase 3",r:380},{l:75,t:"Twin Villa",p:"Phase 3",r:380},
+{l:76,t:"Twin Villa",p:"Phase 3",r:350},{l:77,t:"Twin Villa",p:"Phase 3",r:330},{l:78,t:"Twin Villa",p:"Phase 3",r:330},
+{l:79,t:"Twin Villa",p:"Phase 3",r:400},{l:80,t:"Twin Villa",p:"Phase 3",r:420},{l:81,t:"Twin Villa",p:"Phase 3",r:420},
+{l:82,t:"Apartments",p:"Phase 3",r:180},{l:83,t:"Apartments",p:"Phase 3",r:180},{l:84,t:"Apartments",p:"Phase 3",r:160},
+{l:85,t:"Apartments",p:"Phase 3",r:160},{l:86,t:"Apartments",p:"Phase 1",r:160},{l:87,t:"Apartments",p:"Phase 1",r:130},
+{l:88,t:"Apartments",p:"Phase 1",r:130},{l:89,t:"Apartments",p:"Phase 1",r:130},{l:90,t:"Apartments",p:"Phase 1",r:130},
+{l:91,t:"Apartments",p:"Phase 1",r:130},{l:92,t:"Apartments",p:"Phase 2",r:160},{l:93,t:"Apartments",p:"Phase 2",r:160},
+{l:94,t:"Apartments",p:"Phase 2",r:180},{l:95,t:"Apartments",p:"Phase 2",r:180},{l:96,t:"Apartments",p:"Phase 2",r:180},
+{l:97,t:"Apartments",p:"Phase 2",r:180},{l:98,t:"Apartments",p:"Phase 2",r:130},{l:99,t:"Apartments",p:"Phase 2",r:130},
+{l:100,t:"Apartments",p:"Phase 2",r:130},{l:101,t:"Apartments",p:"Phase 2",r:130},
+{l:109,t:"Apartments",p:"TBD",r:80},{l:110,t:"Apartments",p:"TBD",r:80}
+];
+const isV=p=>p.t.includes("Villa")||p.t.includes("Twin");
+const isA=p=>p.t==="Apartments";
+const zone=p=>isA(p)?"c":p.r>=400?"a":"b";
+let activeTypes={villa:true,apt:true};
+function isActive(p){return (isV(p)&&activeTypes.villa)||(isA(p)&&activeTypes.apt);}
+function toggleType(t){activeTypes[t]=!activeTypes[t];const btn=document.getElementById('ft-'+t);btn.classList.toggle('active',activeTypes[t]);btn.classList.toggle('inactive',!activeTypes[t]);render();}
+let L1=P.map(p=>Math.round(p.r*0.65));
+let RET=P.map(p=>p.r);
+let savedL1=null,savedRET=null;
+function render(){
+const tb=document.getElementById("tb");tb.innerHTML="";
+P.forEach((p,i)=>{const z=zone(p),l1=L1[i],r=RET[i],l2=Math.round(r*0.80),d=((1-l1/r)*100).toFixed(1);
+const zl=z==="a"?"A":z==="b"?"B":"C";
+const tr=document.createElement("tr");tr.className="zone-"+z+(isActive(p)?"":" muted");
+const rDisp=r!==p.r?`<span style="text-decoration:line-through;color:var(--soft);font-size:11px">$${p.r}</span> $${r}`:`$${r}`;
+tr.innerHTML=`<td>${p.l}<span class="zt ${z}">${zl}</span></td><td>${p.t}</td><td>${p.p}</td><td>${rDisp}</td><td><input type="number" value="${l1}" min="0" max="999" step="5" data-i="${i}" onchange="ul1(this)" onfocus="this.select()"></td><td>$${l2}</td><td>${d}%</td>`;
+tb.appendChild(tr);});calc();}
+function ul1(e){const i=parseInt(e.dataset.i);L1[i]=parseInt(e.value)||0;const r=RET[i],d=((1-L1[i]/r)*100).toFixed(1);e.closest("tr").cells[6].textContent=d+"%";calc();}
+function calc(){
+const allFull=P.map((p,i)=>({...p,r:RET[i],l1:L1[i],l2:Math.round(RET[i]*.8)}));
+const all=allFull.filter(p=>isActive(p));
+const vi=all.filter(p=>isV(p)),ap=all.filter(p=>isA(p));
+const totalV=allFull.filter(p=>isV(p)).length,totalA=allFull.filter(p=>isA(p)).length;
+const av=(a,k)=>a.length?Math.round(a.reduce((s,p)=>s+p[k],0)/a.length):0;
+const dc=(a)=>a.length?((1-av(a,"l1")/av(a,"r"))*100).toFixed(1):"0.0";
+document.getElementById("sp").textContent=all.length;
+document.getElementById("sr").textContent="$"+av(all,"r");
+document.getElementById("sl").textContent="$"+av(all,"l1");
+document.getElementById("s2").textContent="$"+av(all,"l2");
+document.getElementById("sd").textContent=dc(all)+"%";
+document.getElementById("fr").textContent="$"+av(all,"r");
+document.getElementById("fl").textContent="$"+av(all,"l1");
+document.getElementById("f2").textContent="$"+av(all,"l2");
+document.getElementById("fd").textContent=dc(all)+"%";
+document.getElementById("vr").textContent="$"+av(vi,"r");
+document.getElementById("vl").textContent="$"+av(vi,"l1");
+document.getElementById("v2").textContent="$"+av(vi,"l2");
+document.getElementById("vd").textContent=dc(vi)+"%";
+document.getElementById("ar").textContent="$"+av(ap,"r");
+document.getElementById("al2").textContent="$"+av(ap,"l1");
+document.getElementById("a2").textContent="$"+av(ap,"l2");
+document.getElementById("ad").textContent=dc(ap)+"%";
+const allLabel=`Average — ${all.length} active plot${all.length===1?"":"s"}${all.length<allFull.length?` (of ${allFull.length})`:""}`;
+document.getElementById("all-label").textContent=allLabel;
+document.getElementById("villa-label").textContent=`Villas & twins (${vi.length}${vi.length<totalV?" of "+totalV:""} plot${vi.length===1?"":"s"})`;
+document.getElementById("apt-label").textContent=`Apartments (${ap.length}${ap.length<totalA?" of "+totalA:""} plot${ap.length===1?"":"s"})`;
+document.getElementById("ft-villa").textContent=`Villas & Twins (${totalV})`;
+document.getElementById("ft-apt").textContent=`Apartments (${totalA})`;}
+function bulkDisc(){const z=document.getElementById("zs").value,d=parseInt(document.getElementById("bd").value)/100;
+P.forEach((p,i)=>{if(z==="all"||(z==="villa"&&isV(p))||(z==="apt"&&isA(p)))L1[i]=Math.round(RET[i]*(1-d));});render();}
+function bulkFlat(){const z=document.getElementById("zs").value,f=parseInt(document.getElementById("fp").value);
+P.forEach((p,i)=>{if(z==="all"||(z==="villa"&&isV(p))||(z==="apt"&&isA(p)))L1[i]=f;});render();}
+function reset(){P.forEach((p,i)=>{RET[i]=p.r;L1[i]=Math.round(p.r*0.65);});document.getElementById("bd").value=35;document.getElementById("apt-reduce").value=50;document.getElementById("saved-banner").classList.remove("show");render();}
+function saveDefault(){savedL1=[...L1];savedRET=[...RET];document.getElementById("saved-banner").classList.add("show");document.getElementById("load-btn").style.display="inline-block";document.getElementById("tb").classList.add("locked");setTimeout(()=>{document.getElementById("tb").classList.remove("locked");},2000);}
+function loadDefault(){if(savedL1&&savedRET){L1=[...savedL1];RET=[...savedRET];render();}}
+function aptFlat(){const f=parseInt(document.getElementById("apt-flat").value);
+P.forEach((p,i)=>{if(isA(p))L1[i]=f;});render();}
+function aptReduce(){const red=parseInt(document.getElementById("apt-reduce").value);const disc=parseInt(document.getElementById("bd").value)/100;
+P.forEach((p,i)=>{if(isA(p)){RET[i]=Math.max(p.r-red,0);L1[i]=Math.round(RET[i]*(1-disc));}});render();}
+function aptResetRetail(){P.forEach((p,i)=>{if(isA(p)){RET[i]=p.r;L1[i]=Math.round(p.r*0.65);}});render();}
+function exportCSV(){
+const rows=[["Lot","Typology","Phase","Retail_USD_sqm","L1_USD_sqm","L2_USD_sqm","Discount_pct"]];
+P.forEach((p,i)=>{const r=RET[i],l1=L1[i],l2=Math.round(r*0.80),d=((1-l1/r)*100).toFixed(1);
+rows.push([p.l,p.t,p.p,r,l1,l2,d]);});
+const all=P.map((p,i)=>({r:RET[i],l1:L1[i]}));
+const avgR=Math.round(all.reduce((s,p)=>s+p.r,0)/all.length);
+const avgL1=Math.round(all.reduce((s,p)=>s+p.l1,0)/all.length);
+const avgL2=Math.round(avgR*0.80);
+const avgD=((1-avgL1/avgR)*100).toFixed(1);
+rows.push([]);
+rows.push(["AVERAGE","All "+P.length+" plots","",avgR,avgL1,avgL2,avgD]);
+const csv=rows.map(r=>r.join(",")).join("\n");
+const blob=new Blob([csv],{type:"text/csv"});
+const url=URL.createObjectURL(blob);
+const a=document.createElement("a");a.href=url;a.download="deddeh_hills_pricing_"+new Date().toISOString().slice(0,10)+".csv";
+document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);}
+function exportJSON(){
+const data=P.map((p,i)=>{const r=RET[i],l1=L1[i],l2=Math.round(r*0.80);
+return{lot:p.l,typology:p.t,phase:p.p,retail_usd_sqm:r,l1_usd_sqm:l1,l2_usd_sqm:l2,discount_pct:parseFloat(((1-l1/r)*100).toFixed(1))};});
+const all=P.map((p,i)=>({r:RET[i],l1:L1[i]}));
+const summary={total_plots:P.length,avg_retail:Math.round(all.reduce((s,p)=>s+p.r,0)/all.length),avg_l1:Math.round(all.reduce((s,p)=>s+p.l1,0)/all.length),avg_l2:Math.round(all.reduce((s,p)=>s+p.r,0)/all.length*0.80),avg_discount:parseFloat(((1-Math.round(all.reduce((s,p)=>s+p.l1,0)/all.length)/Math.round(all.reduce((s,p)=>s+p.r,0)/all.length))*100).toFixed(1)),villas:all.filter((_,i)=>isV(P[i])).length,apartments:all.filter((_,i)=>isA(P[i])).length};
+const output={summary:summary,plots:data,exported_at:new Date().toISOString()};
+const json=JSON.stringify(output,null,2);
+navigator.clipboard.writeText(json).then(()=>{
+const b=document.getElementById("json-btn");b.textContent="Copied!";b.style.background="var(--green)";
+setTimeout(()=>{b.textContent="Copy JSON";b.style.background="var(--soft)";},2000);
+}).catch(()=>{const w=window.open();w.document.write("<pre>"+json+"</pre>");});}
+render();
+</script>
+</body>
+</html>
