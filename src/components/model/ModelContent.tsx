@@ -9,7 +9,8 @@ import type { DevelopmentType, Phase, LotAssignment } from "@/types";
 import type { LotPricing } from "@/lib/investment-layers";
 import LOT_PRICES_RAW from "@/data/lot-prices.json";
 import { getLotPricing } from "@/lib/lot-pricing";
-import { CoDevControls, CoDevSplitCard, type CoDevControlValues } from "./CoDevSplit";
+import { CoDevControls, CoDevSplitCard, AllocationPanel, FundingSlider, type CoDevFees, type TypologyAlloc } from "./CoDevSplit";
+import type { CoDevLine } from "@/lib/codev";
 
 const LOT_PRICES = LOT_PRICES_RAW as LotPricing[];
 // Build a lookup: lot ID → retail price per sqm from lot-prices.json
@@ -348,12 +349,14 @@ function Row({ label, value, bold, color, indent, tip }: {
 
 function TypologySection({
   typKey, inputs, result, onInputChange, lang, pricingMode, defaultOpen = false,
-  avgLandSqm = 0, coDev, landDiscount = DEFAULT_LAND_DISCOUNT,
+  avgLandSqm = 0, coDevFunding, coDevFees, onFunding, landDiscount = DEFAULT_LAND_DISCOUNT,
 }: {
   typKey: TypologyKey; inputs: TypologyInputs; result: TypologyResult;
   onInputChange: (f: keyof TypologyInputs, v: number) => void;
   lang: string; pricingMode: PricingMode; defaultOpen?: boolean;
-  avgLandSqm?: number; coDev?: CoDevControlValues; landDiscount?: number;
+  avgLandSqm?: number;
+  coDevFunding?: number; coDevFees?: CoDevFees; onFunding?: (p: number) => void;
+  landDiscount?: number;
 }) {
   const meta = TYPOLOGY_META[typKey];
   const [open, setOpen] = useState(defaultOpen);
@@ -562,18 +565,22 @@ function TypologySection({
           </div>
 
           {/* Co-development split for this typology */}
-          {coDev && (
-            <div className="bg-blue-50/30 border border-blue-100/60 rounded-lg p-2.5 space-y-1.5">
-              <div className="text-[9px] uppercase tracking-widest font-semibold text-blue-400">Co-Development Split</div>
+          {coDevFees && coDevFunding !== undefined && (
+            <div className="bg-blue-50/30 border border-blue-100/60 rounded-lg p-2.5 space-y-2">
+              <div className="flex items-center justify-between gap-3">
+                <div className="text-[9px] uppercase tracking-widest font-semibold text-blue-400">Co-Development Split</div>
+                {onFunding && <div className="flex-1 max-w-[260px]"><FundingSlider value={coDevFunding} onChange={onFunding} /></div>}
+              </div>
               <CoDevSplitCard
                 label=""
-                deal={{
+                lines={[{
                   landValue: result.landCost,
                   buildCost: result.totalConstructionCost,
                   revenue: result.totalSales,
                   retailLandValue: result.landCost / (1 - landDiscount),
-                }}
-                controls={coDev}
+                  mahmoudConstrPct: coDevFunding,
+                }]}
+                fees={coDevFees}
                 variant="compact"
                 equityPct={inputs.equityPct}
               />
@@ -784,7 +791,7 @@ function LandMapPricing({ lang, assignments, lotStatuses, landDiscount = DEFAULT
 }
 
 function PhaseCard({
-  phaseNum, lots, inputs, onInputChange, assignments, lotStatuses, lang, pricingMode, coDev, landDiscount,
+  phaseNum, lots, inputs, onInputChange, assignments, lotStatuses, lang, pricingMode, coDevFunding, coDevFees, onFunding, landDiscount,
 }: {
   phaseNum: 1 | 2 | 3;
   lots: typeof LOTS;
@@ -794,7 +801,9 @@ function PhaseCard({
   lotStatuses: Map<number, any>;
   lang: string;
   pricingMode: PricingMode;
-  coDev: CoDevControlValues;
+  coDevFunding: Record<TypologyKey, number>;
+  coDevFees: CoDevFees;
+  onFunding: (key: string, p: number) => void;
   landDiscount: number;
 }) {
   const ldPct = Math.round(landDiscount * 100);
@@ -1046,15 +1055,18 @@ function PhaseCard({
         <div className="px-4 pt-1">
           <CoDevSplitCard
             label={lang === "ar" ? `تقاسم المرحلة ${phaseNum}` : `Phase ${phaseNum} Split`}
-            deal={{
-              landValue: totals.land,
-              buildCost: totals.construction,
-              revenue: totals.revenue,
-              retailLandValue: totals.land / (1 - landDiscount),
-              plots: totals.plots,
-              units: totals.units,
-            }}
-            controls={coDev}
+            lines={TYPOLOGY_KEYS
+              .filter(k => results[k].numPlots > 0)
+              .map(k => ({
+                landValue: results[k].landCost,
+                buildCost: results[k].totalConstructionCost,
+                revenue: results[k].totalSales,
+                retailLandValue: results[k].landCost / (1 - landDiscount),
+                mahmoudConstrPct: coDevFunding[k],
+              }))}
+            fees={coDevFees}
+            plots={totals.plots}
+            units={totals.units}
             variant="full"
           />
         </div>
@@ -1072,7 +1084,9 @@ function PhaseCard({
               pricingMode={pricingMode}
               defaultOpen={k === TYPOLOGY_KEYS.find(tk => results[tk].numPlots > 0)}
               avgLandSqm={pricingByTypology[k].land}
-              coDev={coDev}
+              coDevFunding={coDevFunding[k]}
+              coDevFees={coDevFees}
+              onFunding={(p) => onFunding(k, p)}
               landDiscount={landDiscount}
             />
           ))}
@@ -1110,9 +1124,16 @@ export function ModelContent() {
 
   const [pricingMode, setPricingMode] = useState<PricingMode>("by_location");
   const [landDiscount, setLandDiscount] = useState(DEFAULT_LAND_DISCOUNT);
-  const [coDev, setCoDev] = useState<CoDevControlValues>({
-    scenario: "land_only", manualPct: 0, mgmtFeePct: 0.05, salesCommPct: 0.025,
+  // Per-typology Mahmoud construction-funding share (0 = HD funds it, 1 = Mahmoud alone)
+  const [coDevFunding, setCoDevFunding] = useState<Record<TypologyKey, number>>({
+    twin_villa: 0, villa_2f: 0, villa_3f: 0, apartments: 0,
   });
+  const [coDevFees, setCoDevFees] = useState<CoDevFees>({ mgmtFeePct: 0.05, salesCommPct: 0.025 });
+  const setFunding = (key: string, p: number) => setCoDevFunding(f => ({ ...f, [key as TypologyKey]: p }));
+  const setAllFunding = (p: number) => setCoDevFunding({ twin_villa: p, villa_2f: p, villa_3f: p, apartments: p });
+  // Single shared funding % across typologies, or null if mixed (for preset highlight)
+  const fundingVals = Object.values(coDevFunding);
+  const activeFundingPct = fundingVals.every(v => Math.abs(v - fundingVals[0]) < 0.001) ? fundingVals[0] : null;
   const [phaseInputs, setPhaseInputs] = useState<Record<1 | 2 | 3, Record<TypologyKey, TypologyInputs>>>(defaultPhaseInputs);
 
   // Merge saved data with defaults (handles newly-added fields)
@@ -1393,19 +1414,32 @@ export function ModelContent() {
           </div>
         </div>
 
-        {/* Co-development split — global controls + project total */}
-        <CoDevControls value={coDev} onChange={setCoDev} />
+        {/* Co-development split — global controls, per-typology allocation + project total */}
+        <CoDevControls fees={coDevFees} onFees={setCoDevFees} onPreset={setAllFunding} activePct={activeFundingPct} />
+        <AllocationPanel
+          rows={TYPOLOGY_KEYS.map(k => ({
+            key: k,
+            label: lang === "ar" ? TYPOLOGY_META[k].labelAr : TYPOLOGY_META[k].label,
+            color: TYPOLOGY_META[k].color,
+            plots: aggByTypology[k].plots,
+            mahmoudConstrPct: coDevFunding[k],
+          }))}
+          onChange={setFunding}
+        />
         <CoDevSplitCard
           label={lang === "ar" ? "إجمالي المشروع" : "Project Total"}
-          deal={{
-            landValue: grand.land,
-            buildCost: grand.cost,
-            revenue: grand.revenue,
-            retailLandValue: grand.land / (1 - landDiscount),
-            plots: grand.plots,
-            units: grand.units,
-          }}
-          controls={coDev}
+          lines={TYPOLOGY_KEYS
+            .filter(k => aggByTypology[k].plots > 0)
+            .map(k => ({
+              landValue: aggByTypology[k].land,
+              buildCost: aggByTypology[k].cost,
+              revenue: aggByTypology[k].revenue,
+              retailLandValue: aggByTypology[k].land / (1 - landDiscount),
+              mahmoudConstrPct: coDevFunding[k],
+            }))}
+          fees={coDevFees}
+          plots={grand.plots}
+          units={grand.units}
           variant="full"
         />
 
@@ -1421,7 +1455,9 @@ export function ModelContent() {
             lotStatuses={lotStatuses}
             lang={lang}
             pricingMode={pricingMode}
-            coDev={coDev}
+            coDevFunding={coDevFunding}
+            coDevFees={coDevFees}
+            onFunding={setFunding}
             landDiscount={landDiscount}
           />
         ))}

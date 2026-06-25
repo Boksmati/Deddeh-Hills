@@ -88,8 +88,12 @@ export function scenarioConstrPct(
 
 export function computeCoDevSplit(inp: CoDevInputs): CoDevSplit {
   const grossProfit = inp.revenue - inp.landValue - inp.buildCost;
-  const mgmtFee = inp.buildCost * inp.mgmtFeePct;
-  const salesComm = inp.revenue * inp.salesCommPct;
+  // Fees compensate HD for managing/selling construction, so they scale with HD's
+  // construction-funding share. If Mahmoud funds 100% ("develops alone"), HD earns
+  // nothing from that scope.
+  const hdConstrShare = 1 - inp.mahmoudConstrPct;
+  const mgmtFee = inp.buildCost * inp.mgmtFeePct * hdConstrShare;
+  const salesComm = inp.revenue * inp.salesCommPct * hdConstrShare;
   const netPool = grossProfit - mgmtFee - salesComm;
 
   const mahmoudConstrib = inp.mahmoudConstrPct * inp.buildCost;
@@ -113,6 +117,67 @@ export function computeCoDevSplit(inp: CoDevInputs): CoDevSplit {
   const hdCashROI = hdCash > 0 ? hdNet / hdCash : 0;
 
   const discountGiven = inp.retailLandValue - inp.landValue;
+
+  return {
+    grossProfit, mgmtFee, salesComm, netPool,
+    mahmoudContrib, hdContrib, totalContrib, mahmoudShare, hdShare,
+    mahmoudNet, hdNet,
+    mahmoudROC, hdROC,
+    mahmoudCash, hdCash, mahmoudCashROI, hdCashROI,
+    discountGiven,
+    discountExceedsProfit: discountGiven > mahmoudNet,
+  };
+}
+
+/** One scope's deal + its own Mahmoud construction-funding share. */
+export interface CoDevLine {
+  landValue: number;
+  buildCost: number;
+  revenue: number;
+  retailLandValue: number;
+  mahmoudConstrPct: number;
+}
+
+/**
+ * Aggregate a split across lines that each have their own funding %.
+ * This is the correct way to roll typology-level allocations up to a phase or
+ * the whole project: compute each line's split, then sum the dollar fields and
+ * re-derive the ratios. Applying one blended % to the summed land+build would be
+ * wrong when typologies are funded differently.
+ */
+export function aggregateCoDevSplit(
+  lines: CoDevLine[],
+  mgmtFeePct: number,
+  salesCommPct: number,
+  equityPct: number,
+): CoDevSplit {
+  let grossProfit = 0, mgmtFee = 0, salesComm = 0, netPool = 0;
+  let mahmoudContrib = 0, hdContrib = 0;
+  let mahmoudNet = 0, hdNet = 0;
+  let discountGiven = 0;
+
+  for (const ln of lines) {
+    const s = computeCoDevSplit({ ...ln, mgmtFeePct, salesCommPct, equityPct });
+    grossProfit += s.grossProfit;
+    mgmtFee += s.mgmtFee;
+    salesComm += s.salesComm;
+    netPool += s.netPool;
+    mahmoudContrib += s.mahmoudContrib;
+    hdContrib += s.hdContrib;
+    mahmoudNet += s.mahmoudNet;
+    hdNet += s.hdNet;
+    discountGiven += s.discountGiven;
+  }
+
+  const totalContrib = mahmoudContrib + hdContrib;
+  const mahmoudShare = totalContrib > 0 ? mahmoudContrib / totalContrib : 0;
+  const hdShare = totalContrib > 0 ? hdContrib / totalContrib : 0;
+  const mahmoudROC = mahmoudContrib > 0 ? mahmoudNet / mahmoudContrib : 0;
+  const hdROC = hdContrib > 0 ? hdNet / hdContrib : 0;
+  const mahmoudCash = equityPct * mahmoudContrib;
+  const hdCash = equityPct * hdContrib;
+  const mahmoudCashROI = mahmoudCash > 0 ? mahmoudNet / mahmoudCash : 0;
+  const hdCashROI = hdCash > 0 ? hdNet / hdCash : 0;
 
   return {
     grossProfit, mgmtFee, salesComm, netPool,
