@@ -10,8 +10,6 @@
  * project. Only the dollar magnitudes change; the ratios follow land:build.
  */
 
-export type CoDevScenarioKey = "land_only" | "fifty_fifty" | "land_plus_half";
-
 export interface CoDevInputs {
   /** Discounted land value contributed by Mahmoud/Tilal ($). */
   landValue: number;
@@ -66,26 +64,6 @@ export interface CoDevSplit {
   discountExceedsProfit: boolean;
 }
 
-/** Construction-funding % that makes Mahmoud's total contribution = 50% of capital. */
-export function fiftyFiftyConstrPct(landValue: number, buildCost: number): number {
-  if (buildCost <= 0) return 0;
-  const pct = (0.5 * (landValue + buildCost) - landValue) / buildCost;
-  return Math.min(1, Math.max(0, pct));
-}
-
-/** Map a named scenario to Mahmoud's construction-funding fraction. */
-export function scenarioConstrPct(
-  scenario: CoDevScenarioKey,
-  landValue: number,
-  buildCost: number,
-): number {
-  switch (scenario) {
-    case "land_only":      return 0;
-    case "fifty_fifty":    return fiftyFiftyConstrPct(landValue, buildCost);
-    case "land_plus_half": return 0.5;
-  }
-}
-
 export function computeCoDevSplit(inp: CoDevInputs): CoDevSplit {
   const grossProfit = inp.revenue - inp.landValue - inp.buildCost;
   // Fees compensate HD for managing/selling construction, so they scale with HD's
@@ -129,17 +107,20 @@ export function computeCoDevSplit(inp: CoDevInputs): CoDevSplit {
   };
 }
 
-/** One scope's deal + its own Mahmoud construction-funding share. */
+/** One scope's deal + its own Mahmoud construction-funding share + equity assumption. */
 export interface CoDevLine {
   landValue: number;
   buildCost: number;
   revenue: number;
   retailLandValue: number;
   mahmoudConstrPct: number;
+  /** Cash-to-start fraction for this line (e.g. 0.30). Lets cash figures stay
+   *  consistent when typologies carry different equity assumptions. */
+  equityPct: number;
 }
 
 /**
- * Aggregate a split across lines that each have their own funding %.
+ * Aggregate a split across lines that each have their own funding % and equity.
  * This is the correct way to roll typology-level allocations up to a phase or
  * the whole project: compute each line's split, then sum the dollar fields and
  * re-derive the ratios. Applying one blended % to the summed land+build would be
@@ -149,15 +130,15 @@ export function aggregateCoDevSplit(
   lines: CoDevLine[],
   mgmtFeePct: number,
   salesCommPct: number,
-  equityPct: number,
 ): CoDevSplit {
   let grossProfit = 0, mgmtFee = 0, salesComm = 0, netPool = 0;
   let mahmoudContrib = 0, hdContrib = 0;
   let mahmoudNet = 0, hdNet = 0;
+  let mahmoudCash = 0, hdCash = 0;
   let discountGiven = 0;
 
   for (const ln of lines) {
-    const s = computeCoDevSplit({ ...ln, mgmtFeePct, salesCommPct, equityPct });
+    const s = computeCoDevSplit({ ...ln, mgmtFeePct, salesCommPct, equityPct: ln.equityPct });
     grossProfit += s.grossProfit;
     mgmtFee += s.mgmtFee;
     salesComm += s.salesComm;
@@ -166,6 +147,8 @@ export function aggregateCoDevSplit(
     hdContrib += s.hdContrib;
     mahmoudNet += s.mahmoudNet;
     hdNet += s.hdNet;
+    mahmoudCash += s.mahmoudCash;   // per-line equity × per-line contribution
+    hdCash += s.hdCash;
     discountGiven += s.discountGiven;
   }
 
@@ -174,8 +157,6 @@ export function aggregateCoDevSplit(
   const hdShare = totalContrib > 0 ? hdContrib / totalContrib : 0;
   const mahmoudROC = mahmoudContrib > 0 ? mahmoudNet / mahmoudContrib : 0;
   const hdROC = hdContrib > 0 ? hdNet / hdContrib : 0;
-  const mahmoudCash = equityPct * mahmoudContrib;
-  const hdCash = equityPct * hdContrib;
   const mahmoudCashROI = mahmoudCash > 0 ? mahmoudNet / mahmoudCash : 0;
   const hdCashROI = hdCash > 0 ? hdNet / hdCash : 0;
 

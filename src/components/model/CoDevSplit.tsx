@@ -142,17 +142,16 @@ export function FundingSlider({ value, onChange }: { value: number; onChange: (v
 
 /* ── split card (full or compact), driven by per-typology lines ─ */
 export function CoDevSplitCard({
-  label, lines, fees, variant = "full", equityPct = 0.30, plots, units,
+  label, lines, fees, variant = "full", plots, units,
 }: {
   label: string;
   lines: CoDevLine[];
   fees: CoDevFees;
   variant?: "full" | "compact";
-  equityPct?: number;
   plots?: number;
   units?: number;
 }) {
-  const s = aggregateCoDevSplit(lines, fees.mgmtFeePct, fees.salesCommPct, equityPct);
+  const s = aggregateCoDevSplit(lines, fees.mgmtFeePct, fees.salesCommPct);
   const revenue = lines.reduce((a, l) => a + l.revenue, 0);
   const landValue = lines.reduce((a, l) => a + l.landValue, 0);
   const buildCost = lines.reduce((a, l) => a + l.buildCost, 0);
@@ -163,6 +162,8 @@ export function CoDevSplitCard({
   const totalCash = s.mahmoudCash + s.hdCash;
   const totalROC = s.totalContrib > 0 ? totalNet / s.totalContrib : 0;
   const totalCashROI = totalCash > 0 ? totalNet / totalCash : 0;
+  // Blended cash-to-start % (lines may carry different equity assumptions).
+  const equityPct = s.totalContrib > 0 ? totalCash / s.totalContrib : 0;
 
   if (variant === "compact") {
     return (

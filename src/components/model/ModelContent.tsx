@@ -122,11 +122,12 @@ const DEFAULT_LAND_DISCOUNT = 0.30;
 
 type PricingMode = "average" | "by_location";
 
-function calculateTypology(inputs: TypologyInputs, lots: typeof LOTS, pricingMode: PricingMode, landDiscount = DEFAULT_LAND_DISCOUNT): TypologyResult {
+function calculateTypology(inputs: TypologyInputs, lots: typeof LOTS, pricingMode: PricingMode, landDiscount = DEFAULT_LAND_DISCOUNT, overrides?: Map<number, { retail: number; l1: number }> | null): TypologyResult {
   const numPlots = lots.length;
   const totalArea = lots.reduce((s, l) => s + l.area_sqm, 0);
-  // Retail price from lot-prices.json (per-lot actual market price)
-  const retailLandCost = lots.reduce((s, l) => s + l.area_sqm * (LOT_RETAIL_MAP.get(l.id) ?? l.zone_price_retail), 0);
+  // Retail price — honors per-lot overrides so the engine and the displayed
+  // avg land price resolve from the same source (getLotPricing).
+  const retailLandCost = lots.reduce((s, l) => s + l.area_sqm * getLotPricing(l.id, overrides).retail, 0);
   const avgRetailLandSqm = totalArea > 0 ? retailLandCost / totalArea : 0;
   // Single discounted land cost (off retail)
   const landCost = retailLandCost * (1 - landDiscount);
@@ -209,7 +210,7 @@ function calculateTypology(inputs: TypologyInputs, lots: typeof LOTS, pricingMod
     sellingPriceMax = -Infinity;
     let weightedPriceSum = 0;
     for (const lot of lots) {
-      const landSqm = (LOT_RETAIL_MAP.get(lot.id) ?? lot.zone_price_retail) * (1 - landDiscount);
+      const landSqm = getLotPricing(lot.id, overrides).retail * (1 - landDiscount);
       // Land cost per sellable m² = (discounted land $/m² × lot_area) / sellable area per plot
       const landCostPerSqm = (landSqm * lot.area_sqm) / sellableAreaPerPlot;
       const lotSellingPrice = landCostPerSqm + inputs.constructionCost + inputs.profitMargin;
@@ -579,10 +580,10 @@ function TypologySection({
                   revenue: result.totalSales,
                   retailLandValue: result.landCost / (1 - landDiscount),
                   mahmoudConstrPct: coDevFunding,
+                  equityPct: inputs.equityPct,
                 }]}
                 fees={coDevFees}
                 variant="compact"
-                equityPct={inputs.equityPct}
               />
             </div>
           )}
@@ -883,9 +884,9 @@ function PhaseCard({
   // L1/L2 discounts. No cross-typology averaging, no scalar user override.
   const results = useMemo(() => {
     const r: Record<TypologyKey, TypologyResult> = {} as any;
-    for (const k of TYPOLOGY_KEYS) r[k] = calculateTypology(inputs[k], lotsByType[k], pricingMode, landDiscount);
+    for (const k of TYPOLOGY_KEYS) r[k] = calculateTypology(inputs[k], lotsByType[k], pricingMode, landDiscount, lotPriceOverrides);
     return r;
-  }, [inputs, lotsByType, pricingMode, landDiscount]);
+  }, [inputs, lotsByType, pricingMode, landDiscount, lotPriceOverrides]);
 
   // Phase totals
   const totals = useMemo(() => {
@@ -1063,6 +1064,7 @@ function PhaseCard({
                 revenue: results[k].totalSales,
                 retailLandValue: results[k].landCost / (1 - landDiscount),
                 mahmoudConstrPct: coDevFunding[k],
+                equityPct: inputs[k].equityPct,
               }))}
             fees={coDevFees}
             plots={totals.plots}
@@ -1104,6 +1106,7 @@ export function ModelContent() {
   const { t, lang } = useTranslations();
   const assignments = useSimulationStore((s) => s.assignments);
   const lotStatuses = useSimulationStore((s) => s.lotStatuses);
+  const lotPriceOverrides = useSimulationStore((s) => s.lotPriceOverrides);
   const [mounted, setMounted] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   // Scenario management
@@ -1131,9 +1134,6 @@ export function ModelContent() {
   const [coDevFees, setCoDevFees] = useState<CoDevFees>({ mgmtFeePct: 0.05, salesCommPct: 0.025 });
   const setFunding = (key: string, p: number) => setCoDevFunding(f => ({ ...f, [key as TypologyKey]: p }));
   const setAllFunding = (p: number) => setCoDevFunding({ twin_villa: p, villa_2f: p, villa_3f: p, apartments: p });
-  // Single shared funding % across typologies, or null if mixed (for preset highlight)
-  const fundingVals = Object.values(coDevFunding);
-  const activeFundingPct = fundingVals.every(v => Math.abs(v - fundingVals[0]) < 0.001) ? fundingVals[0] : null;
   const [phaseInputs, setPhaseInputs] = useState<Record<1 | 2 | 3, Record<TypologyKey, TypologyInputs>>>(defaultPhaseInputs);
 
   // Merge saved data with defaults (handles newly-added fields)
@@ -1147,6 +1147,24 @@ export function ModelContent() {
     }
     return merged as Record<1 | 2 | 3, Record<TypologyKey, TypologyInputs>>;
   };
+
+  // Persist co-dev funding, fees and land discount across reloads (localStorage).
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("dh-model-codev");
+      if (!raw) return;
+      const p = JSON.parse(raw);
+      if (typeof p.landDiscount === "number") setLandDiscount(p.landDiscount);
+      if (p.coDevFunding) setCoDevFunding(prev => ({ ...prev, ...p.coDevFunding }));
+      if (p.coDevFees) setCoDevFees(prev => ({ ...prev, ...p.coDevFees }));
+    } catch { /* ignore */ }
+  }, []);
+  useEffect(() => {
+    if (!mounted) return;
+    try {
+      localStorage.setItem("dh-model-codev", JSON.stringify({ landDiscount, coDevFunding, coDevFees }));
+    } catch { /* ignore */ }
+  }, [mounted, landDiscount, coDevFunding, coDevFees]);
 
   // Load both working and default scenarios on mount
   useEffect(() => {
@@ -1246,7 +1264,7 @@ export function ModelContent() {
         if (dt && dt in byType) byType[dt].push(lot);
       }
       for (const k of TYPOLOGY_KEYS) {
-        const r = calculateTypology(phInputs[k], byType[k], pricingMode, landDiscount);
+        const r = calculateTypology(phInputs[k], byType[k], pricingMode, landDiscount, lotPriceOverrides);
         plots += r.numPlots;
         area += r.totalArea;
         bua += r.totalSellableArea;
@@ -1258,7 +1276,7 @@ export function ModelContent() {
       }
     }
     return { plots, area, bua, units, revenue, cost, land, net };
-  }, [lotsByPhase, visibleInputs, assignments, pricingMode, landDiscount]);
+  }, [lotsByPhase, visibleInputs, assignments, pricingMode, landDiscount, lotPriceOverrides]);
 
   // Per-typology aggregate across all phases
   const aggByTypology = useMemo(() => {
@@ -1276,7 +1294,7 @@ export function ModelContent() {
         if (dt && dt in byType) byType[dt].push(lot);
       }
       for (const k of TYPOLOGY_KEYS) {
-        const r = calculateTypology(phInputs[k], byType[k], pricingMode, landDiscount);
+        const r = calculateTypology(phInputs[k], byType[k], pricingMode, landDiscount, lotPriceOverrides);
         acc[k].plots   += r.numPlots;
         acc[k].area    += r.totalArea;
         acc[k].bua     += r.totalSellableArea;
@@ -1288,7 +1306,13 @@ export function ModelContent() {
       }
     }
     return acc;
-  }, [lotsByPhase, visibleInputs, assignments, pricingMode, landDiscount]);
+  }, [lotsByPhase, visibleInputs, assignments, pricingMode, landDiscount, lotPriceOverrides]);
+
+  // Preset highlight: shared funding % across the typologies that actually have plots
+  const activeFundingKeys = TYPOLOGY_KEYS.filter(k => aggByTypology[k].plots > 0);
+  const activeFundingVals = activeFundingKeys.map(k => coDevFunding[k]);
+  const activeFundingPct = activeFundingVals.length > 0 && activeFundingVals.every(v => Math.abs(v - activeFundingVals[0]) < 0.001)
+    ? activeFundingVals[0] : null;
 
   if (!mounted) {
     return (
@@ -1436,6 +1460,7 @@ export function ModelContent() {
               revenue: aggByTypology[k].revenue,
               retailLandValue: aggByTypology[k].land / (1 - landDiscount),
               mahmoudConstrPct: coDevFunding[k],
+              equityPct: visibleInputs[1][k].equityPct,
             }))}
           fees={coDevFees}
           plots={grand.plots}
@@ -1465,130 +1490,6 @@ export function ModelContent() {
         {/* Land Map & Pricing */}
         <LandMapPricing lang={lang} assignments={assignments} lotStatuses={lotStatuses} landDiscount={landDiscount} />
 
-        {/* ── Full-Project Aggregate by Typology ── (hidden for now) */}
-        {false && (() => {
-          // Aggregate L1 grand totals across all typologies
-          const grandL1 = TYPOLOGY_KEYS.reduce((acc, k) => ({
-            revenue: acc.revenue + aggByTypology[k].revenue,
-            cost:    acc.cost    + aggByTypology[k].cost,
-            land:    acc.land    + aggByTypology[k].land,
-            net:     acc.net     + aggByTypology[k].net,
-            bua:     acc.bua     + aggByTypology[k].bua,
-          }), { revenue: 0, cost: 0, land: 0, net: 0, bua: 0 });
-
-          return (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          {/* Header */}
-          <div className="px-5 py-4 border-b border-gray-100" style={{ borderLeftWidth: 4, borderLeftColor: "#1A3810" }}>
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-sm font-bold text-gray-800">All Phases — Full Project</h2>
-                  <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">L1 pricing</span>
-                </div>
-                <p className="text-[10px] text-gray-400 mt-0.5">{grand.plots} plots · {fmtN(grand.area, 0)} m² · {fmtN(grand.units, 1)} units · {`land at −${Math.round(landDiscount*100)}% off retail`}</p>
-              </div>
-              <div className="flex items-center gap-4 text-xs tabular-nums">
-                {[
-                  { lbl: "BUA",        val: `${fmtN(grandL1.bua, 0)} m²`, cls: "text-gray-700" },
-                  { lbl: "Revenue",    val: fmt(grandL1.revenue),          cls: "font-bold text-gray-800" },
-                  { lbl: "Land (L1)",  val: fmt(grandL1.land),             cls: "text-red-500" },
-                  { lbl: "Net Profit", val: fmt(grandL1.net),              cls: `font-bold ${grandL1.net >= 0 ? "text-emerald-600" : "text-red-600"}` },
-                ].map(s => (
-                  <div key={s.lbl} className="text-center">
-                    <div className="text-[9px] text-gray-400">{s.lbl}</div>
-                    <div className={s.cls}>{s.val}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Per-typology rows */}
-          <div className="divide-y divide-gray-50">
-            {TYPOLOGY_KEYS.map(k => {
-              const meta = TYPOLOGY_META[k];
-              const d = aggByTypology[k];
-              if (d.plots === 0) return null;
-              const margin = d.revenue > 0 ? (d.net / d.revenue) * 100 : 0;
-              return (
-                <div key={k} className="px-5 py-4">
-                  {/* Typology label + top-line KPIs */}
-                  <div className="flex items-center justify-between mb-3 flex-wrap gap-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: meta.color }} />
-                      <span className="text-xs font-semibold text-gray-800">{lang === "ar" ? meta.labelAr : meta.label}</span>
-                      <span className="text-[10px] text-gray-400">{d.plots} plots · {fmtN(d.area, 0)} m² · {fmtU(d.units)} units</span>
-                    </div>
-                    <div className="flex items-center gap-5 text-xs tabular-nums">
-                      <div className="text-center">
-                        <div className="text-[9px] text-gray-400">BUA</div>
-                        <div className="font-medium text-gray-700">{fmtN(d.bua, 0)} m²</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-[9px] text-gray-400">Revenue</div>
-                        <div className="font-bold text-gray-800">{fmt(d.revenue)}</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-[9px] text-gray-400">Construction</div>
-                        <div className="font-medium text-red-500">{fmt(d.cost)}</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-[9px] text-gray-400">Land (L1)</div>
-                        <div className="font-medium text-blue-600">{fmt(d.land)}</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-[9px] text-gray-400">Net Profit</div>
-                        <div className={`font-bold ${d.net >= 0 ? "text-emerald-600" : "text-red-600"}`}>{fmt(d.net)}</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-[9px] text-gray-400">Margin</div>
-                        <div className={`font-bold ${margin >= 20 ? "text-emerald-600" : margin >= 10 ? "text-amber-500" : "text-red-500"}`}>{margin.toFixed(1)}%</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Mini stat bar */}
-                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                    {[
-                      { lbl: "Avg sell $/m²",  val: d.bua > 0   ? `$${fmtN(d.revenue / d.bua, 0)}`    : "—" },
-                      { lbl: "Land $/m²",   val: d.area > 0  ? `$${fmtN(d.land / d.area, 0)}`    : "—" },
-                      { lbl: "Revenue/unit",   val: d.units > 0 ? fmt(d.revenue / d.units)              : "—" },
-                      { lbl: "Profit/unit",    val: d.units > 0 ? fmt(d.net / d.units)               : "—" },
-                      { lbl: "BUA/unit",       val: d.units > 0 ? `${fmtN(d.bua / d.units, 0)} m²`    : "—" },
-                      { lbl: "Land/unit",      val: d.units > 0 ? `${fmtN(d.area / d.units, 0)} m²`   : "—" },
-                    ].map(s => (
-                      <div key={s.lbl} className="bg-gray-50 rounded-lg px-3 py-2">
-                        <div className="text-[9px] text-gray-400 uppercase tracking-wide">{s.lbl}</div>
-                        <div className="text-xs font-semibold text-gray-700 mt-0.5">{s.val}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Project-level margin summary */}
-          <div className="px-5 py-3 bg-blue-50 border-t border-blue-100 flex items-center gap-6 text-xs flex-wrap">
-            <span className="text-[10px] uppercase tracking-widest font-semibold text-blue-600">L1 project totals</span>
-            {[
-              { lbl: "Revenue",     val: fmt(grandL1.revenue) },
-              { lbl: "Land (L1)",   val: fmt(grandL1.land) },
-              { lbl: "Construction",val: fmt(grandL1.cost) },
-              { lbl: "Net Profit",  val: fmt(grandL1.net), green: true },
-              { lbl: "Margin",      val: `${grandL1.revenue > 0 ? ((grandL1.net / grandL1.revenue) * 100).toFixed(1) : 0}%`, green: true },
-              { lbl: "Avg $/m²",    val: grandL1.bua > 0 ? `$${fmtN(grandL1.revenue / grandL1.bua, 0)}` : "—" },
-            ].map(s => (
-              <div key={s.lbl} className="flex items-center gap-1.5">
-                <span className="text-gray-400">{s.lbl}</span>
-                <span className={`font-bold tabular-nums ${s.green ? "text-emerald-700" : "text-gray-800"}`}>{s.val}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-          );
-        })()}
 
       </div>
     </div>
