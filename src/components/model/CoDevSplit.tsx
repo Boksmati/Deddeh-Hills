@@ -142,7 +142,7 @@ export function FundingSlider({ value, onChange }: { value: number; onChange: (v
 
 /* ── split card (full or compact), driven by per-typology lines ─ */
 export function CoDevSplitCard({
-  label, lines, fees, variant = "full", plots, units,
+  label, lines, fees, variant = "full", plots, units, showInsights = true,
 }: {
   label: string;
   lines: CoDevLine[];
@@ -150,6 +150,9 @@ export function CoDevSplitCard({
   variant?: "full" | "compact";
   plots?: number;
   units?: number;
+  /** Show the discount-vs-profit insight footer. Gated behind a passcode
+   *  toggle upstream — off by default when a real user viewer might see this screen. */
+  showInsights?: boolean;
 }) {
   const s = aggregateCoDevSplit(lines, fees.mgmtFeePct, fees.salesCommPct);
   const revenue = lines.reduce((a, l) => a + l.revenue, 0);
@@ -264,22 +267,24 @@ export function CoDevSplitCard({
         <Cell value={pct(annualizedByExit(s.hdCashROI, 3))} subtle tip={`(1 + ${pct(s.hdCashROI)})^(1/3) − 1`} />
       </div>
 
-      {/* insight footer */}
-      <div className={`px-4 py-2 text-[10px] border-t ${s.discountExceedsProfit ? "bg-red-50 border-red-100" : "bg-amber-50/60 border-amber-100"}`}>
-        <div className="flex items-center justify-between">
-          <span className="text-gray-600">Land discount you grant</span>
-          <span className="font-semibold tabular-nums text-gray-800">{usd(s.discountGiven)}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-gray-600">Your net profit</span>
-          <span className="font-semibold tabular-nums text-gray-800">{usd(s.mahmoudNet)}</span>
-        </div>
-        {s.discountExceedsProfit && (
-          <div className="mt-1 text-red-600 font-medium">
-            ⚠ The discount you give exceeds your profit — revisit the funding allocation.
+      {/* insight footer — private, gated behind the passcode toggle */}
+      {showInsights && (
+        <div className={`px-4 py-2 text-[10px] border-t ${s.discountExceedsProfit ? "bg-red-50 border-red-100" : "bg-amber-50/60 border-amber-100"}`}>
+          <div className="flex items-center justify-between">
+            <span className="text-gray-600">Land discount you grant</span>
+            <span className="font-semibold tabular-nums text-gray-800">{usd(s.discountGiven)}</span>
           </div>
-        )}
-      </div>
+          <div className="flex items-center justify-between">
+            <span className="text-gray-600">Your net profit</span>
+            <span className="font-semibold tabular-nums text-gray-800">{usd(s.mahmoudNet)}</span>
+          </div>
+          {s.discountExceedsProfit && (
+            <div className="mt-1 text-red-600 font-medium">
+              ⚠ The discount you give exceeds your profit — revisit the funding allocation.
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

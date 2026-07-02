@@ -785,7 +785,7 @@ function LandMapPricing({ lang, assignments, lotStatuses, landDiscount = DEFAULT
 }
 
 function PhaseCard({
-  phaseNum, lots, inputs, onInputChange, assignments, lotStatuses, lang, pricingMode, coDevFunding, coDevFees, onFunding, landDiscount,
+  phaseNum, lots, inputs, onInputChange, assignments, lotStatuses, lang, pricingMode, coDevFunding, coDevFees, onFunding, landDiscount, showInsights,
 }: {
   phaseNum: 1 | 2 | 3;
   lots: typeof LOTS;
@@ -799,6 +799,7 @@ function PhaseCard({
   coDevFees: CoDevFees;
   onFunding: (key: string, p: number) => void;
   landDiscount: number;
+  showInsights: boolean;
 }) {
   const ldPct = Math.round(landDiscount * 100);
   const [selectedLotIds, setSelectedLotIds] = useState<Set<number>>(new Set());
@@ -1063,6 +1064,7 @@ function PhaseCard({
             plots={totals.plots}
             units={totals.units}
             variant="full"
+            showInsights={showInsights}
           />
         </div>
 
@@ -1127,6 +1129,16 @@ export function ModelContent() {
   const [coDevFees, setCoDevFees] = useState<CoDevFees>({ mgmtFeePct: 0.05, salesCommPct: 0.025 });
   const setFunding = (key: string, p: number) => setCoDevFunding(f => ({ ...f, [key as TypologyKey]: p }));
   const setAllFunding = (p: number) => setCoDevFunding({ twin_villa: p, villa_2f: p, villa_3f: p, apartments: p });
+
+  // Private discount-vs-profit insight — hidden by default so it's never on
+  // screen accidentally; requires a passcode to reveal, no passcode to hide.
+  const [showInsights, setShowInsights] = useState(false);
+  const toggleInsights = () => {
+    if (showInsights) { setShowInsights(false); return; }
+    const code = prompt(lang === "ar" ? "أدخل الرمز لإظهار البيانات الخاصة" : "Enter passcode to reveal private insights");
+    if (code === "0852") setShowInsights(true);
+    else if (code !== null) alert(lang === "ar" ? "رمز غير صحيح" : "Incorrect passcode");
+  };
   const [phaseInputs, setPhaseInputs] = useState<Record<1 | 2 | 3, Record<TypologyKey, TypologyInputs>>>(defaultPhaseInputs);
 
   // Merge saved data with defaults (handles newly-added fields)
@@ -1380,6 +1392,23 @@ export function ModelContent() {
             {activeScenario === "default" && (
               <span className="text-[11px] text-amber-300/80 italic">Viewing locked baseline — switch to Working to edit</span>
             )}
+
+            <div className="flex-1" />
+
+            {/* Master toggle — private discount-vs-profit insight, passcode to reveal */}
+            <button
+              onClick={toggleInsights}
+              title={lang === "ar" ? "بيانات خاصة — بحاجة إلى رمز للإظهار" : "Private insight — passcode required to reveal"}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${
+                showInsights
+                  ? "bg-red-400/20 border border-red-400/40 text-red-200 hover:bg-red-400/30"
+                  : "bg-white/10 hover:bg-white/20 text-white/70 hover:text-white"
+              }`}
+            >
+              {showInsights
+                ? (lang === "ar" ? "🔓 إخفاء البيانات الخاصة" : "🔓 Hide private insight")
+                : (lang === "ar" ? "🔒 إظهار البيانات الخاصة" : "🔒 Show private insight")}
+            </button>
           </div>
         </div>
       </div>
@@ -1463,6 +1492,7 @@ export function ModelContent() {
           plots={grand.plots}
           units={grand.units}
           variant="full"
+          showInsights={showInsights}
         />
 
         {/* Phase 1, 2, 3 */}
@@ -1481,6 +1511,7 @@ export function ModelContent() {
             coDevFees={coDevFees}
             onFunding={setFunding}
             landDiscount={landDiscount}
+            showInsights={showInsights}
           />
         ))}
 
