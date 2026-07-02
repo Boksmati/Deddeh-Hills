@@ -6,15 +6,11 @@ import { LOTS } from "@/data/lots";
 import CustomerMap from "@/components/customer/CustomerMap";
 import { useTranslations } from "@/i18n/useTranslations";
 import type { DevelopmentType, Phase, LotAssignment } from "@/types";
-import type { LotPricing } from "@/lib/investment-layers";
-import LOT_PRICES_RAW from "@/data/lot-prices.json";
 import { getLotPricing } from "@/lib/lot-pricing";
 import { CoDevControls, CoDevSplitCard, AllocationPanel, FundingSlider, type CoDevFees, type TypologyAlloc } from "./CoDevSplit";
 import type { CoDevLine } from "@/lib/codev";
-
-const LOT_PRICES = LOT_PRICES_RAW as LotPricing[];
-// Build a lookup: lot ID → retail price per sqm from lot-prices.json
-const LOT_RETAIL_MAP = new Map(LOT_PRICES.map(lp => [lp.lot, lp.price_sqm]));
+import { PricingCalculator } from "./PricingCalculator";
+import { TYPOLOGY_KEYS, TYPOLOGY_META, type TypologyKey } from "@/data/typologies";
 
 /* ────────────────────────────────────────────────────────────
    TYPES & CONSTANTS
@@ -55,6 +51,10 @@ interface TypologyResult {
   grossProfitPerSqm: number;
   avgLandPriceSqm: number;
   landCost: number;
+  /** Undiscounted retail land value (Σ lot area × retail $/m²) — the true retail
+   *  figure, kept separate so downstream code never has to reconstruct it by
+   *  dividing landCost back through (1 - discount). */
+  retailLandCost: number;
   grossCostPerSqm: number;
   netProfitPerSqm: number;
   totalSellableArea: number;
@@ -80,15 +80,6 @@ interface TypologyResult {
   cashEquity: number;
 }
 
-type TypologyKey = "twin_villa" | "villa_2f" | "villa_3f" | "apartments";
-const TYPOLOGY_KEYS: TypologyKey[] = ["twin_villa", "villa_2f", "villa_3f", "apartments"];
-
-const TYPOLOGY_META: Record<TypologyKey, { label: string; labelAr: string; color: string }> = {
-  twin_villa: { label: "Twin Villa", labelAr: "فيلا مزدوجة", color: "#1E88E5" },
-  villa_2f:   { label: "Villa 2F",   labelAr: "فيلا طابقين", color: "#43A047" },
-  villa_3f:   { label: "Villa 3F",   labelAr: "فيلا 3 طوابق", color: "#F4511E" },
-  apartments: { label: "Apartments", labelAr: "شقق", color: "#FDD835" },
-};
 
 const DEFAULT_INPUTS: Record<TypologyKey, TypologyInputs> = {
   twin_villa: {
@@ -176,7 +167,7 @@ function calculateTypology(inputs: TypologyInputs, lots: typeof LOTS, pricingMod
       numPlots, totalArea, commonArea, netArea, footprint,
       regularFloorArea, jamalonArea, undergroundArea, totalBuiltArea,
       totalUnits: 0, unitsPerPlot: 0, villaFootprint: 0, lotPerVilla: 0, garden: 0,
-      potentialBUA: 0, avgUnitPrice: 0, grossProfitPerSqm: 0, avgLandPriceSqm, landCost,
+      potentialBUA: 0, avgUnitPrice: 0, grossProfitPerSqm: 0, avgLandPriceSqm, landCost, retailLandCost,
       grossCostPerSqm: 0, netProfitPerSqm: 0, totalSellableArea: 0, sellableAreaPerUnit: inputs.avgUnitSize,
       totalConstructionCost: 0, totalSales: 0, grossProfit: 0, netProfit: -landCost,
       effectiveSellingPrice: inputs.sellingPrice, sellingPriceMin: inputs.sellingPrice, sellingPriceMax: inputs.sellingPrice,
@@ -250,7 +241,7 @@ function calculateTypology(inputs: TypologyInputs, lots: typeof LOTS, pricingMod
     regularFloorArea, jamalonArea, undergroundArea, totalBuiltArea,
     potentialBUA,
     totalUnits, unitsPerPlot, villaFootprint, lotPerVilla, garden,
-    avgUnitPrice, grossProfitPerSqm, avgLandPriceSqm, landCost,
+    avgUnitPrice, grossProfitPerSqm, avgLandPriceSqm, landCost, retailLandCost,
     grossCostPerSqm, netProfitPerSqm, totalSellableArea, sellableAreaPerUnit,
     totalConstructionCost, totalSales, grossProfit, netProfit,
     effectiveSellingPrice, sellingPriceMin, sellingPriceMax,
@@ -578,7 +569,7 @@ function TypologySection({
                   landValue: result.landCost,
                   buildCost: result.totalConstructionCost,
                   revenue: result.totalSales,
-                  retailLandValue: result.landCost / (1 - landDiscount),
+                  retailLandValue: result.retailLandCost,
                   mahmoudConstrPct: coDevFunding,
                   equityPct: inputs.equityPct,
                 }]}
@@ -599,9 +590,10 @@ function TypologySection({
 
 function LotPricingCard({ lotId, lang, landDiscount = DEFAULT_LAND_DISCOUNT }: { lotId: number; lang: string; landDiscount?: number }) {
   const lot = LOTS.find(l => l.id === lotId);
+  const lotPriceOverrides = useSimulationStore(s => s.lotPriceOverrides);
   if (!lot) return null;
   const ldPct = Math.round(landDiscount * 100);
-  const retailSqm = LOT_RETAIL_MAP.get(lotId) ?? lot.zone_price_retail;
+  const retailSqm = getLotPricing(lotId, lotPriceOverrides).retail;
   const landSqm = retailSqm * (1 - landDiscount);
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-2.5 space-y-1.5">
@@ -636,6 +628,7 @@ function LandMapPricing({ lang, assignments, lotStatuses, landDiscount = DEFAULT
   landDiscount?: number;
 }) {
   const ldPct = Math.round(landDiscount * 100);
+  const lotPriceOverrides = useSimulationStore(s => s.lotPriceOverrides);
   const [phaseFilter, setPhaseFilter] = useState<"all" | 1 | 2 | 3>("all");
   const [selectedLotIds, setSelectedLotIds] = useState<Set<number>>(new Set());
   const [lassoMode, setLassoMode] = useState(false);
@@ -670,14 +663,14 @@ function LandMapPricing({ lang, assignments, lotStatuses, landDiscount = DEFAULT
     const lots = LOTS.filter(l => ids.has(l.id) && lotStatuses.get(l.id) !== "sold");
     if (lots.length === 0) return null;
     const totalArea = lots.reduce((s, l) => s + l.area_sqm, 0);
-    const weightedRetail = lots.reduce((s, l) => s + l.area_sqm * (LOT_RETAIL_MAP.get(l.id) ?? l.zone_price_retail), 0);
+    const weightedRetail = lots.reduce((s, l) => s + l.area_sqm * getLotPricing(l.id, lotPriceOverrides).retail, 0);
     const avgRetail = weightedRetail / totalArea;
     return {
       count: lots.length, totalArea, avgRetail,
       avgLand: avgRetail * (1 - landDiscount),
       isSelection: selectedLotIds.size > 0,
     };
-  }, [selectedLotIds, filteredLotIds, lotStatuses, landDiscount]);
+  }, [selectedLotIds, filteredLotIds, lotStatuses, landDiscount, lotPriceOverrides]);
 
   const fmtP = (n: number) => `$${n.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
 
@@ -1062,7 +1055,7 @@ function PhaseCard({
                 landValue: results[k].landCost,
                 buildCost: results[k].totalConstructionCost,
                 revenue: results[k].totalSales,
-                retailLandValue: results[k].landCost / (1 - landDiscount),
+                retailLandValue: results[k].retailLandCost,
                 mahmoudConstrPct: coDevFunding[k],
                 equityPct: inputs[k].equityPct,
               }))}
@@ -1280,11 +1273,11 @@ export function ModelContent() {
 
   // Per-typology aggregate across all phases
   const aggByTypology = useMemo(() => {
-    const acc: Record<TypologyKey, { plots: number; area: number; bua: number; units: number; revenue: number; cost: number; land: number; net: number }> = {
-      twin_villa:  { plots: 0, area: 0, bua: 0, units: 0, revenue: 0, cost: 0, land: 0, net: 0 },
-      villa_2f:    { plots: 0, area: 0, bua: 0, units: 0, revenue: 0, cost: 0, land: 0, net: 0 },
-      villa_3f:    { plots: 0, area: 0, bua: 0, units: 0, revenue: 0, cost: 0, land: 0, net: 0 },
-      apartments:  { plots: 0, area: 0, bua: 0, units: 0, revenue: 0, cost: 0, land: 0, net: 0 },
+    const acc: Record<TypologyKey, { plots: number; area: number; bua: number; units: number; revenue: number; cost: number; land: number; retailLand: number; net: number }> = {
+      twin_villa:  { plots: 0, area: 0, bua: 0, units: 0, revenue: 0, cost: 0, land: 0, retailLand: 0, net: 0 },
+      villa_2f:    { plots: 0, area: 0, bua: 0, units: 0, revenue: 0, cost: 0, land: 0, retailLand: 0, net: 0 },
+      villa_3f:    { plots: 0, area: 0, bua: 0, units: 0, revenue: 0, cost: 0, land: 0, retailLand: 0, net: 0 },
+      apartments:  { plots: 0, area: 0, bua: 0, units: 0, revenue: 0, cost: 0, land: 0, retailLand: 0, net: 0 },
     };
     for (const ph of [1, 2, 3] as const) {
       const phInputs = visibleInputs[ph];
@@ -1295,14 +1288,15 @@ export function ModelContent() {
       }
       for (const k of TYPOLOGY_KEYS) {
         const r = calculateTypology(phInputs[k], byType[k], pricingMode, landDiscount, lotPriceOverrides);
-        acc[k].plots   += r.numPlots;
-        acc[k].area    += r.totalArea;
-        acc[k].bua     += r.totalSellableArea;
-        acc[k].units   += r.totalUnits;
-        acc[k].revenue += r.totalSales;
-        acc[k].cost    += r.totalConstructionCost;
-        acc[k].land    += r.landCost;
-        acc[k].net     += r.netProfit;
+        acc[k].plots      += r.numPlots;
+        acc[k].area       += r.totalArea;
+        acc[k].bua        += r.totalSellableArea;
+        acc[k].units      += r.totalUnits;
+        acc[k].revenue    += r.totalSales;
+        acc[k].cost       += r.totalConstructionCost;
+        acc[k].land       += r.landCost;
+        acc[k].retailLand += r.retailLandCost;
+        acc[k].net        += r.netProfit;
       }
     }
     return acc;
@@ -1415,6 +1409,9 @@ export function ModelContent() {
           </div>
         </div>
 
+        {/* Per-lot pricing calculator — edits flow into every card below */}
+        <PricingCalculator lang={lang} assignments={assignments} lotStatuses={lotStatuses} />
+
         {/* Global land discount off retail */}
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 flex flex-wrap items-center gap-3">
           <div>
@@ -1458,7 +1455,7 @@ export function ModelContent() {
               landValue: aggByTypology[k].land,
               buildCost: aggByTypology[k].cost,
               revenue: aggByTypology[k].revenue,
-              retailLandValue: aggByTypology[k].land / (1 - landDiscount),
+              retailLandValue: aggByTypology[k].retailLand,
               mahmoudConstrPct: coDevFunding[k],
               equityPct: visibleInputs[1][k].equityPct,
             }))}
