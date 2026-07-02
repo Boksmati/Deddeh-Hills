@@ -10,6 +10,7 @@ import { getLotPricing } from "@/lib/lot-pricing";
 import { CoDevControls, CoDevSplitCard, AllocationPanel, FundingSlider, type CoDevFees, type TypologyAlloc } from "./CoDevSplit";
 import type { CoDevLine } from "@/lib/codev";
 import { PricingCalculator } from "./PricingCalculator";
+import { PasscodeModal } from "./PasscodeModal";
 import { TYPOLOGY_KEYS, TYPOLOGY_META, type TypologyKey } from "@/data/typologies";
 
 /* ────────────────────────────────────────────────────────────
@@ -1132,12 +1133,14 @@ export function ModelContent() {
 
   // Private discount-vs-profit insight — hidden by default so it's never on
   // screen accidentally; requires a passcode to reveal, no passcode to hide.
+  // Uses an in-app modal rather than window.prompt/alert — native dialogs are
+  // blocked or unreliable inside sandboxed preview iframes and some embedded
+  // browser views.
   const [showInsights, setShowInsights] = useState(false);
+  const [showPasscodeModal, setShowPasscodeModal] = useState(false);
   const toggleInsights = () => {
     if (showInsights) { setShowInsights(false); return; }
-    const code = prompt(lang === "ar" ? "أدخل الرمز لإظهار البيانات الخاصة" : "Enter passcode to reveal private insights");
-    if (code === "0852") setShowInsights(true);
-    else if (code !== null) alert(lang === "ar" ? "رمز غير صحيح" : "Incorrect passcode");
+    setShowPasscodeModal(true);
   };
   const [phaseInputs, setPhaseInputs] = useState<Record<1 | 2 | 3, Record<TypologyKey, TypologyInputs>>>(defaultPhaseInputs);
 
@@ -1328,6 +1331,14 @@ export function ModelContent() {
 
   return (
     <div style={{ background: "#F4F9EF" }}>
+      {showPasscodeModal && (
+        <PasscodeModal
+          lang={lang}
+          code="0852"
+          onSuccess={() => { setShowInsights(true); setShowPasscodeModal(false); }}
+          onClose={() => setShowPasscodeModal(false)}
+        />
+      )}
 
       {/* Hero */}
       <div className="bg-dh-dark text-white">
