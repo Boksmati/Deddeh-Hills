@@ -1398,16 +1398,16 @@ export function ModelContent() {
             {/* Master toggle — private discount-vs-profit insight, passcode to reveal */}
             <button
               onClick={toggleInsights}
-              title={lang === "ar" ? "بيانات خاصة — بحاجة إلى رمز للإظهار" : "Private insight — passcode required to reveal"}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${
+              title={showInsights
+                ? (lang === "ar" ? "إخفاء البيانات الخاصة" : "Hide private insight")
+                : (lang === "ar" ? "بيانات خاصة — بحاجة إلى رمز للإظهار" : "Private insight — passcode required to reveal")}
+              className={`flex items-center justify-center w-8 h-8 rounded-lg text-sm transition-colors ${
                 showInsights
                   ? "bg-red-400/20 border border-red-400/40 text-red-200 hover:bg-red-400/30"
                   : "bg-white/10 hover:bg-white/20 text-white/70 hover:text-white"
               }`}
             >
-              {showInsights
-                ? (lang === "ar" ? "🔓 إخفاء البيانات الخاصة" : "🔓 Hide private insight")
-                : (lang === "ar" ? "🔒 إظهار البيانات الخاصة" : "🔒 Show private insight")}
+              {showInsights ? "🔓" : "🔒"}
             </button>
           </div>
         </div>
